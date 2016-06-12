@@ -48,46 +48,50 @@
 %%% Basic information on the thesis
 
 % Thesis title in English (exactly as in the formal assignment)
-\def\ThesisTitle{Thesis title}
+\def\ThesisTitle{Software-based eye tracking}
 
 % Author of the thesis
-\def\ThesisAuthor{Name Surname}
+\def\ThesisAuthor{Adam Dominec}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{YEAR}
+\def\YearSubmitted{2016}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
 % or a full name of a department outside MFF)
-\def\Department{Name of the department}
+\def\Department{Department of Software and Computer Science Education}
 
 % Is it a department (katedra), or an institute (ústav)?
 \def\DeptType{Department}
 
 % Thesis supervisor: name, surname and titles
-\def\Supervisor{Supervisor's Name}
+\def\Supervisor{RNDr. Barbara Zitová, Ph.D.}
 
 % Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{department}
+\def\SupervisorsDepartment{Institute of Information Theory and Automation, Czech Academy of Science}
 
 % Study programme and specialization
-\def\StudyProgramme{study programme}
-\def\StudyBranch{study branch}
+\def\StudyProgramme{Computer Science}
+\def\StudyBranch{Software Systems}
 
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, a person who lent the software, etc.)
 \def\Dedication{%
-Dedication.
+I could not finish this work without the help of many people.
+But most of all, Samy is my hero!
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Abstract.
+This thesis presents a software library for eye gaze tracking.
+The typical use case is a person watching their computer screen.
+All data is obtained from a single video camera and is processed in real time.
+The resulting software is freely available including source code.
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces
 \def\Keywords{%
-{key} {words}
+{face tracking} {gaze tracking} {image analysis}
 }
 
 %% The hyperref package for clickable links in PDF and also for storing
@@ -97,7 +101,7 @@ Abstract.
 \hypersetup{pdftitle={\ThesisTitle}}
 \hypersetup{pdfauthor={\ThesisAuthor}}
 \hypersetup{pdfkeywords=\Keywords}
-\hypersetup{urlcolor=blue}
+\hypersetup{colorlinks=false, pdfborder={0 0 0}}
 
 % Definitions of macros (see description inside)
 \include{macros}
@@ -112,20 +116,13 @@ Abstract.
 
 %%% Each chapter is kept in a separate file
 \include{preface}
-\include{chap01}
-\include{chap02}
+\include{modeling}
+\include{implementation}
 
 \include{epilog}
 
 %%% Bibliography
 \include{bibliography}
-
-%%% Figures used in the thesis (consider if this is needed)
-\listoffigures
-
-%%% Tables used in the thesis (consider if this is needed)
-%%% In mathematical theses, it could be better to move the list of tables to the beginning of the thesis.
-\listoftables
 
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.

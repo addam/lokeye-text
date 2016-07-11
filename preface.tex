@@ -1,7 +1,44 @@
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
-The objective of this software is to track gaze.
-In order to simplify the deployment as much as possible, only a single video camera is assumed on the hardware side.
+\chapter{Introduction}
 
-\section*{Related Work}
-A lot!
+The main idea behind this program is to view human eye as a means of communication.
+It is rather intuitive for us to recognize other people's gaze just by looking at their face thanks to high contrast coloring of the eye itself.
+The corresponding brain circuitry develops early in infants (@cite) and is equivalent among individuals.
+This seems to be an evidence of evolutionary purpose, that the human eye is built in a way so as to display the gaze clearly.
+Therefore it should be possible for a computer to estimate gaze from the data us humans have available, that is, a color image.
+
+Thanks to the fact that almost every laptop computer or cell phone is now equipped with a video camera, the hardware requirements of this software should be easy to satisfy.
+If applications are built on top of this program, minimal hardware requirements like this allow them to be used almost immediately upon download and completely for free.
+
+Eye trackers can actually be used for communication, namely for human-computer interaction.
+Wide variety of algorithms have been proposed (@cite) for on-screen keyboard and general desktop control.
+The user's center of attention can also serve as a cue for adaptive rendering in video games because the rest of the screen need not be displayed in full detail.
+Possible applications in gaze tracking in cell phones are a vast topic, such as locking the screen when not looked at or displaying a note when somebody looks over your shoulder.
+
+\section{History}
+
+Perhaps a more appropriate heading of this section would be \textit{Unrelated Work}.
+Indeed, before we get to the overview of our software competitors, we should shortly review past research of gaze tracking in general.
+Its history spans half a century before the computer era.
+
+The interest in eye tracking originates in the field of psychology.
+Gaze designates the focus of attention of the subject, which in turn can tell much about ongoing cognitive processes.
+Furthermore, eye movement itself is the result of a rather complex neural system; nowadays, it is perhaps the best studied part of human cognition.
+
+In order to record data with reasonable precision, sophisticated mechanical structures were often built around the subject's head.
+Eye movement was then measured either directly from an object attached to the eye, or indirectly from small displacements in the eye region.
+An especially precise technique was developed by Yarbus in 1954 and requires to stick a mirror to the surface of the eye using a small suction cup.\footnote{The article is not cited here because it has been published only in Russian and does not seem generally available.}
+Eye movement can then be recorded directly on a piece of photographic film.
+
+A method known as \textit{electrooculography} provides a less invasive alternative.
+There is a constant voltage gradient across the eye from back to front, in magnitude of about 1 mV.
+Rotation of this small dipole is measurable, so it is possible to almost directly measure the speed at which the eye moves.
+The advantage gained is temporal resolution: this method allows to draw a graph of angle against time.
+However, the actual direction is an integral of the measured value, and therefore tends to deteriorate and spatial resolution is generally poor.
+
+Details on other purely analog methods such as this can be found in a 1967 book by Yarbus \cite{yarbus1967}.
+The various methods suggested for eye tracking since the end of 19th century can be seen as a story of human curiosity and a proof of the effort directed towards this area.
+
+\section{Related Work}
+
+Rapid development of computers and digital video cameras removed most of the hardware constraints mentioned so far.
+

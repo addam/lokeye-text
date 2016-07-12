@@ -13,34 +13,37 @@ A technique called Direct Linear Transformation is widely used to overcome this 
 
 \subsection{Direct Linear Transformation}
 
-Projective correspondences of the form $\matH \matx^i = \alpha_i \matp^i$ do not form a linear system of equations with respect to unknown matrix $\matH$ because there is an unknown scale factor $\alpha_i$ involved in each equation.
+We are presented with a set projective correspondences of the form
+$$\matH \matx^k = \alpha_k \matp^k, 1 \leq k \leq K.$$
+Unfortunately, these equations do not form a linear system with respect to the unknown matrix $\matH$ because there is an unknown scale factor $\alpha_i$ involved in each equation.
 Differences among the scale factors make up the perspective part of the homography, so although they can make the problem numerically unstable, we cannot impose any limits on these values.
 The core idea of Direct Linear Transformation is to find a set of vectors that must be orthogonal to the solution, and then solve the resulting homogeneous system.
 
-Let us define a set of antisymmetric matrices $\{\matM^{i, j} \in \R^{N \times N}\}$, $1 \leq i < j \leq N$, each having only two nonzero elements:
+Let us define a set of antisymmetric matrices $\{\matM^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
 $$\matM^{i, j}_{i, j} = 1,
 \matM^{i, j}_{j, i} = -1.$$
-From this definition it follows that for any $p \in \R^N$, the product $\matp\T \matM^{i, j} \matp = 1 \cdot \matp_{i} \cdot \matp_{j} - 1 \cdot \matp_{j} \cdot \matp{i} = 0$.
-This method clearly produces a set of vectors orthogonal to any given $\matp$, namely $\matp\T \matM^{i, j}$ for $1 \leq i < j \leq N$.
+From this definition it follows that for any $\matp \in \R^n$, the product $\matp\T \matM^{i, j} \matp = \matp_{i} \matp_{j} - \matp_{j} \matp_{i} = 0$.
+The vectors $\left\{ \matM^{i, j} \matp \right\}, 1 \leq i < j \leq n$, are all orthogonal to a given $\matp \in \R^n$.
 
 With increasing dimension, this set of vectors becomes heavily redundant.
-Clearly, a minimal solution would form a basis of the subspace $\R^N / \matp$ orthogonal to $\matp$ and thus would consist of $N - 1$ vectors, whereas this approach generates $\frac {1} {2} N \cdot (N - 1)$ vectors.
-Some sources\cite{MVG} suggest to pick an arbitrary subset of size $N - 1$ from the matrices defined above and use these for the whole data set.
-A more proper solution is to select these matrices specifically for each correspondence pair $\matx^i \leftrightarrow \matp^i$ so as to avoid possible degeneracies.
-In particular, we find the largest vector element $p_k$ (in absolute value) and then select all matrices $\matM^{i, j}$ such that $i = k$ or $j = k$.
-As can be easily verified, all vectors generated this way are linearly independent as long as $\matp \neq 0$.
-\todo{prove it.}
+Clearly, a minimal solution would form a basis of the subspace $\R^n / \matp$ orthogonal to $\matp$ and thus would consist of $n - 1$ vectors, whereas this approach generates $\frac {1} {2} n \cdot (n - 1)$ vectors.
+Some sources\cite{MVG} suggest to pick an arbitrary subset of size $n - 1$ from the matrices defined above and use these for the whole data set.
+A more proper solution is to select these matrices specifically for each correspondence pair $\matx^k \leftrightarrow \matp^k$ so as to avoid possible degeneracies.
+In particular, we find the largest vector element $\matp_l$ (in absolute value) and then select all matrices $\matM^{i, j}$ such that $i = l$ or $j = l$.
+Each of the vectors generated this way contains the value of $\matp_l$ at a different position (i.e., different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \matp$.
 
 Now we can formulate the linear system.
-It will consist of $(N - 1) \cdot K$ equations, where $N$ is the dimension of $\mat{p}^i$ and $K$ is the number of correspondence pairs $\matx^i \leftrightarrow \matp^i$.
-Its unknowns will be solely the elements of the matrix $\matH$.
-Each equation of the system represents a constraint of the form $\matp\T \matM^{i, j} \matH \matx = 0$, which is exactly the orthogonality constraint as proposed above.
+It will consist of $(n - 1) \cdot K$ equations, $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
+Its unknowns will be precisely the elements of the matrix $\matH$.
+Each equation of the system represents a constraint of the form $\matp\T \matM \matH \matx = 0$, which is the orthogonality constraint as proposed above.
 This constraint can be reformulated in terms of the Frobenius inner product $\langle \matA, \matB \rangle_F = \sum_{i, j} \matA_{i, j} \cdot \matB_{i, j}$ and the vector outer product as follows:
-$$\matp\T \matM^{i, j} \matH \matx = \sum_{k, l} (\matp\T \matM^{i, j})_k \matH_{k, l} \matx_l = \sum_{k, l} \left( (\matp\T \matM^{i, j})_k \matx_l \right) \matH_{k, l} = \langle \matp\T \matM^{i, j} \matx_l\T, \matH \rangle_F = 0.$$
+$$\matp\T \matM \matH \matx = \sum_{i, j} (\matp\T \matM)_i \matH_{i, j} \matx_j = \langle \matp\T \matM \matx\T, \matH \rangle_F = 0.$$
 Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form:
-$$vec(\matp\T \matM^{i, j} \matx_l\T)\T \cdot vec(\matH) = 0,$$
-where $vec(\matA \in \R^{m \times n}) \in \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
+$$\vec (\matp\T \matM \matx\T)\T \cdot \vec(\matH) = 0,$$
+where $\vec : \R^{m \times n} \rightarrow \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
+Each correspondence pair and each selected antisymmetric matrix $\matM^{i, j}$ for that pair provide one such equation, and the row vectors $\vec ({\matp^k}\T \matM^{i, j} {\matx^k}\T)\T$ can be stacked to form the system matrix.
 
-Homogeneous linear systems can be solved using the Singular Value Decomposition (SVD).
-However, if the input vectors are degenerate and only span a subspace of $R^M$, there are multiple solutions and not all of them are proper solutions of the original equation $\matH \matx^i = \alpha_i \matp^i$.
-In particular, it is possible that \todo{what?}
+Homogeneous linear systems such as this one can be solved using the Singular Value Decomposition (SVD).
+However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\matH \matx^k = \alpha_k \matp^k$.
+In particular, it is possible that a solution will produce points at infinity, meaning that $\matp_n \approx 0$ and that the Cartesian counterpart of $\matp$ is undefined.
+Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.

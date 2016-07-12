@@ -1,3 +1,7 @@
+\chapter{Solving}
+
+This chapter provides mathematical methods for solving the problems presented so far.
+
 \section{Projective fitting}
 
 The correspondence between measured values and the appropriate results is assumed to be a homography.
@@ -9,34 +13,34 @@ A technique called Direct Linear Transformation is widely used to overcome this 
 
 \subsection{Direct Linear Transformation}
 
-Projective correspondences of the form $\mathbf H \mathbf x^i = \alpha_i \mathbf p^i$ do not form a linear system of equations with respect to unknown matrix $A$ because there is an unknown scale factor $\alpha$ involved.
+Projective correspondences of the form $\matH \matx^i = \alpha_i \matp^i$ do not form a linear system of equations with respect to unknown matrix $\matH$ because there is an unknown scale factor $\alpha_i$ involved in each equation.
 Differences among the scale factors make up the perspective part of the homography, so although they can make the problem numerically unstable, we cannot impose any limits on these values.
 The core idea of Direct Linear Transformation is to find a set of vectors that must be orthogonal to the solution, and then solve the resulting homogeneous system.
 
-Let us define a set of antisymmetric matrices $\{M^{i, j} \in R^{N \times N}\}$, $1 \leq i < j \leq N$, each having only two nonzero elements:
-$$M^{i, j}_{i, j} = 1,
-M^{i, j}_{j, i} = -1.$$
-From this definition it follows that for any $p \in R^N$, the product $p^T M^{i, j} p = 1 \cdot p_{i} \cdot p_{j} - 1 \cdot p_{j} \cdot p{i} = 0$.
-This method clearly produces a set of vectors orthogonal to any given $p$, namely $p^T M^{i, j}$ for $1 \leq i < j \leq N$.
+Let us define a set of antisymmetric matrices $\{\matM^{i, j} \in \R^{N \times N}\}$, $1 \leq i < j \leq N$, each having only two nonzero elements:
+$$\matM^{i, j}_{i, j} = 1,
+\matM^{i, j}_{j, i} = -1.$$
+From this definition it follows that for any $p \in \R^N$, the product $\matp\T \matM^{i, j} \matp = 1 \cdot \matp_{i} \cdot \matp_{j} - 1 \cdot \matp_{j} \cdot \matp{i} = 0$.
+This method clearly produces a set of vectors orthogonal to any given $\matp$, namely $\matp\T \matM^{i, j}$ for $1 \leq i < j \leq N$.
 
 With increasing dimension, this set of vectors becomes heavily redundant.
-Clearly, a minimal solution would form a basis of the quotient space $R^N / p$ and thus would consist of $N - 1$ vectors, whereas this approach generates $\frac {1} {2} N \cdot (N - 1)$ vectors.
+Clearly, a minimal solution would form a basis of the subspace $\R^N / \matp$ orthogonal to $\matp$ and thus would consist of $N - 1$ vectors, whereas this approach generates $\frac {1} {2} N \cdot (N - 1)$ vectors.
 Some sources\cite{MVG} suggest to pick an arbitrary subset of size $N - 1$ from the matrices defined above and use these for the whole data set.
-A more proper solution is to select these matrices specifically for each correspondence pair $x^i \leftrightarrow p^i$ so as to avoid possible degeneracies.
-In particular, we find the largest vector element $p_k$ (in absolute value) and then select all matrices $M^{i, j}$ such that $i = k$ or $j = k$.
-As can be easily verified, all vectors generated this way are linearly independent as long as $p \neq 0$.
+A more proper solution is to select these matrices specifically for each correspondence pair $\matx^i \leftrightarrow \matp^i$ so as to avoid possible degeneracies.
+In particular, we find the largest vector element $p_k$ (in absolute value) and then select all matrices $\matM^{i, j}$ such that $i = k$ or $j = k$.
+As can be easily verified, all vectors generated this way are linearly independent as long as $\matp \neq 0$.
 \todo{prove it.}
 
 Now we can formulate the linear system.
-It will consist of $(N - 1) \cdot K$ equations, where $N$ is the dimension of $p^i$ and $K$ is the number of correspondence pairs $x^i \leftrightarrow p^i$.
-Its unknowns will be solely the elements of the matrix $H$.
-Each equation of the system represents a constraint of the form $p^T M^{i, j} H x = 0$, which is exactly the orthogonality constraint as proposed above.
-This constraint can be reformulated in terms of the Frobenius inner product $<A, B>_F = \sum_{i, j} A_{i, j} \cdot B_{i, j}$ and the vector outer product as follows:
-$$p^T M^{i, j} H x = \sum_{k, l} (p^T M^{i, j})_k H_{k, l} x_l = \sum_{k, l} \left( (p^T M^{i, j})_k x_l \right) H_{k, l} = <p^T m^{i, j} x_l^T, H>_F = 0$$.
+It will consist of $(N - 1) \cdot K$ equations, where $N$ is the dimension of $\mat{p}^i$ and $K$ is the number of correspondence pairs $\matx^i \leftrightarrow \matp^i$.
+Its unknowns will be solely the elements of the matrix $\matH$.
+Each equation of the system represents a constraint of the form $\matp\T \matM^{i, j} \matH \matx = 0$, which is exactly the orthogonality constraint as proposed above.
+This constraint can be reformulated in terms of the Frobenius inner product $\langle \matA, \matB \rangle_F = \sum_{i, j} \matA_{i, j} \cdot \matB_{i, j}$ and the vector outer product as follows:
+$$\matp\T \matM^{i, j} \matH \matx = \sum_{k, l} (\matp\T \matM^{i, j})_k \matH_{k, l} \matx_l = \sum_{k, l} \left( (\matp\T \matM^{i, j})_k \matx_l \right) \matH_{k, l} = \langle \matp\T \matM^{i, j} \matx_l\T, \matH \rangle_F = 0.$$
 Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form:
-$$vec(p^T m^{i, j} x_l^T)^T \cdot vec(H) = 0$$,
-where $vec(A \in R^{m \times n}) \in R^{mn}$ stacks all matrix elements to a vector, in row-major order.
+$$vec(\matp\T \matM^{i, j} \matx_l\T)\T \cdot vec(\matH) = 0,$$
+where $vec(\matA \in \R^{m \times n}) \in \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
 
 Homogeneous linear systems can be solved using the Singular Value Decomposition (SVD).
-However, if the input vectors are degenerate and only span a subspace of $R^M$, there are multiple solutions and not all of them are proper solutions of the original equation $H x^i = \alpha_i p^i$.
+However, if the input vectors are degenerate and only span a subspace of $R^M$, there are multiple solutions and not all of them are proper solutions of the original equation $\matH \matx^i = \alpha_i \matp^i$.
 In particular, it is possible that \todo{what?}

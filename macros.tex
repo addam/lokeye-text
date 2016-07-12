@@ -72,7 +72,7 @@
 \DeclareMathOperator{\sd}{\textrm{sd}}
 
 %%% Transposition of a vector/matrix
-\newcommand{\T}[1]{#1^\top}
+\def\T{^{\!\mathsf{T}}}
 
 %%% Various math goodies
 \newcommand{\goto}{\rightarrow}
@@ -86,6 +86,13 @@
 \newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
 
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\matp}{\mathbf{p}}
+\newcommand{\matx}{\mathbf{x}}
+\newcommand{\matM}{\mathbf{M}}
+\newcommand{\matH}{\mathbf{H}}
+\newcommand{\matA}{\mathbf{A}}
+\newcommand{\matB}{\mathbf{B}}
 % TODO pred odevzdanim prace je nutne zkontrolovat, ze toto makro se uz v textu nevyskytuje
 \newcommand\todo[1]{(\textit{\underline{TODO:} #1})}
 \newcommand\done[1]{}

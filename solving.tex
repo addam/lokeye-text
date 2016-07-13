@@ -33,7 +33,7 @@ In particular, we find the largest vector element $\matp_l$ (in absolute value) 
 Each of the vectors generated this way contains the value of $\matp_l$ at a different position (i.e., different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \matp$.
 
 Now we can formulate the linear system.
-It will consist of $(n - 1) \cdot K$ equations, $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
+It will consist of $K \cdot (n - 1)$ equations, $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
 Its unknowns will be precisely the elements of the matrix $\matH$.
 Each equation of the system represents a constraint of the form $\matp\T \matM \matH \matx = 0$, which is the orthogonality constraint as proposed above.
 This constraint can be reformulated in terms of the Frobenius inner product $\langle \matA, \matB \rangle_F = \sum_{i, j} \matA_{i, j} \cdot \matB_{i, j}$ and the vector outer product as follows:
@@ -43,7 +43,15 @@ $$\vec (\matp\T \matM \matx\T)\T \cdot \vec(\matH) = 0,$$
 where $\vec : \R^{m \times n} \rightarrow \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
 Each correspondence pair and each selected antisymmetric matrix $\matM^{i, j}$ for that pair provide one such equation, and the row vectors $\vec ({\matp^k}\T \matM^{i, j} {\matx^k}\T)\T$ can be stacked to form the system matrix.
 
+\subsection{Singular Value Decomposition}
+
 Homogeneous linear systems such as this one can be solved using the Singular Value Decomposition (SVD).
+
+
 However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\matH \matx^k = \alpha_k \matp^k$.
 In particular, it is possible that a solution will produce points at infinity, meaning that $\matp_n \approx 0$ and that the Cartesian counterpart of $\matp$ is undefined.
 Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.
+
+The system matrix in our case is of shape $K \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
+
+\subsection{Nonlinear optimization}

@@ -26,7 +26,10 @@ Furthermore, eye movement itself is the result of a rather complex neural system
 
 In order to record data with reasonable precision, sophisticated mechanical structures were often built around the subject's head.
 Eye movement was then measured either directly from an object attached to the eye, or indirectly from small displacements in the eye region.
-An especially precise technique was developed by Yarbus in 1954 and requires to stick a mirror to the surface of the eye using a small suction cup.\footnote{The article is not cited here because it has been published only in Russian and does not seem generally available.}
+An especially precise technique was developed by Yarbus in 1954 and requires to stick a mirror to the surface of the eye using a small suction cup.\footnote{
+The article is not cited here because it has been published only in Russian and does not seem generally available.
+However, Yarbus provides details on the method in \cite{yarbus1967}.
+}
 Eye movement can then be recorded directly on a piece of photographic film.
 
 A method known as \textit{electrooculography} provides a less invasive alternative.
@@ -36,9 +39,42 @@ The advantage gained is temporal resolution: this method allows to draw a graph 
 However, the actual direction is an integral of the measured value, and therefore tends to deteriorate and spatial resolution is generally poor.
 
 Details on other purely analog methods such as this can be found in a 1967 book by Yarbus \cite{yarbus1967}.
-The various methods suggested for eye tracking since the end of 19th century can be seen as a story of human curiosity and a proof of the effort directed towards this area.
+The various methods suggested for eye tracking since the end of 19th century are a story of human curiosity and can be seen as a proof of the effort directed towards this area.
 
 \section{Related Work}
 
-Rapid development of computers and digital video cameras removed most of the hardware constraints mentioned so far.
+Rapid development of computers and digital video cameras has removed most of the hardware constraints mentioned so far.
+The demand for non-intrusive gaze tracking is high in many branches of science; for example, it is obvious that the results of a psychological experiment can greatly vary with emotional influence of the environment.
+Letting the subject move their head without constraints, invariance against head pose becomes a serious challenge.
+Head pose estimation and gaze tracking are typically handled as two separate tasks to be performed in series.
+Few approaches are able to encompass the both tasks within a single model.
 
+Many substantially different approaches have been suggested for head pose estimation, and there seems to be no consensus so far.
+The tracker by Kanade, Lucas and Tomasi(@cite) is based on matching a template image using gradient descent optimization and can be considered the cornerstone of object tracking.
+The original paper describes tracking a rectangular grayscale template by horizontal and vertical shift.
+We should note here that such a problem can efficiently be solved on global scale by normalized cross-correlation and the Fast Fourier Transform.
+However, there have been numerous generalizations of this concept to a broader class of motion models such as affine(@cite) or perspective(@cite) transformations where global optimization is not feasible.
+
+An especially sophisticated motion model are the Adaptive Appearance Models(@cite) (AAMs).
+A planar mesh is overlaid on the object, subdividing the template image into polygon-shaped cells.
+Each of the cells is able to stretch its cut-out image part when its vertices are displaced.
+All vertices of the mesh can be displaced separately, and they are essentially the parameter models to be optimized.
+The degrees of freedom of this model can be customized to application needs, so that the method will handle either rigid or soft-body transformations gracefully.
+
+Purely geometric image transformations have poor invariance to changes in lighting, so they are well combined with element-wise transformations.
+A simple option is to acquire multiple templates of the object in question, and either just select the best candidate for each input image, or allow their arbitrary linear combinations.(@cite)
+If the amount of training data grows large, more efficient and robust schemes are necessary.
+The template images can be arranged in a search structure (\dots)
+Instead of single images, linear subspaces can be taken into account using Principal Component Analysis---an approach widely known as Eigenfaces(@cite).
+(\dots)
+
+Eye tracking is rather a simple task once the head pose is known.
+Much research relies on the fact that both human iris and pupil are circles, so their camera projection is always an ellipse.
+When the gaze direction is reasonably bounded, these projected shapes can safely be considered to remain circular(@cite).
+The generalized Hough transform(@cite) provides a global method of searching for circles with one-pixel precision.
+In many applications(@cite), this is enough.
+
+It is possible and sometimes more robust to use an appearance-based method (\dots)
+
+Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on the outside and from the inside.
+In near infrared light, (...)

@@ -114,6 +114,8 @@ $$\mat{R} \cdot \matC \sim \begin{pmatrix}
  \end{pmatrix}.$$
 This particular choice is also pleasant from a numeric point of view, because $\mathrm{det}(\mat{R}) = 1$ and therefore also $\mat{R}^4 = \mat{I}_3$, the identity matrix.
 
+We observe that $\mathrm{dec}(\mat{a}, \mat{b}, \mat{c}, \mat{d}) \cdot \matC \sim \mathrm{dec}(\mat{d}, \mat{a}, \mat{b}, \mat{c}) \cdot \mat{R} \cdot \matC$ and because four points define the homography matrix (up to scale), we can safely conclude that $\mathrm{dec}(\mat{a}, \mat{b}, \mat{c}, \mat{d}) = \mathrm{dec}(\mat{d}, \mat{a}, \mat{b}, \mat{c}) \cdot \mat{R}$.
+
 \subsection{Derivatives of a homography}
 
 We wish to calculate the derivative of a four-point homography with respect to the coordinates of its four control points.

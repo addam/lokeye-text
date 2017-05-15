@@ -1,0 +1,54 @@
+\chapter{Modeling}
+
+In this section, design decisions behind all the necessary concepts are presented.
+Many of them are deliberate, but all are based on solid theory or measurements.
+
+\section{Eye}
+\subsection{Eye Shape}
+
+Throughout the literature, eye is modeled either as a sphere, or with an extra spherical section for the cornea.
+Some sources also model the eyelids.
+
+Sclera is white and pupil is black.
+Cornea is something in between.
+
+\subsection{Eye Movement}
+
+Eye can rotate in all three degrees of freedom, in fact.
+
+Donder's Law is important here because of the view axis offset from the optical axis.
+Theoretically, position of the pupil might on its own not be sufficient to calculate gaze precisely.
+That is not the case.
+
+\section{Face}
+\subsection{Face Appearance}
+\subsection{Face Movement}
+Human face consists of many muscles.
+Like the pupil, they mainly serve for communication.
+Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
+
+\section{Gaze}
+
+Under the assumption of small angle divergence, we can model movement of the pupil as simple translation.
+
+Given the eye--face offset, onscreen gaze center is assumed to be a homography.
+This saves us from explicitly modeling the viewed scene.
+The non-linear factor is quite huge, unfortunately.
+
+\section{Image}
+The image as acquired from the camera is assumed to be a rectangular grid of colored points.
+However, certain parts of the computation require a continuous image model in order to obtain sub-pixel precision.
+This problem has three solutions in general:
+
+\begin{itemize}
+\item Use simple interpolation and ignore the inaccuracy induced.
+This is the approach applied in this thesis.
+
+\item Use simple interpolation on a blurred image so that the inaccuracy disappears.
+This is the solution implicitly used by many software libraries.
+
+\item Interpolate using a sophisticated function.
+Surprisingly enough, commonly used interpolation functions are not suitable for a precise model.
+
+\end{itemize}
+

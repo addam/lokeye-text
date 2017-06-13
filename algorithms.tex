@@ -1,6 +1,6 @@
-\chapter{Solving}
+\chapter{Algorithms}
 
-This chapter provides mathematical methods for solving the problems presented so far.
+This chapter provides mathematical and  methods for problems to be presented in the next section.
 
 \section{Projective fitting}
 
@@ -33,7 +33,7 @@ In particular, we find the largest vector element $\matp_l$ (in absolute value) 
 Each of the vectors generated this way contains the value of $\matp_l$ at a different position (i.e., different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \matp$.
 
 Now we can formulate the linear system.
-It will consist of $K \cdot (n - 1)$ equations, $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
+It will consist of $K \cdot (n - 1)$ equations, where $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
 Its unknowns will be precisely the elements of the matrix $\matH$.
 Each equation of the system represents a constraint of the form $\matp\T \matM \matH \matx = 0$, which is the orthogonality constraint as proposed above.
 This constraint can be reformulated in terms of the Frobenius inner product $\langle \matA, \matB \rangle_F = \sum_{i, j} \matA_{i, j} \cdot \matB_{i, j}$ and the vector outer product as follows:
@@ -127,3 +127,7 @@ $$\frac{\partial} {\partial \mat{c}_i} \mathrm{dec}(\matA) \sim \frac{\partial} 
 \todo{I'm not exactly sure if the permutation works this way or the other.}
 The remaining two points $\mat{a}, \mat{b}$ are obtained by iteration of this scheme.
 The scale factors are important and need to be calculated, too.
+
+\section{Convolution}
+
+\subsection{Normalized Cross-Correlation}

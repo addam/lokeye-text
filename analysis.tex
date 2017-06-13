@@ -1,0 +1,116 @@
+\chapter{Problem Analysis}
+
+This chapter provides a thorough analysis of available data from the camera and the objects displayed therein.
+We discuss the anatomy of human face and eyes in particular, and all relevant technical details about commonly used web cameras.
+
+\section{Face}
+
+Human face consists of many muscles.
+Like the pupil, they mainly serve for communication.
+Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
+
+\section{Eye}
+\subsection{Eye Anatomy}
+
+The eyeball consists of several parts, most notably:
+\begin{itemize}
+\item Transparent cornea, which makes a fixed lens and provides some mechanical protection
+\item Flexible and reflective iris
+\item Flexible lens stretched by several muscles to control its optical magnitude
+\item Purely white sclera, which serves as a hard shell of the eyeball
+\item The vitreous body, consisting mostly of transparent gel to maintain inner pressure
+\item The light-sensitive retina
+\end{itemize}
+
+Throughout the literature, eye is modeled either as a sphere, or with an extra spherical section for the cornea.
+Some sources also model the eyelids.
+
+Sclera is white and pupil is black.
+Iris is something in between.
+The iris diameter remains constant but the pupil diameter can change dramatically.
+
+In a healthy case, the inner and outer boundary of the iris (the pupil and the limbus, respectively) should have a precisely circular shape.
+There are many reasons why 
+
+\subsection{Eye Movement}
+
+Human eyes have developed not only as an organ of sight, but also as a means of communication.
+When attending to an object or another person, people will usually turn their eyes directly towards it.
+
+The main reason of this is that the overall acuity of our visual system increases towards an area near the optical axis; the corresponding spot on the retina is called the fovea.
+
+Eye can rotate in all three degrees of freedom, in fact.
+
+Donder's Law is important here because of the view axis offset from the optical axis.
+Theoretically, position of the pupil might on its own not be sufficient to calculate gaze precisely.
+That is not the case.
+
+\section{Gaze}
+
+Under the assumption of small angle divergence, we can model movement of the pupil as a simple translation.
+
+Given the eye--face offset, onscreen gaze center is assumed to be a homography.
+This saves us from explicitly modeling the viewed scene.
+The non-linear factor is quite huge, unfortunately.
+
+\section{Camera}
+
+A suitable yet very simple mathematical model of a video camera is the pinhole camera.
+Light rays passing through a certain point in space (figuratively, the pinhole) are projected onto an image plane.
+The axis of symmetry of this system is called the optical axis, and the intersection of the optical axis with the image plane is assumed to be the origin point in image coordinates.
+
+Real-world cameras can suffer from many kinds of degeneracies off this model:
+
+\begin{itemize}
+
+\item
+Imprecise manufacturing.
+The image origin point may be offset from the optical axis.
+The sensor may be stretched and skewed, so that orthonormal vectors in image plane are not always sensed as orthonormal.
+
+\item
+Blur.
+Refractive lens are usually inserted into the optical path so that light need not pass through an infinitely small pinhole, but rather though a small disc.
+This approach results in that only light rays originating from a certain surface in the scene, known as the focal plane, are properly projected onto the image plane.
+Points from a plane parallel with the focal plane will be displayed as if convolved with a disc kernel; the radius increases with the parallel distance from the focal plane, and the shape is mostly a projection of the camera iris.
+
+The lens may be dirty or otherwise bad, which casues a slight and uniform foggy blur.
+
+In very small cameras with relatively high resolution, the wave nature of light may cause additional blur @cite.
+The most notable of these issues is diffraction at edges of the iris.
+
+\item
+Lens aberration.
+The lens itself is a thick solid object and therefore can never fulfill its physical model perfectly.
+The nonlinear effect usually manifests itself by stretching sensed points in or out relatively to the image origin point.
+If carefully measured, this geometrical transformation within the image plane can be very well cancelled.
+
+Because the refractive index of materials varies with wavelength (this fact is known as dispersion), the nonlinearities are also wavelength dependent.
+There are software tools to reduce percieved color aberration, but this problem is under-determined and can never be solved exactly.
+A proper solution would require to densely sample the spectrum at each image point but we only have three values roughly corresponding to red, green and blue.
+
+These effects are often well compensated in high-end cameras by sophistication of the optical system.
+On the other hand, they also decrease with the lens size, and cameras with a narrow or almost closed iris can be fairly well aproximated as pinhole cameras.
+
+\item
+Moiré.
+
+\end{itemize}
+
+\section{Image}
+The image as acquired from the camera is assumed to be a rectangular grid of colored points.
+However, certain parts of the computation require a continuous image model in order to obtain sub-pixel precision.
+This problem has three solutions in general:
+
+\begin{itemize}
+\item Use simple interpolation and ignore the inaccuracy induced.
+This is the approach applied in this thesis.
+
+\item Use simple interpolation on a blurred image so that the inaccuracy disappears.
+This is the solution implicitly used by many software libraries.
+
+\item Interpolate using a sophisticated function.
+Surprisingly enough, commonly used interpolation functions are not suitable for a precise model.
+
+\end{itemize}
+

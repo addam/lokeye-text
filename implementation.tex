@@ -1,7 +1,109 @@
 \chapter{Implementation}
 
-\section{Gaze Estimation}
-\subsection{Face Tracking}
-\subsection{Eye Tracking}
+Let us now use the theory and knowledge from previous two chapters to design a gaze tracker.
+After sketching out the basic traits of the program, we continue by listing out various approaches to each of the subproblems.
+There are indeed many options which make difference in computational difficulty, precision and robustness to possible difficulties in the input data.
+They are presented here, and will be evaluated in the next section under varying conditions.
+
+\section{Schema of Operation}
+
+On a first run, the program needs a calibration step to learn specific parameters related to the user.
+Some calibration is also necessary on each run and during longer periods of execution because of changing light conditions.
+
+The pipeline of computation is presented in Drawing @ref.
+Firstly, the face is locally tracked from the previous frame.
+Only if this step fails, the program starts a global face localization procedure.
+This first step results in a 3-dimensional similarity mapping.
+
+Next, the precise position of both eyes is established within a reasonable region in the face.
+This steps requires the face to be localized properly in the image but since the eyes can move very quickly, this uses no prior from the previous frame.
+
+Finally, the 6 degrees of freedom of the head and the 4 degrees of freedom of the eyes are fed into a gaze estimator that outputs coordinates in screen reference frame.
 
 \section{Calibration}
+
+The specific parameters being calculated during the calibration step depend on the particular methods being used for the remaining subtasks.
+However, the calibration session always remains the same from user's point of view, so that is what will be described here.
+
+\section{Face Tracking}
+
+Our program supports two methods of face tracking, which represent two major groups of tracking techniques in general.
+First is feature-based, second is appearance-based.
+
+\subsection{Feature Tracking}
+Along the lines of (@cite wang shi 16), we adopted a local feature-based tracking system.
+
+\subsection{Active Appearance Models}
+
+A surface within the face is tracked pixel per pixel.
+Depending on the transformation allowed, we get different methods:
+
+\begin{itemize}
+\item Similarity transformation. 3 DoF. Aligning in grid makes no sense.
+\item Affinity. 6 DoF. Aligning in grid makes little sense.
+\item Barycentric transformation. 6 DoF. Possible to align in grid.
+\item Perspectivity. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
+\end{itemize}
+
+\section{Eye Tracking}
+
+There are a plenty of eye trackers in our program.
+From a broader perspective, we took four different approaches:
+\begin{itemize}
+\item Tracking the limbus. There should be a circle with a strong gradient directed outwards.
+\item Tracking the iris. It should be radially symmetric with a strong gradient on the edges.
+\item Segmentation. Skin, sclera, iris and pupil should each be uniform, but mutually different in color.
+\item Machine learning. Instead of modeling, we can feed the image into a regression engine.
+\end{itemize}
+
+These approaches have been combined in many different ways, resulting in the following methods available to the user:
+
+\subsection{Limbus gradient}
+This method relies on the edge between the iris and the sclera.
+Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be displayed as a circle of high contrast.
+We assume the eyelids to be of uniform color, so they have zero value in the gradient domain and can be neglected.
+
+\subsection{Limbus polynomial gradient}
+The eye region of the face is actually not uniform as it contains many wrinkles and directional light may cause strong shadow.
+These facts cause a low-magnitude gradient that might modify the global optimum of the method described above.
+In order to gain some robustness, we can apply a heuristic filter to the gradient values.
+If designed with care, the method can still operate at nearly the same speed.
+
+\subsection{Hough transformation}
+We can use a voting scheme to find the limbus center.
+This allows us to apply a sophisticated heuristic filter at almost no cost.
+However, there is a free parameter: the resolution of the voting grid.
+Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
+
+\subsection{Dark iris correlation}
+Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
+An appropriately fast and reliable one is the normalized cross-correlation.
+
+\subsection{Personalized iris correlation}
+This is yet to be coded and tested.
+The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
+
+\subsection{Iris radial symmetry}
+We can define a model with few free parameters, relying only on the radial symmetry around the iris.
+Being highly nonlinear, it is also difficult to optimize and may be trapped in a local minimum.
+
+\subsection{Skin segmentation}
+This is yet to be coded and tested.
+It should be a switch that just disables processing of skin regions.
+
+\subsection{Random forest regression}
+This is yet to be coded and tested, but it is not going to work anyway.
+
+\subsection{Convolutional neural networks}
+This is yet to be coded and tested.
+
+\subsection{Combined estimator}
+
+Choosing several trackers that are sensitive to different deteriorations of the image, we can trade off some computational time for much robustness and precision.
+Each of the trackers chosen should obviously fail in different conditions so that a majority of them is correct on every image.
+Reasonable selection of trackers for a combined estimator is discussed in the next chapter.
+
+\section{Gaze Estimation}
+
+Only one method is available since both theory and measurements show that it works reliably and well.
+It is a perspectivity.

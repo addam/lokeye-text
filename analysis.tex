@@ -3,11 +3,14 @@
 This chapter provides a thorough analysis of available data from the camera and the objects displayed therein.
 We discuss the anatomy of human face and eyes in particular, and all relevant technical details about commonly used web cameras.
 
+\todo{define the task, the input and further constraints}
+
 \section{Face}
 
 Human face consists of many muscles.
 Like the pupil, they mainly serve for communication.
 Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
+\todo{\dots}
 
 \section{Eye}
 \subsection{Eye Anatomy}
@@ -30,7 +33,7 @@ Iris is something in between.
 The iris diameter remains constant but the pupil diameter can change dramatically.
 
 In a healthy case, the inner and outer boundary of the iris (the pupil and the limbus, respectively) should have a precisely circular shape.
-There are many reasons why 
+There are many reasons why \todo{\dots}
 
 \subsection{Eye Movement}
 
@@ -44,6 +47,7 @@ Eye can rotate in all three degrees of freedom, in fact.
 Donder's Law is important here because of the view axis offset from the optical axis.
 Theoretically, position of the pupil might on its own not be sufficient to calculate gaze precisely.
 That is not the case.
+\todo{\dots}
 
 \section{Gaze}
 
@@ -111,6 +115,12 @@ This is the solution implicitly used by many software libraries.
 
 \item Interpolate using a sophisticated function.
 Surprisingly enough, commonly used interpolation functions are not suitable for a precise model.
+An interpolator should obviously not be biased towards zero, and therefore, functions such as $\mathrm{sinc}$ cannot be used directly.
+Bias disappears if we use the function value only as a weight in a weighted average formula.
+However, that often makes image derivatives prohibitively hard to calculate.
+This may lead us to only estimating the image derivatives by a simple formula -- but such a step effectively classifies us as the first category above.
 
 \end{itemize}
+
+\todo{shifted derivatives}
 

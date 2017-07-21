@@ -1,0 +1,11 @@
+% Metadata to be stored in PDF, see documentation of the pdfx package for more details.
+
+\Author{Adam Dominec}
+\Title{Software-based eye tracking}
+\Keywords{face tracking\sep gaze tracking\sep image analysis}
+\Subject{This thesis presents a software library for eye gaze tracking.
+The typical use case is a person watching their computer screen.
+All data is obtained from a single video camera and is processed in real time.
+The resulting software is freely available including source code.
+}
+\Publisher{Charles University}

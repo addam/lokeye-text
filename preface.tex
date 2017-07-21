@@ -3,16 +3,21 @@
 The main idea behind this program is to view human eye as a means of communication.
 It is rather intuitive for us to recognize other people's gaze just by looking at their face thanks to high contrast coloring of the eye itself.
 The corresponding brain circuitry develops early in infants (@cite) and is equivalent among individuals.
-This seems to be an evidence of evolutionary purpose, that the human eye is built in a way so as to display the gaze clearly.
-Therefore it should be possible for a computer to estimate gaze from the data us humans have available, that is, a color image.
+This seems to be an evidence of evolutionary purpose---the human eye is built in a way so as to display the gaze clearly.
+Therefore it should also be possible for a computer to estimate gaze from the data us humans have available, that is, a color image.
 
-Thanks to the fact that almost every laptop computer or cell phone is now equipped with a video camera, the hardware requirements of this software should be easy to satisfy.
-If applications are built on top of this program, minimal hardware requirements like this allow them to be used almost immediately upon download and completely for free.
+Thanks to the fact that almost every laptop computer or cell phone is now equipped with a video camera, the hardware requirements of this software are easy to satisfy.
+Future programs built on top of this library will also exhibit minimal hardware requirements that enable them to be used almost immediately upon download and completely for free.
 
 Eye trackers can actually be used for communication, namely for human-computer interaction.
 Wide variety of algorithms have been proposed (@cite) for on-screen keyboard and general desktop control.
 The user's center of attention can also serve as a cue for adaptive rendering in video games because the rest of the screen need not be displayed in full detail.
 Possible applications in gaze tracking in cell phones are a vast topic, such as locking the screen when not looked at or displaying a note when somebody looks over your shoulder.
+
+Hereby we offer an open-source solution in the belief that it will help further development within this scientific field.
+\todo{what are my contributions, what is new?}
+
+The program tends to rely on complex, rigid models by the author's personal preference, and also because models with more free parameters would require too much training data.
 
 \section{History}
 
@@ -64,9 +69,9 @@ The degrees of freedom of this model can be customized to application needs, so 
 Purely geometric image transformations have poor invariance to changes in lighting, so they are well combined with element-wise image transformations.
 A simple option is to acquire multiple templates of the object in question, and either just select the best candidate for each input image, or allow their arbitrary linear combinations.(@cite)
 If the amount of training data grows large, more efficient and robust schemes are necessary.
-The template images can be arranged in a search structure (\dots)
+The template images can be arranged in a search structure \todo{\dots}
 Instead of single images, linear subspaces can be taken into account using Principal Component Analysis---an approach widely known as Eigenfaces(@cite).
-(\dots)
+\todo{\dots}
 
 Eye tracking is rather a simple task once the head pose is known.
 Much research relies on the fact that both human iris and pupil are circles, so their camera projection is always an ellipse.
@@ -74,7 +79,14 @@ When the gaze direction is reasonably bounded, these projected shapes can safely
 The generalized Hough transform(@cite) provides a global method of searching for circles with one-pixel precision.
 In many applications(@cite), this is enough.
 
-It is possible and sometimes more robust to use an appearance-based method (\dots)
+It is possible and sometimes more robust to use an appearance-based method \todo{\dots}
 
 Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on the outside and from the inside.
-In near infrared light, (...)
+In near infrared light, \todo{\dots}
+
+\todo{finish}
+
+\todo{youtubers}
+
+\section{Notation}
+\todo{describe all math notation used}

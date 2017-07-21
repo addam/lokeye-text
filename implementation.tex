@@ -13,7 +13,7 @@ Some calibration is also necessary on each run and during longer periods of exec
 The pipeline of computation is presented in Drawing @ref.
 Firstly, the face is locally tracked from the previous frame.
 Only if this step fails, the program starts a global face localization procedure.
-This first step results in a 3-dimensional similarity mapping.
+This first step results in a 3-dimensional translation and rotation mapping from the initial pose.
 
 Next, the precise position of both eyes is established within a reasonable region in the face.
 This steps requires the face to be localized properly in the image but since the eyes can move very quickly, this uses no prior from the previous frame.
@@ -39,7 +39,7 @@ A surface within the face is tracked pixel per pixel.
 Depending on the transformation allowed, we get different methods:
 
 \begin{itemize}
-\item Similarity transformation. 3 DoF. Aligning in grid makes no sense.
+\item Similarity transformation. 4 DoF. Aligning in grid makes no sense at all.
 \item Affinity. 6 DoF. Aligning in grid makes little sense.
 \item Barycentric transformation. 6 DoF. Possible to align in grid.
 \item Perspectivity. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
@@ -77,11 +77,16 @@ Using each pixel as a voting bin is usually the best choice, but it may fail on 
 
 \subsection{Dark iris correlation}
 Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
-An appropriately fast and reliable one is the normalized cross-correlation.
+An appropriately fast and reliable one is the normalized cross-correlation, using a slightly blurred black circle as the template.
+
+This method appears to work especially well when tested in regions where the majority of people are brown-eyed and with white skin.
+It can also easily get confused by dark spots around the eyes, such as glass rims or strong makeup.
+Finally, this method requires most of the iris to be visible, which need not be true because of the viewing angle and the user's personal habit.
 
 \subsection{Personalized iris correlation}
 This is yet to be coded and tested.
 The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
+We can, however, rely on the 
 
 \subsection{Iris radial symmetry}
 We can define a model with few free parameters, relying only on the radial symmetry around the iris.
@@ -105,5 +110,16 @@ Reasonable selection of trackers for a combined estimator is discussed in the ne
 
 \section{Gaze Estimation}
 
+Computer screen is a plane in space, with pixels aligned in a regular square grid.
+If the face and the eyes were also planar objects, then the gaze in screen coordinates would be related to the face and eyes position by a projectivity.
+This is obviously not the case, and the face transformation has many more degrees of freedom than a planar rigid body would.
+ 
+In order to properly model the mapping from our face and eye parameter space to two-dimensional gaze, we would have to actually estimate the three-dimensional model of the face.
+Many programs have been published that follow this path (@cite), but we decided for a simpler approach.
+Modeling the face would either require us to provide a strong a priori model, or it would require a longer calibration phase.
+
+We decided to actually assume the gaze to be given by a projective transformation of the face and eye parameters.
+This approach is limited and does never perfectly fit the data, but it is also very robust against overfitting. 
 Only one method is available since both theory and measurements show that it works reliably and well.
 It is a perspectivity.
+\todo{\dots}

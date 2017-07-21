@@ -25,8 +25,15 @@
 % \setlength\headheight{0mm}
 % \let\openright=\cleardoublepage
 
+%% Generate PDF/A-2u
+% disabled because I do not have a color profile
+% \usepackage[a-2u]{pdfx}
+
 %% Character encoding: usually latin2, cp1250 or utf8:
 \usepackage[utf8]{inputenc}
+
+%% Prefer Latin Modern fonts
+\usepackage{lmodern}
 
 %% Further useful packages (included in most LaTeX distributions)
 \usepackage{amsmath}        % extensions for typesetting of math
@@ -54,7 +61,7 @@
 \def\ThesisAuthor{Adam Dominec}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{2016}
+\def\YearSubmitted{2017}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,

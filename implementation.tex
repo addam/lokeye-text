@@ -77,7 +77,7 @@ Using each pixel as a voting bin is usually the best choice, but it may fail on 
 
 \subsection{Dark iris correlation}
 Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
-An appropriately fast and reliable one is the normalized cross-correlation, using a slightly blurred black circle as the template.
+An appropriately fast and reliable one is the normalized correlation, using a slightly blurred black circle as the template.
 
 This method appears to work especially well when tested in regions where the majority of people are brown-eyed and with white skin.
 It can also easily get confused by dark spots around the eyes, such as glass rims or strong makeup.
@@ -86,11 +86,15 @@ Finally, this method requires most of the iris to be visible, which need not be 
 \subsection{Personalized iris correlation}
 This is yet to be coded and tested.
 The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
-We can, however, rely on the 
+We can, however, rely on the whole iris region (including the pupil) to be a constant, radially symmetric image, and locate it using a personalized template.
+This template requires the user to open wide their eyes, so that the whole limbus is visible.
+
+For tracking a colored object, it is again reasonable to use the normalized correlation.
 
 \subsection{Iris radial symmetry}
 We can define a model with few free parameters, relying only on the radial symmetry around the iris.
 Being highly nonlinear, it is also difficult to optimize and may be trapped in a local minimum.
+\todo{explain in detail!}
 
 \subsection{Skin segmentation}
 This is yet to be coded and tested.

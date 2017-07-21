@@ -3,13 +3,28 @@
 This chapter provides a thorough analysis of available data from the camera and the objects displayed therein.
 We discuss the anatomy of human face and eyes in particular, and all relevant technical details about commonly used web cameras.
 
-\todo{define the task, the input and further constraints}
+\section{Conditions}
+
+We assume that the user is working with their personal computer, or a similar device such as a tablet.
+The user and the device can freely move around; the only constraint there is that the camera must be fixed to the computer screen.
+
+For a good calibration, we require active cooperation from the user: they are asked to watch a dot moving around the screen.
+If necessary, this requirement can be somewhat lifted by using a calibration file defined earlier or completely different means of calibration.
+We allow the user to move their head but we cannot \textit{rely} on this because many users (e.g. disabled ones) may have difficulties to move.
+
+Ambient lighting must be good enough for the camera to deliver a high-contrast and sharp image.
+The image brightness, white balance etc. may change abruptly and by all means.
+There is, however, a strong requirement on the light being rather diffuse than directional, and making no sharp shadows on the user's face.
+If the light conditions substantially change, it may be necessary to re-calibrate.
 
 \section{Face}
 
 Human face consists of many muscles.
 Like the pupil, they mainly serve for communication.
 Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
+\todo{image}
+These include most notably the chin, base of the nose and small outer regions around and slightly below the eyes.
+The chin is especially prominent and easy to track, but may become completely misleading if the user opens their jaw.
 \todo{\dots}
 
 \section{Eye}
@@ -25,29 +40,41 @@ The eyeball consists of several parts, most notably:
 \item The light-sensitive retina
 \end{itemize}
 
+Furthermore, each eyeball is embedded in a hole called \todo{what---eye chamber, perhaps?} that provides fixation and actuation.
+There are \todo{how many} separately controlled muscles stretching between to the eyeball and the eye chamber.
+
 Throughout the literature, eye is modeled either as a sphere, or with an extra spherical section for the cornea.
-Some sources also model the eyelids.
+Some sources also explicitly model the eyelids.
 
 Sclera is white and pupil is black.
 Iris is something in between.
 The iris diameter remains constant but the pupil diameter can change dramatically.
 
 In a healthy case, the inner and outer boundary of the iris (the pupil and the limbus, respectively) should have a precisely circular shape.
-There are many reasons why \todo{\dots}
+Generally, the inner shape of the iris is less reliable of these two.
+Its radius changes depending on the amount of incoming light and the emotional state of the user.
+This motion is controlled from \todo{which brain region---thalamus?} and therefore cannot be directly controlled by will.
+In case of a disease or an injury, it is also possible that some of the muscles stop working properly and the inner iris shape is no longer a circle.\todo{image}
 
 \subsection{Eye Movement}
 
 Human eyes have developed not only as an organ of sight, but also as a means of communication.
 When attending to an object or another person, people will usually turn their eyes directly towards it.
 
-The main reason of this is that the overall acuity of our visual system increases towards an area near the optical axis; the corresponding spot on the retina is called the fovea.
+The main reason of this is that the overall acuity of our visual system increases towards an area near the optical axis.
+The corresponding spot on the retina is called the fovea, and it is located about \todo{how many?} degrees horizontally towards the nose.
+The density of photopic (daylight-sensitive) cells is up to \todo{how much} times more than in the peripheral areas of the retina.
 
-Eye can rotate in all three degrees of freedom, in fact.
+Although gaze can be precisely controlled by will, there are many peculiarities about eye motion that depend on old brain circuitry and are common to all humans.
+Assuming that each muscle can apply force only by stretching, and not extending itself, the \todo{how many} muscles provide \todo{how many} degrees of freedom to the eye motion---but only two DoF are necessary to control the gaze direction.
 
-Donder's Law is important here because of the view axis offset from the optical axis.
-Theoretically, position of the pupil might on its own not be sufficient to calculate gaze precisely.
-That is not the case.
-\todo{\dots}
+A third DoF, namely rotation around the optical axis (the \textit{roll}) is actively used by the brain.
+The effect is slight, but because fovea is offset from the optical axis, this could make the gaze direction unpredictable given the optical axis only.
+Fortunately, the roll is deterministic with respect to the remaining two rotation angles.
+This fact is known as the \textit{Donder's Law}.
+Thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
+
+\todo{saccades, fixation, smooth pursuit}
 
 \section{Gaze}
 
@@ -64,7 +91,6 @@ Light rays passing through a certain point in space (figuratively, the pinhole) 
 The axis of symmetry of this system is called the optical axis, and the intersection of the optical axis with the image plane is assumed to be the origin point in image coordinates.
 
 Real-world cameras can suffer from many kinds of degeneracies off this model:
-
 \begin{itemize}
 
 \item
@@ -81,7 +107,7 @@ Points from a plane parallel with the focal plane will be displayed as if convol
 The lens may be dirty or otherwise bad, which casues a slight and uniform foggy blur.
 
 In very small cameras with relatively high resolution, the wave nature of light may cause additional blur @cite.
-The most notable of these issues is diffraction at edges of the iris.
+The most notable of these issues is diffraction at edges of the camera iris.
 
 \item
 Lens aberration.
@@ -94,19 +120,31 @@ There are software tools to reduce percieved color aberration, but this problem 
 A proper solution would require to densely sample the spectrum at each image point but we only have three values roughly corresponding to red, green and blue.
 
 These effects are often well compensated in high-end cameras by sophistication of the optical system.
-On the other hand, they also decrease with the lens size, and cameras with a narrow or almost closed iris can be fairly well aproximated as pinhole cameras.
+On the other hand, they also decrease with the lens size, and cameras with a narrow or almost closed iris can be fairly well aproximated as pinhole cameras with no lens.
 
 \item
 Moiré.
+In low- and mid-cost cameras, image colors are obtained by attaching different color filters to each cell of the light sensor.
+\todo{explain some more}
+Contrast on subpixel level makes each color channel sum up to a different amount, even if there are no colored objects in the scene.
+When imaging fine black-and-white colored structures, spurious and highly saturated colors may appear.
+
+This effect can hardly cause any issues when displaying human faces.
+Quite to the contrary, it can be used for manual focusing of the camera, if necessary.
+Moiré is an optical effect between the imaged object and the light sensor, and usually will not be affected by image processing such as denoising algorithms.
+We can put a black and white grid nearby the user's head and tune the camera focus until color moiré appears
 
 \end{itemize}
 
 \section{Image}
 The image as acquired from the camera is assumed to be a rectangular grid of colored points.
-However, certain parts of the computation require a continuous image model in order to obtain sub-pixel precision.
-This problem has three solutions in general:
+However, certain parts of the computation require a continuous and smooth image model in order to obtain sub-pixel precision.
+In order to apply classic optimization methods, we need to geometrically transform (i.e., stretch) the image and its partial derivatives.
+
+This problem has three possible solutions:
 
 \begin{itemize}
+
 \item Use simple interpolation and ignore the inaccuracy induced.
 This is the approach applied in this thesis.
 
@@ -116,11 +154,13 @@ This is the solution implicitly used by many software libraries.
 \item Interpolate using a sophisticated function.
 Surprisingly enough, commonly used interpolation functions are not suitable for a precise model.
 An interpolator should obviously not be biased towards zero, and therefore, functions such as $\mathrm{sinc}$ cannot be used directly.
+
 Bias disappears if we use the function value only as a weight in a weighted average formula.
 However, that often makes image derivatives prohibitively hard to calculate.
-This may lead us to only estimating the image derivatives by a simple formula -- but such a step effectively classifies us as the first category above.
+This may lead us to only estimating the image derivatives by a simple formula---but by making such a step we effectively classify to the first category above.
 
 \end{itemize}
 
+\todo{what is our image model, then.}
 \todo{shifted derivatives}
 

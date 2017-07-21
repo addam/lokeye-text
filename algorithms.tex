@@ -1,9 +1,8 @@
 \chapter{Algorithms}
 
-This chapter provides mathematical and  methods for problems to be presented in the next section.
+This chapter provides mathematical tools and computational methods for the problems to be presented in the next section.
 
 \section{Projective fitting}
-
 The correspondence between measured values and the appropriate results is assumed to be a homography.
 There are, loosely speaking, two difficulties in homography fitting as compared to affine transformations.
 Firstly, it has a nonlinear component so an algebraic least-squares solution is generally different from a geometric least-squares solution.
@@ -13,9 +12,14 @@ A technique called Direct Linear Transformation is widely used to overcome this 
 
 \subsection{Direct Linear Transformation}
 
+\textit{Input:} a set of point pairs $\matx^k \leftrightarrow \matp^k$ related by an unknown homography.\\
+\textit{Output:} homography matrix $\matH$.\\
+
 We are presented with a set projective correspondences of the form
-$$\matH \matx^k = \alpha_k \matp^k, 1 \leq k \leq K.$$
-Unfortunately, these equations do not form a linear system with respect to the unknown matrix $\matH$ because there is an unknown scale factor $\alpha_i$ involved in each equation.
+$$\matH \matx^k = \alpha_k \matp^k, 1 \leq k \leq K,$$
+where $\alpha_k$ are unknown scalars and $\matH$ is an unknown matrix that we want to calculate.
+
+Unfortunately, these equations do not form a linear system with respect to the unknown matrix $\matH$ because there is an unknown scale factor $\alpha_k$ involved in each equation.
 Differences among the scale factors make up the perspective part of the homography, so although they can make the problem numerically unstable, we cannot impose any limits on these values.
 The core idea of Direct Linear Transformation is to find a set of vectors that must be orthogonal to the solution, and then solve the resulting homogeneous system.
 
@@ -43,14 +47,23 @@ $$\vec (\matp\T \matM \matx\T)\T \cdot \vec(\matH) = 0,$$
 where $\vec : \R^{m \times n} \rightarrow \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
 Each correspondence pair and each selected antisymmetric matrix $\matM^{i, j}$ for that pair provide one such equation, and the row vectors $\vec ({\matp^k}\T \matM^{i, j} {\matx^k}\T)\T$ can be stacked to form the system matrix.
 
-\subsection{Singular Value Decomposition}
+\subsection{Homogeneous Linear Solving}
+\todo{change the heading}
+\textit{Input:} matrix $\matA$\\
+\textit{Output:} nonzero vector $\matx$ that solves the equation $\matA \matx = 0$ in least-squares sense.\\
 
 Homogeneous linear systems such as this one can be solved using the Singular Value Decomposition (SVD).
 
-
+\todo{\dots}
 However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\matH \matx^k = \alpha_k \matp^k$.
 In particular, it is possible that a solution will produce points at infinity, meaning that $\matp_n \approx 0$ and that the Cartesian counterpart of $\matp$ is undefined.
 Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.
+
+\subsection{Singular Value Decomposition}
+\textit{Input:} matrix $\matA$\\
+\textit{Output:} matrices $\mat U, \mat S, \mat V$ such that $\matA = \mat U \mat S \mat V\T$, $\mat U$ and $\mat V$ are orthonormal and $\mat S$ is diagonal.\\
+
+\todo{Jacobi algorithm!}
 
 The system matrix in our case is of shape $K \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
 
@@ -102,36 +115,15 @@ These two mappings can be composed to provide any four-point homography as neces
 $$\mathrm{dec}(\matB) \cdot \mathrm{can}(\matA) \cdot \matA \sim \matB.$$
 The resulting mapping is linear with respect to the last column of $\matB$.
 
-\todo{the following trick is not being used in the program, delete.}
-To obtain alternate formulations that are linear with respect to the remaining three columns of $\matB$, we can use the following homography:
-$$\mat{R} = \begin{pmatrix}
- 0 & 0 & 1 \\
- -1 & 0 & 1 \\
- 0 & -1 & 1
- \end{pmatrix}.$$
-It has the effect of a cyclic permutation upon the points of $\matC$, namely:
-$$\mat{R} \cdot \matC \sim \begin{pmatrix}
- 1 & 1 & 0 & 0 \\
- 1 & 0 & 1 & 0 \\
- 1 & 0 & 0 & 1
- \end{pmatrix}.$$
-This particular choice is also pleasant from a numeric point of view, because $\mathrm{det}(\mat{R}) = 1$ and therefore also $\mat{R}^4 = \mat{I}_3$, the identity matrix.
-
-We observe that $\mathrm{dec}(\mat{a}, \mat{b}, \mat{c}, \mat{d}) \cdot \matC \sim \mathrm{dec}(\mat{d}, \mat{a}, \mat{b}, \mat{c}) \cdot \mat{R} \cdot \matC$ and because four points define the homography matrix (up to scale), we can safely conclude that $\mathrm{dec}(\mat{a}, \mat{b}, \mat{c}, \mat{d}) = \mathrm{dec}(\mat{d}, \mat{a}, \mat{b}, \mat{c}) \cdot \mat{R}$.
-
-\todo{what are the overall computational requirements, per pixel?}
+\todo{what are the overall computational requirements?}
 
 \subsection{Derivatives of a homography}
 
 We wish to calculate the derivative of a four-point homography with respect to the coordinates of its four control points.
 The linearity of $\mathrm{dec}(\matA)$ implies that the derivative $\frac{\partial} {\partial \mat{d}_i} \mathrm{dec} \left( \mat{a}, \mat{b}, \mat{c}, \mat{d} \right) = \mathrm{dec} \left( \mat{a}, \mat{b}, \mat{c}, \mat{e}_i \right)$, where $\mat{e}_i$ is the unit vector for the coordinate axis $i$.
 
-\todo{this trick is not being used in the program, delete.}
-Derivative with respect to $\mat{c}$ can be obtained by a permutation of the points:
-$$\mathrm{dec}(\matA) = \mathrm{dec}(\matA) \cdot \mat{R}\inv \cdot \mat{R} \sim \mathrm{dec}(\mat{d}, \mat{a}, \mat{b}, \mat{c}) \cdot \mat{R},$$
-$$\frac{\partial} {\partial \mat{c}_i} \mathrm{dec}(\matA) \sim \frac{\partial} {\partial \mat{c}_i} \mathrm{dec}(\mat{d}, \mat{a}, \mat{b}, \mat{c}) \cdot \mat{R} = \mathrm{dec} \left( \mat{d}, \mat{a}, \mat{b}, \mat{e}_i \right) \cdot \mat{R}.$$
-The remaining two points $\mat{a}, \mat{b}$ are obtained by iteration of this scheme.
-The scale factors are important and need to be calculated, too.
+Derivative with respect to $\mat a$, $\mat b$ and $\mat c$ cannot be easily calculated from this formula because there are many scale factors in effect.
+The suggested approach is to explicitly permute the points so that the point in question becomes the last one, and to repeat the original scheme.
 
 \todo{what are the overall computational requirements, per pixel?}
 
@@ -139,5 +131,5 @@ The scale factors are important and need to be calculated, too.
 
 \subsection{Normalized Cross-Correlation}
 
-\todo {there are more use cases than this one.}
+\todo {there are more use cases beyond this one.}
 

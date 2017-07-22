@@ -138,6 +138,7 @@ We can put a black and white grid nearby the user's head and tune the camera foc
 \end{itemize}
 
 \section{Image}
+\label{s.imagemodel}
 The image as acquired from the camera is a rectangular grid of colored points.
 However, certain parts of the computation require a continuous and smooth image model in order to obtain sub-pixel precision.
 In order to apply classic optimization methods, we need to geometrically transform (i.e., stretch) the image, and evaluate its partial derivatives at random points.

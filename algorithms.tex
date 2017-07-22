@@ -12,6 +12,12 @@ This chapter provides mathematical tools and computational methods for the probl
 
 The system matrix in our case is of shape $K \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
 
+\subsection{Linear Solving}
+\textit{Input:} matrix $\matA$, vector $\mat b$\\
+\textit{Output:} vector $\matx$ such that $|\matA \matx - \mat b|$ is minimal.\\
+
+\todo{\dots}
+
 \subsection{Homogeneous Linear Solving}
 \textit{Input:} matrix $\matA$\\
 \textit{Output:} vector $\matx$ such that $|\matx| = 1$ and $|\matA \matx|$ is minimal.\\
@@ -36,16 +42,46 @@ The result is $\mat x = \mat V \inv \mat v = \mat V \T \mat v$.
 If $\mat s_i^2 = \mat s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway.
 This can be proven by adding a small perturbation to $\mat s_j$.
 
+\subsection{Quadratic polynomial fitting}
+\textit{Input:} set of points $P = \{\mat p^i \in \R^2 \}$ and a function $\textrm{score}: \R^2 \rightarrow \R$.\\
+\textit{Output:} quadratic polynomial $Q \in \R^2 \rightarrow \R$ fitting $Q$ in least-squares sense and its maximum $\mat x$.\\
+
+Given several samples of a real function nearby its maximum, we would like to get a precise estimate of the maximum location.
+Although this topic belongs to real analysis, it is listed here because most of the actual computations involved belong to linear algebra.
+
+Let us express the least-squares fit as a linear system:
+$$(x^2, xy, x, y^2, y, 1)\T \mat q = \textrm{score}(\mat p^i) \text{ for each } i, \text{ where } \mat p^i = (x, y)\T.$$
+The polynomial $Q$ can be expressed in terms of the solution $\mat q$ as the symmetrical matrix
+$$\mat Q = \begin{pmatrix}
+ 2 \mat q_1 & \mat q_2 & \mat q_3 \\
+ \mat q_2 & 2 \mat q_4 & \mat q_5 \\
+ \mat q_3 & \mat q_5 & 2 \mat q_6
+\end{pmatrix}.$$
+Let us split this matrix into the following blocks:
+$$\mat A = \begin{pmatrix}
+ 2 \mat q_1 & \mat q_2 \\
+ \mat q_2 & 2 \mat q_4 \\
+\end{pmatrix},
+\mat b = \begin{pmatrix}
+ \mat q_3 \\
+ \mat q_5 \\
+\end{pmatrix}.$$
+The global extremum $\mat x$ of this polynomial satisfies $\mat A \mat x = -\mat b$.
+
+\begin{proof}
+\todo{\dots}
+\end{proof}
+
 \subsection{Principal Component Analysis}
 \todo{is this used in the program?}
 
 \section{Nonlinear optimization}
 
-\todo{Gradient descent}
+\subsection{Gradient descent}
 
 \todo {line search}
 
-\section{Fourier Analysis}
+\section{Fourier analysis}
 
 \subsection{Fast Fourier Transform}
 \textit{Input:} vector $\mat v \in \C^n$.\\

@@ -22,6 +22,9 @@ Finally, the 6 degrees of freedom of the head and the 4 degrees of freedom of th
 
 \section{Face Tracking}
 
+\todo{problem i/o}
+
+\todo{rewrite this outdated paragraph}
 Our program supports two methods of face tracking, which represent two major groups of tracking techniques in general.
 First is feature-based, second is appearance-based.
 A surface within the face is tracked pixel per pixel.
@@ -34,7 +37,9 @@ Depending on the transformation allowed, we get different methods:
 \item Homography. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
 \end{itemize}
 
-\todo{blabla}.
+\todo{pyramid}
+
+\todo{why}
 There is a \textit{master tracker} that covers the whole face.
 It provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
 In order to gain some robustess against changes in lighting, the master trackers is color-normalized.
@@ -79,7 +84,14 @@ From a broader perspective, we took four different approaches:
 \item Machine learning. Instead of modeling, we can feed the image into a regression engine.
 \end{itemize}
 
-These approaches have been combined in many different ways, resulting in the following methods available to the host application:
+Acknowledging that the scale (e.g., the radius $R$) can be only a few pixels, we aim for a subpixel precision.
+That is a meaningful pursuit thanks to the continuous image model defined in Section \ref{s.imagemodel}.
+
+However, many of the algorithms to be presented are based on pixel by pixel evaluation of a scoring function.
+In such cases, it is not very appropriate to evaluate at fractional coordinates.
+Instead, we fit a quadratic polynomial to several score values around the maximal pixel, and output the maximum of this polynomial as the global maximum.
+
+The following methods are available to the host application:
 
 \subsection{Limbus gradient}
 This method relies on the edge between the iris and the sclera.
@@ -107,12 +119,13 @@ It can also easily get confused by dark spots around the eyes, such as glass rim
 Finally, this method requires most of the iris to be visible, which need not be true because of the viewing angle and the user's personal habit.
 
 \subsection{Personalized iris correlation}
-This is yet to be coded and tested.
 The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
 We can, however, rely on the whole iris region (including the pupil) to be a constant, radially symmetric image, and locate it using a personalized template.
 This template requires the user to open wide their eyes, so that the whole limbus is visible.
 
 For tracking a colored object, it is again reasonable to use the normalized correlation.
+
+\todo{This is yet to be coded and tested.}
 
 \subsection{Iris radial symmetry}
 
@@ -156,21 +169,25 @@ This tracker uses exhaustive search to find the global minimum within a crop-out
 
 \subsection{Skin masking}
 
-Skin, and most importantly the eyelids, can be often detected by simple analysis of its color.
+Skin, including the eyelids, can easily be detected by an analysis of its color.
 We allow each of the eye trackers presented so far to be coupled with a HSV (hue-saturation-value) detector tuned for skin tones.
-Areas masked out by this detector are excluded from eye fitting.
+Pixels whose HSV vector lies within a user-defined cube are excluded from eye fitting.
 
+The mapping of RGB values to HSV is a piecewise linear function:
 \todo{formula}
+
+It is important to note the heuristic aspects of this approach.
+\todo{HSV, sRGB, the cube -- lighting, skin color etc.}
 
 Since there are usually many distractive features around the eyes, such as the eyelashes and makeup, the mask is pre-processed so as to have a smooth boundary and to cover nearby black splotches.
 
 \todo{This is yet to be coded and tested.}
 
 \subsection{Random forest regression}
-This is yet to be coded and tested, but it is not going to work anyway.
+\todo{This is yet to be coded and tested, but it is not going to work anyway.}
 
 \subsection{Convolutional neural networks}
-This is yet to be coded and tested.
+\todo{This is yet to be coded and tested.}
 
 \subsection{Combined estimator}
 

@@ -27,7 +27,7 @@
 
 %% Generate PDF/A-2u
 % disabled because I do not have a color profile
-% \usepackage[a-2u]{pdfx}
+\usepackage[a-2u]{pdfx}
 
 %% Character encoding: usually latin2, cp1250 or utf8:
 \usepackage[utf8]{inputenc}
@@ -103,11 +103,11 @@ The resulting software is freely available including source code.
 
 %% The hyperref package for clickable links in PDF and also for storing
 %% metadata to PDF (including the table of contents).
-\usepackage[pdftex,unicode]{hyperref}   % Must follow all other packages
+\hypersetup{unicode}
 \hypersetup{breaklinks=true}
-\hypersetup{pdftitle={\ThesisTitle}}
-\hypersetup{pdfauthor={\ThesisAuthor}}
-\hypersetup{pdfkeywords=\Keywords}
+%\hypersetup{pdftitle={\ThesisTitle}}
+%\hypersetup{pdfauthor={\ThesisAuthor}}
+%\hypersetup{pdfkeywords=\Keywords}
 \hypersetup{colorlinks=false, pdfborder={0 0 0}}
 
 % Definitions of macros (see description inside)

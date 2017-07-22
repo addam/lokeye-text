@@ -9,3 +9,7 @@ All data is obtained from a single video camera and is processed in real time.
 The resulting software is freely available including source code.
 }
 \Publisher{Charles University}
+\setRGBcolorprofile{sRGB2014.icc}
+{sRGB}
+{sRGB}
+{http://www.color.org}

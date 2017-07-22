@@ -6,24 +6,33 @@ This chapter provides mathematical tools and computational methods for the probl
 
 \subsection{Singular Value Decomposition}
 \textit{Input:} matrix $\matA$\\
-\textit{Output:} orthonormal matrices $\mat U, \mat V$ and a vector $\mat s$ such that $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.\\
+\textit{Output:} orthonormal matrices $\mat U, \mat V$ and a vector $\mat s$ such that $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$, $\mat s_i \geq 0$ and $\mat s_i \geq \mat s_j$ for all $i \leq j$.\\
 
 \todo{Jacobi algorithm!}
+
+The SVD always exists and is unique.
+
+In the specific case where $\mat A$ is symmetric, then $\mat U = \mat V$.
 
 The system matrix in our case is of shape $K \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
 
 \subsection{Linear Solving}
-\textit{Input:} matrix $\matA$, vector $\mat b$\\
+\textit{Input:} matrix $\matA \in \R^{n \times m}$ of rank $n$, vector $\mat b \in \R^n$.\\
 \textit{Output:} vector $\matx$ such that $|\matA \matx - \mat b|$ is minimal.\\
 
+Let us consider the SVD\todo{abbreviation} of $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.
+The result is $\mat x = \mat V \cdot \diag(\mat t) \cdot \mat U\T \cdot \mat b$, where $\mat t$ is given by $\mat t_i = \mat s_i ^{-1}$.
+
+\begin{proof}
 \todo{\dots}
+\end{proof}
 
 \subsection{Homogeneous Linear Solving}
 \textit{Input:} matrix $\matA$\\
 \textit{Output:} vector $\matx$ such that $|\matx| = 1$ and $|\matA \matx|$ is minimal.\\
 
 Let us consider the SVD\todo{abbreviation} of $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.
-The result $\matx$ is the $i$-th column of $\mat V \T$, where $i$ is chosen so that $\mat s_i^2$ is minimal.
+The result $\matx$ is last column of $\mat V \T$.
 
 \begin{proof}
 Let us define a vector $\mat v = \mat V \matx$.
@@ -43,8 +52,8 @@ If $\mat s_i^2 = \mat s_j^2$ for some $j$, the global minimum is not unique but 
 This can be proven by adding a small perturbation to $\mat s_j$.
 
 \subsection{Quadratic polynomial fitting}
-\textit{Input:} set of points $P = \{\mat p^i \in \R^2 \}$ and a function $\textrm{score}: \R^2 \rightarrow \R$.\\
-\textit{Output:} quadratic polynomial $Q \in \R^2 \rightarrow \R$ fitting $Q$ in least-squares sense and its maximum $\mat x$.\\
+\textit{Input:} set of samples $P = \{\mat p^i \in \R^2 \}$ and function $\textrm{score}: \R^2 \rightarrow \R$.\\
+\textit{Output:} quadratic polynomial $Q \in \R^2 \rightarrow \R$ minimizing $\sum_i |\textrm{score}(\mat p^i) - Q(\mat p^i)|^2$ and vector $\mat x$ maximizing $Q(\mat x)$.\\
 
 Given several samples of a real function nearby its maximum, we would like to get a precise estimate of the maximum location.
 Although this topic belongs to real analysis, it is listed here because most of the actual computations involved belong to linear algebra.
@@ -73,7 +82,36 @@ The global extremum $\mat x$ of this polynomial satisfies $\mat A \mat x = -\mat
 \end{proof}
 
 \subsection{Principal Component Analysis}
-\todo{is this used in the program?}
+\textit{Input:} set of samples $P = \{\mat p^i \in \R^n \}$.\\
+\textit{Output:} orthonormal basis $\{\mat q^i\}$ such that the orthogonal projection of $P$ onto each $\mat q^i$ has maximal variance with all $\mat q^j, j < i$ being fixed.\\
+
+Given several random samples, we want to find the most prominent aspects the data.
+The basis vectors are supposed to capture (and extract) covariance of the data, and when expressed in the basis $\{\mat q^i\}$, the data will be decorrelated.
+
+Let us consider the covariance matrix $\mat C = \sum_{i,j} (\mat p^i - \mat m) \left(\mat p^j - \mat m \right) \T$ (up to scale), where $\mat m = \smallfrac 1 {|P|} \sum_i \mat p^i$ is the center of mass. Let us further consider the Singular Value Decomposition of this symmetrical matrix $\mat C = \mat U \cdot \diag(\mat s) \cdot \mat U\T$.
+The sought basis vectors are the columns of $\mat U\T$, in their order.
+
+\begin{lemma}
+If each point $\mat x$ of data with covariance $\mat C$ is transformed to $\mat A \mat x$, the resulting points have covariance matrix $\mat A \mat C \mat A \T$.
+\end{lemma}
+
+\begin{proof}
+We can view the data as a single random vector following a normal distribution with covariance matrix $\mat C$.
+\todo{or maybe not?}
+Using the fact that 
+\begin{multline}
+\cov\big( (\mat A \mat x)_i, (\mat A \mat x)_j \big) = \cov\Big( \sum_k(\mat A_{ik} \mat x_k), \sum_l(\mat A_{jl} \mat x_l) \Big) = \sum_k \Big( \mat A_{ik} \sum_l \cov( \mat x_k, \mat x_l ) \mat A_{jl} \Big) \\
+= \sum_k \Big( \mat A_{ik} \sum_l \mat C_{kl} \mat A_{lj}\T \Big) = \sum_k \mat A_{ik} (\mat C \mat A \T)_{kj} = (\mat A \mat C \mat A\T)_{ij},
+\end{multline}
+\end{proof}
+
+\begin{proof}[Proof of the algorithm]
+Setting $\mat A = \mat U\T$, we obtain $\mat A \mat C \mat A \T = \mat U\T \mat U \cdot \diag(\mat s) \cdot \mat U\T \mat U = \diag(\mat s)$.
+This means that if the data are expressed in the orthonormal basis  $\mat U$, their vector components are no longer correlated.
+
+Picking the first basis vector $\mat q^1$ (such that the variance of the orthogonal projection of $\mat P$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
+
+\end{proof}
 
 \section{Nonlinear optimization}
 

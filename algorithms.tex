@@ -5,8 +5,8 @@ This chapter provides mathematical tools and computational methods for the probl
 \section{Linear algebra}
 
 \subsection{Singular Value Decomposition}
-\textit{Input:} matrix $\matA$\\
-\textit{Output:} orthonormal matrices $\mat U, \mat V$ and a vector $\mat s$ such that $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$, $\mat s_i \geq 0$ and $\mat s_i \geq \mat s_j$ for all $i \leq j$.\\
+\textit{Input:} matrix $\mat A$\\
+\textit{Output:} orthonormal matrices $\mat U, \mat V$ and a vector $\vec s$ such that $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$, $\vec s_i \geq 0$ and $\vec s_i \geq \vec s_j$ for all $i \leq j$.\\
 
 \todo{Jacobi algorithm!}
 
@@ -14,85 +14,83 @@ The SVD always exists and is unique.
 
 In the specific case where $\mat A$ is symmetric, then $\mat U = \mat V$.
 
-The system matrix in our case is of shape $K \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
-
 \subsection{Linear Solving}
-\textit{Input:} matrix $\matA \in \R^{n \times m}$ of rank $n$, vector $\mat b \in \R^n$.\\
-\textit{Output:} vector $\matx$ such that $|\matA \matx - \mat b|$ is minimal.\\
+\textit{Input:} matrix $\mat A \in \R^{n \times m}$ of rank $n$, vector $\vec b \in \R^n$.\\
+\textit{Output:} vector $\vec x$ such that $|\mat A \vec x - \vec b|$ is minimal.\\
 
-Let us consider the SVD\todo{abbreviation} of $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.
-The result is $\mat x = \mat V \cdot \diag(\mat t) \cdot \mat U\T \cdot \mat b$, where $\mat t$ is given by $\mat t_i = \mat s_i ^{-1}$.
+Let us consider the SVD\todo{abbreviation} of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
+The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \cdot \vec b$, where $\vec t$ is given by $\vec t_i = \vec s_i ^{-1}$.
 
 \begin{proof}
 \todo{\dots}
 \end{proof}
 
 \subsection{Homogeneous Linear Solving}
-\textit{Input:} matrix $\matA$\\
-\textit{Output:} vector $\matx$ such that $|\matx| = 1$ and $|\matA \matx|$ is minimal.\\
+\textit{Input:} matrix $\mat A$\\
+\textit{Output:} vector $\vec x$ such that $|\vec x| = 1$ and $|\mat A \vec x|$ is minimal.\\
 
-Let us consider the SVD\todo{abbreviation} of $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.
-The result $\matx$ is last column of $\mat V \T$.
+Let us consider the SVD\todo{abbreviation} of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
+The result $\vec x$ is last column of $\mat V \T$.
 
 \begin{proof}
-Let us define a vector $\mat v = \mat V \matx$.
-This is effectively a change of basis, and because $\mat V$ is an orthonormal matrix, the norm $|\mat v| = |\mat x|$ is preserved.
-Because also $\mat U$ is an orthonormal matrix, it can be safely crossed out of the norm $|\matA \matx| = |\diag(\mat s) \cdot \mat v|$.
-This in turn can be expressed as the square root of $\sum_i (\mat s_i \mat v_i)^2 = \sum_i \mat s_i^2 \mat v_i^2$.
+Let us define a vector $\vec v = \mat V \vec x$.
+This is effectively a change of basis, and because $\mat V$ is an orthonormal matrix, the norm $|\vec v| = |\vec x|$ is preserved.
+Because also $\mat U$ is an orthonormal matrix, it can be safely crossed out of the norm $|\mat A \vec x| = |\diag(\vec s) \cdot \vec v|$.
+This in turn can be expressed as the square root of $\sum_i (\vec s_i \vec v_i)^2 = \sum_i \vec s_i^2 \vec v_i^2$.
 
 Finally, this constrained minimization problem can be solved by the method of Lagrange multipliers.
-Equating $\nabla(\sum_i \mat s_i^2 \mat v_i^2) = \lambda \nabla (\sum_i \mat v_i^2)$ leads to the system of equations $\mat s_i^2 \mat v_i = \lambda \mat v_i$ for all $i$.
-These necessary constraints are satisfied only by choosing $\lambda = \mat s_i^2$ for some $i$.
-Deliberately assuming that all $\mat s_j^2 \neq \mat s_i^2$ for all $j \neq i$, we must also set the remaining elements $\mat v_j = 0$, and therefore $\mat v_i = 1$.
-In order to find a global minimum, we pick $i$ such that $\mat s_i^2 \mat v_i^2 = \mat s_i^2$ is minimal.
-The result is $\mat x = \mat V \inv \mat v = \mat V \T \mat v$.
+Equating $\nabla(\sum_i \vec s_i^2 \vec v_i^2) = \lambda \nabla (\sum_i \vec v_i^2)$ leads to the system of equations $\vec s_i^2 \vec v_i = \lambda \vec v_i$ for all $i$.
+These necessary constraints are satisfied only by choosing $\lambda = \vec s_i^2$ for some $i$.
+Deliberately assuming that all $\vec s_j^2 \neq \vec s_i^2$ for all $j \neq i$, we must also set the remaining elements $\vec v_j = 0$, and therefore $\vec v_i = 1$.
+In order to find a global minimum, we pick $i$ such that $\vec s_i^2 \vec v_i^2 = \vec s_i^2$ is minimal.
+The result is $\vec x = \mat V \inv \vec v = \mat V \T \vec v$.
 \end{proof}
 
-If $\mat s_i^2 = \mat s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway.
-This can be proven by adding a small perturbation to $\mat s_j$.
+If $\vec s_i^2 = \vec s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway.
+This can be proven by adding a small perturbation to $\vec s_j$.
 
 \subsection{Quadratic polynomial fitting}
-\textit{Input:} set of samples $P = \{\mat p^i \in \R^2 \}$ and function $\textrm{score}: \R^2 \to \R$.\\
-\textit{Output:} quadratic polynomial $Q \in \R^2 \to \R$ minimizing $\sum_i |\textrm{score}(\mat p^i) - Q(\mat p^i)|^2$ and vector $\mat x$ maximizing $Q(\mat x)$.\\
+\textit{Input:} set of samples $P = \{\vec p^i \in \R^2 \}$ and function $\textrm{score}: \R^2 \to \R$.\\
+\textit{Output:} quadratic polynomial $Q \in \R^2 \to \R$ minimizing $\sum_i |\textrm{score}(\vec p^i) - Q(\vec p^i)|^2$ and vector $\vec x$ maximizing $Q(\vec x)$.\\
 
 Given several samples of a real function nearby its maximum, we would like to get a precise estimate of the maximum location.
 Although this topic belongs to real analysis, it is listed here because most of the actual computations involved belong to linear algebra.
 
 Let us express the least-squares fit as a linear system:
-$$(x^2, xy, x, y^2, y, 1)\T \mat q = \textrm{score}(\mat p^i) \text{ for each } i, \text{ where } \mat p^i = (x, y)\T.$$
-The polynomial $Q$ can be expressed in terms of the solution $\mat q$ as the symmetrical matrix
+$$(x^2, xy, x, y^2, y, 1)\T \vec q = \textrm{score}(\vec p^i) \text{ for each } i, \text{ where } \vec p^i = (x, y)\T.$$
+The polynomial $Q$ can be expressed in terms of the solution $\vec q$ as the symmetrical matrix
 $$\mat Q = \begin{pmatrix}
- 2 \mat q_1 & \mat q_2 & \mat q_3 \\
- \mat q_2 & 2 \mat q_4 & \mat q_5 \\
- \mat q_3 & \mat q_5 & 2 \mat q_6
+ 2 \vec q_1 & \vec q_2 & \vec q_3 \\
+ \vec q_2 & 2 \vec q_4 & \vec q_5 \\
+ \vec q_3 & \vec q_5 & 2 \vec q_6
 \end{pmatrix}.$$
 Let us split this matrix into the following blocks:
 $$\mat A = \begin{pmatrix}
- 2 \mat q_1 & \mat q_2 \\
- \mat q_2 & 2 \mat q_4 \\
+ 2 \vec q_1 & \vec q_2 \\
+ \vec q_2 & 2 \vec q_4 \\
 \end{pmatrix},
-\mat b = \begin{pmatrix}
- \mat q_3 \\
- \mat q_5 \\
+\vec b = \begin{pmatrix}
+ \vec q_3 \\
+ \vec q_5 \\
 \end{pmatrix}.$$
-The global extremum $\mat x$ of this polynomial satisfies $\mat A \mat x = -\mat b$.
+The global extremum $\vec x$ of this polynomial satisfies $\mat A \vec x = -\vec b$.
 
 \begin{proof}
 \todo{\dots}
 \end{proof}
 
 \subsection{Principal Component Analysis}
-\textit{Input:} set of samples $P = \{\mat p^i \in \R^n \}$.\\
-\textit{Output:} orthonormal basis $\{\mat q^i\}$ such that the orthogonal projection of $P$ onto each $\mat q^i$ has maximal variance with all $\mat q^j, j < i$ being fixed.\\
+\textit{Input:} set of samples $P = \{\vec p^i \in \R^n \}$.\\
+\textit{Output:} orthonormal basis $\{\vec q^i\}$ such that the orthogonal projection of $P$ onto each $\vec q^i$ has maximal variance with all $\vec q^j, j < i$ being fixed.\\
 
 Given several random samples, we want to find the most prominent aspects the data.
-The basis vectors are supposed to capture (and extract) covariance of the data, and when expressed in the basis $\{\mat q^i\}$, the data will be decorrelated.
+The basis vectors are supposed to capture (and extract) covariance of the data, and when expressed in the basis $\{\vec q^i\}$, the data will be decorrelated.
 
-Let us consider the covariance matrix $\mat C = \sum_{i,j} (\mat p^i - \mat m) \left(\mat p^j - \mat m \right) \T$ (up to scale), where $\mat m = \smallfrac 1 {|P|} \sum_i \mat p^i$ is the center of mass. Let us further consider the Singular Value Decomposition of this symmetrical matrix $\mat C = \mat U \cdot \diag(\mat s) \cdot \mat U\T$.
+Let us consider the covariance matrix $\mat C = \sum_{i,j} (\vec p^i - \vec m) \left(\vec p^j - \vec m \right) \T$ (up to scale), where $\vec m = \frac 1 {|P|} \sum_i \vec p^i$ is the center of mass. Let us further consider the Singular Value Decomposition of this symmetrical matrix $\mat C = \mat U \cdot \diag(\vec s) \cdot \mat U\T$.
 The sought basis vectors are the columns of $\mat U\T$, in their order.
 
 \begin{lemma}
-If each point $\mat x$ of data with covariance $\mat C$ is transformed to $\mat A \mat x$, the resulting points have covariance matrix $\mat A \mat C \mat A \T$.
+If each point $\vec x$ of data with covariance $\mat C$ is transformed to $\mat A \vec x$, the resulting points have covariance matrix $\mat A \mat C \mat A \T$.
 \end{lemma}
 
 \begin{proof}
@@ -100,16 +98,16 @@ We can view the data as a single random vector following a normal distribution w
 \todo{or maybe not?}
 Using the fact that 
 \begin{multline}
-\cov\big( (\mat A \mat x)_i, (\mat A \mat x)_j \big) = \cov\Big( \sum_k(\mat A_{ik} \mat x_k), \sum_l(\mat A_{jl} \mat x_l) \Big) = \sum_k \Big( \mat A_{ik} \sum_l \cov( \mat x_k, \mat x_l ) \mat A_{jl} \Big) \\
+\cov\big( (\mat A \vec x)_i, (\mat A \vec x)_j \big) = \cov\Big( \sum_k(\mat A_{ik} \vec x_k), \sum_l(\mat A_{jl} \vec x_l) \Big) = \sum_k \Big( \mat A_{ik} \sum_l \cov( \vec x_k, \vec x_l ) \mat A_{jl} \Big) \\
 = \sum_k \Big( \mat A_{ik} \sum_l \mat C_{kl} \mat A_{lj}\T \Big) = \sum_k \mat A_{ik} (\mat C \mat A \T)_{kj} = (\mat A \mat C \mat A\T)_{ij},
 \end{multline}
 \end{proof}
 
 \begin{proof}[Proof of the algorithm]
-Setting $\mat A = \mat U\T$, we obtain $\mat A \mat C \mat A \T = \mat U\T \mat U \cdot \diag(\mat s) \cdot \mat U\T \mat U = \diag(\mat s)$.
+Setting $\mat A = \mat U\T$, we obtain $\mat A \mat C \mat A \T = \mat U\T \mat U \cdot \diag(\vec s) \cdot \mat U\T \mat U = \diag(\vec s)$.
 This means that if the data are expressed in the orthonormal basis  $\mat U$, their vector components are no longer correlated.
 
-Picking the first basis vector $\mat q^1$ (such that the variance of the orthogonal projection of $\mat P$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
+Picking the first basis vector $\vec q^1$ (such that the variance of the orthogonal projection of $\mat P$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
 
 \end{proof}
 
@@ -124,8 +122,8 @@ Picking the first basis vector $\mat q^1$ (such that the variance of the orthogo
 \section{Fourier analysis}
 
 \subsection{Fast Fourier Transform}
-\textit{Input:} vector $\mat v \in \C^n$.\\
-\textit{Output:} vector $\mat f \in \C^n$ such that $\mat x_i = \sum_j \mat f_j \omega^{i j}$ for all $i$, where $\omega$ is $n$-th root of unity.\\
+\textit{Input:} vector $\vec v \in \C^n$.\\
+\textit{Output:} vector $\vec f \in \C^n$ such that $\vec x_i = \sum_j \vec f_j \omega^{i j}$ for all $i$, where $\omega$ is $n$-th root of unity.\\
 
 Let us define the function $\mathrm{FFT}: \R^{2m} \to \R^m$.
 
@@ -149,8 +147,8 @@ Let us define the function $\mathrm{FFT}: \R^{2m} \to \R^m$.
 
 \subsection{Direct Linear Transformation}
 
-\textit{Input:} set of point pairs $\matx^k \leftrightarrow \matp^k$ related by an unknown homography.\\
-\textit{Output:} homography matrix $\matH$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by an unknown homography.\\
+\textit{Output:} homography matrix $\mat H$.\\
 
 \todo{describe as a short solution and its proof}
 
@@ -161,50 +159,52 @@ Secondly, the measured data points are defined only up to scale, so it is not po
 A technique called Direct Linear Transformation is widely used to overcome this issue.
 
 We are presented with a set projective correspondences of the form
-$$\matH \matx^k = \alpha_k \matp^k, 1 \leq k \leq K,$$
-where $\alpha_k$ are unknown scalars and $\matH$ is an unknown matrix that we want to calculate.
+$$\mat H \vec x^k = \alpha_k \vec p^k, 1 \leq k \leq m,$$
+where $\alpha_k$ are unknown scalars and $\mat H$ is an unknown matrix that we want to calculate.
 
-Unfortunately, these equations do not form a linear system with respect to the unknown matrix $\matH$ because there is an unknown scale factor $\alpha_k$ involved in each equation.
+Unfortunately, these equations do not form a linear system with respect to the unknown matrix $\mat H$ because there is an unknown scale factor $\alpha_k$ involved in each equation.
 Differences among the scale factors make up the perspective part of the homography, so although they can make the problem numerically unstable, we cannot impose any limits on these values.
 The core idea of Direct Linear Transformation is to find a set of vectors that must be orthogonal to the solution, and then solve the resulting homogeneous system.
 
-Let us define a set of antisymmetric matrices $\{\matM^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
-$$\matM^{i, j}_{i, j} = 1,
-\matM^{i, j}_{j, i} = -1.$$
-From this definition it follows that for any $\matp \in \R^n$, the product $\matp\T \matM^{i, j} \matp = \matp_{i} \matp_{j} - \matp_{j} \matp_{i} = 0$.
-The vectors $\left\{ \matM^{i, j} \matp \right\}, 1 \leq i < j \leq n$, are all orthogonal to a given $\matp \in \R^n$.
+Let us define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
+$$\mat M^{i, j}_{i, j} = 1,
+\mat M^{i, j}_{j, i} = -1.$$
+From this definition it follows that for any $\vec p \in \R^n$, the product $\vec p\T \mat M^{i, j} \vec p = \vec p_{i} \vec p_{j} - \vec p_{j} \vec p_{i} = 0$.
+The vectors $\left\{ \mat M^{i, j} \vec p \right\}, 1 \leq i < j \leq n$, are all orthogonal to a given $\vec p \in \R^n$.
 
 With increasing dimension, this set of vectors becomes heavily redundant.
-Clearly, a minimal solution would form a basis of the subspace $\R^n / \matp$ orthogonal to $\matp$ and thus would consist of $n - 1$ vectors, whereas this approach generates $\frac {1} {2} n \cdot (n - 1)$ vectors.
+Clearly, a minimal solution would form a basis of the subspace $\R^n / \vec p$ orthogonal to $\vec p$ and thus would consist of $n - 1$ vectors, whereas this approach generates $\frac {1} {2} n \cdot (n - 1)$ vectors.
 Some sources\cite{MVG} suggest to pick an arbitrary subset of size $n - 1$ from the matrices defined above and use these for the whole data set.
-A more proper solution is to select these matrices specifically for each correspondence pair $\matx^k \leftrightarrow \matp^k$ so as to avoid possible degeneracies.
-In particular, we find the largest vector element $\matp_l$ (in absolute value) and then select all matrices $\matM^{i, j}$ such that $i = l$ or $j = l$.
-Each of the vectors generated this way contains the value of $\matp_l$ at a different position (i.e., a different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \matp$.
+A more proper solution is to select these matrices specifically for each correspondence pair $\vec x^k \leftrightarrow \vec p^k$ so as to avoid possible degeneracies.
+In particular, we find the largest vector element $\vec p_l$ (in absolute value) and then select all matrices $\mat M^{i, j}$ such that $i = l$ or $j = l$.
+Each of the vectors generated this way contains the value of $\vec p_l$ at a different position (i.e., a different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \vec p$.
 
 Now we can formulate the linear system.
-It will consist of $K \cdot (n - 1)$ equations, where $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
-Its unknowns will be precisely the elements of the matrix $\matH$.
-Each equation of the system represents a constraint of the form $\matp\T \matM \matH \matx = 0$, which is the orthogonality constraint as proposed above.
-This constraint can be reformulated in terms of the Frobenius inner product $\langle \matA, \matB \rangle_F = \sum_{i, j} \matA_{i, j} \cdot \matB_{i, j}$ and the vector outer product as follows:
-$$\matp\T \matM \matH \matx = \sum_{i, j} (\matp\T \matM)_i \matH_{i, j} \matx_j = \langle \matp\T \matM \matx\T, \matH \rangle_F = 0.$$
+It will consist of $m \cdot (n - 1)$ equations, where $m$ is the number of correspondence pairs $\vec x^k \leftrightarrow \vec p^k$.
+Its unknowns will be precisely the elements of the matrix $\mat H$.
+Each equation of the system represents a constraint of the form $\vec p\T \mat M \mat H \vec x = 0$, which is the orthogonality constraint as proposed above.
+This constraint can be reformulated in terms of the Frobenius inner product $\langle \mat A, \mat B \rangle_F = \sum_{i, j} \mat A_{i, j} \cdot \mat B_{i, j}$ and the vector outer product as follows:
+$$\vec p\T \mat M \mat H \vec x = \sum_{i, j} (\vec p\T \mat M)_i \mat H_{i, j} \vec x_j = \langle \vec p\T \mat M \vec x\T, \mat H \rangle_F = 0.$$
 Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form:
-$$\vec (\matp\T \matM \matx\T)\T \cdot \vec(\matH) = 0,$$
-where $\vec : \R^{m \times n} \to \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
-Each correspondence pair and each selected antisymmetric matrix $\matM^{i, j}$ for that pair provide one such equation, and the row vectors $\vec ({\matp^k}\T \matM^{i, j} {\matx^k}\T)\T$ can be stacked to form the system matrix.
+$$\mathrm{vec} (\vec p\T \mat M \vec x\T)\T \cdot \mathrm{vec}(\mat H) = 0,$$
+where $\mathrm{vec} : \R^{m \times n} \to \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
+Each correspondence pair and each selected antisymmetric matrix $\mat M^{i, j}$ for that pair provide one such equation, and the row vectors $\mathrm{vec} ({\vec p^k}\T \mat M^{i, j} {\vec x^k}\T)\T$ can be stacked to form the system matrix.
 
 Homogeneous linear systems such as this one can be solved using the Singular Value Decomposition (SVD).
 
 \todo{\dots}
-However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\matH \matx^k = \alpha_k \matp^k$.
-In particular, it is possible that a solution will produce points at infinity, meaning that $\matp_n \approx 0$ and that the Cartesian counterpart of $\matp$ is undefined.
+However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\mat H \vec x^k = \alpha_k \vec p^k$.
+In particular, it is possible that a solution will produce points at infinity, meaning that $\vec p_n \approx 0$ and that the Cartesian counterpart of $\vec p$ is undefined.
 Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.
 
 \todo{normalization: subtract mean, enforce unity variance}
 
+The system matrix in our case is of shape $m \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
+
 \subsection{Four-point homography}
 
-\textit{Input:} set of point pairs $\matx^k \leftrightarrow \matp^k$, where $1 \leq k \leq 4$.\\
-\textit{Output:} homography matrix $\matH$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$.\\
+\textit{Output:} homography matrix $\mat H$.\\
 
 A minimal case of a 2-dimensional homography estimation is a correspondence of 4 point pairs.
 If the input points are in a general configuration (none three are collinear), then there is an exact solution---least squares fitting is not necessary here.
@@ -213,42 +213,42 @@ The general formula as generated by Direct Linear Transformation would be needle
 \todo{rewrite this as lemmas, definitions and proofs.}
 
 Let us write the point sets as columns of a $3 \times 4$ matrix, and let us denote the equivalence of two point sets up to scale by the $\sim$ (tilde) character:
-$$\matA \sim \matB \Leftrightarrow \exists \alpha_1 \dots \alpha_4 : \matA \cdot \begin{pmatrix}
+$$\mat A \sim \mat B \Leftrightarrow \exists \alpha_1 \dots \alpha_4 : \mat A \cdot \begin{pmatrix}
  \alpha_1 & & \\
   & \ddots & \\
  & & \alpha_4
- \end{pmatrix} = \matB.$$
+ \end{pmatrix} = \mat B.$$
 Also, let us declare the following set as the \textit{canonical configuration}:
-$$\matC = \begin{pmatrix}
+$$\mat C = \begin{pmatrix}
  1 & 0 & 0 & 1 \\
  0 & 1 & 0 & 1 \\
  0 & 0 & 1 & 1
  \end{pmatrix}.$$
 We will now present the formulas to convert an arbitrary 4-point set to and from the canonical configuration.
 
-For a given point set $\matA = \left( \mat{a}, \mat{b}, \mat{c}, \mat{d} \right)$, the homography $\mathrm{can}(\matA)$ is defined as:
-$$\mathrm{can}(\matA) = \begin{pmatrix}
- \alpha_1 (\mat{b} \times \mat{c}) \T \\
- \alpha_2 (\mat{c} \times \mat{a}) \T \\
- \alpha_3 (\mat{a} \times \mat{b}) \T \\
+For a given point set $\mat A = \left( \vec a, \vec b, \vec c, \vec d \right)$, the homography $\mathrm{can}(\mat A)$ is defined as:
+$$\mathrm{can}(\mat A) = \begin{pmatrix}
+ \alpha_1 (\vec b \times \vec c) \T \\
+ \alpha_2 (\vec c \times \vec a) \T \\
+ \alpha_3 (\vec a \times \vec b) \T \\
  \end{pmatrix},
 $$
-where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{can}(\matA) \cdot \mat{d} = \left( 1, 1, 1 \right)\T$.
+where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{can}(\mat A) \cdot \vec d = \left( 1, 1, 1 \right)\T$.
 Note that this requires no linear solving, just an element-wise division.
-If the points $\matA$ are affine independent, it clearly follows that $\mathrm{can}(\matA) \cdot \matA \sim \matC$.
+If the points $\mat A$ are affine independent, it clearly follows that $\mathrm{can}(\mat A) \cdot \mat A \sim \mat C$.
 
-The homography $\mathrm{dec}(\matA)$ is, in turn, defined as:
-$$\mathrm{dec}(\matA) = \left( \alpha_1 \mat{a}, \alpha_2 \mat{b}, \alpha_3 \mat{c} \right),$$
-where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{dec}(\matA) \cdot \left( 1, 1, 1 \right)\T = \mat{d}$.
-This requires us to solve the $3 \times 3$ linear system $\left(\mat{a}, \mat{b}, \mat{c} \right) \cdot \left(\alpha_1, \alpha_2, \alpha_3 \right) \T = \mat{d}$.
-As a result it follows that $\mathrm{dec}(\matA) \cdot \matC \sim \matA$.
-Note that the vector $\mat{d}$ is exactly the right-hand side of this system.
-A neat side-effect is that the inverse matrix $\mathrm{dec}(\matA) \inv = \mathrm{can}(\matA)$ has correct scale. 
-More importantly, it means that the mapping $\mathrm{dec}$ is linear with respect to all elements of $\mat{d}$.
+The homography $\mathrm{dec}(\mat A)$ is, in turn, defined as:
+$$\mathrm{dec}(\mat A) = \left( \alpha_1 \vec a, \alpha_2 \vec b, \alpha_3 \vec c \right),$$
+where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{dec}(\mat A) \cdot \left( 1, 1, 1 \right)\T = \vec d$.
+This requires us to solve the $3 \times 3$ linear system $\left(\vec a, \vec b, \vec c \right) \cdot \left(\alpha_1, \alpha_2, \alpha_3 \right) \T = \vec d$.
+As a result it follows that $\mathrm{dec}(\mat A) \cdot \mat C \sim \mat A$.
+Note that the vector $\vec d$ is exactly the right-hand side of this system.
+A neat side-effect is that the inverse matrix $\mathrm{dec}(\mat A) \inv = \mathrm{can}(\mat A)$ has correct scale. 
+More importantly, it means that the mapping $\mathrm{dec}$ is linear with respect to all elements of $\vec d$.
 
 These two mappings can be composed to provide any four-point homography as necessary:
-$$\mathrm{dec}(\matB) \cdot \mathrm{can}(\matA) \cdot \matA \sim \matB.$$
-The resulting mapping is linear with respect to the last column of $\matB$.
+$$\mathrm{dec}(\mat B) \cdot \mathrm{can}(\mat A) \cdot \mat A \sim \mat B.$$
+The resulting mapping is linear with respect to the last column of $\mat B$.
 
 \todo{what are the overall computational requirements?}
 
@@ -261,15 +261,15 @@ The resulting mapping is linear with respect to the last column of $\matB$.
 \todo{rewrite as a short solution and its proof}
 
 We wish to calculate the derivative of a four-point homography with respect to the coordinates of its four control points.
-The linearity of $\mathrm{dec}(\matA)$ implies that the derivative $\frac{\partial} {\partial \mat{d}_i} \mathrm{dec} \left( \mat{a}, \mat{b}, \mat{c}, \mat{d} \right) = \mathrm{dec} \left( \mat{a}, \mat{b}, \mat{c}, \mat{e}_i \right)$, where $\mat{e}_i$ is the unit vector for the coordinate axis $i$.
+The linearity of $\mathrm{dec}(\mat A)$ implies that the derivative $\frac{\partial} {\partial \vec d_i} \mathrm{dec} \left( \vec a, \vec b, \vec c, \vec d \right) = \mathrm{dec} \left( \vec a, \vec b, \vec c, \vec e_i \right)$, where $\vec e_i$ is the unit vector for the coordinate axis $i$.
 
-Furthermore, we need to calculate derivatives with respect to $\mat a$, $\mat b$ and $\mat c$.
+Furthermore, we need to calculate derivatives with respect to $\vec a$, $\vec b$ and $\vec c$.
 Theoretically, we could use the fact that any permutation of the canonical points can be expressed as a homography,\footnote{
-The homography $\mat{R} = \begin{pmatrix}
+The homography $\mat R = \begin{pmatrix}
  0 & 0 & 1 \\
  -1 & 0 & 1 \\
  0 & -1 & 1
- \end{pmatrix}$ has the effect $\mat{R} \cdot \matC \sim \begin{pmatrix}
+ \end{pmatrix}$ has the effect $\mat R \cdot \mat C \sim \begin{pmatrix}
  1 & 1 & 0 & 0 \\
  1 & 0 & 1 & 0 \\
  1 & 0 & 0 & 1
@@ -284,12 +284,12 @@ The preferable method is to explicitly permute the points so that the point in q
 
 \subsection{Ransac}
 
-\textit{Input:} set of point pairs $\matx^k \leftrightarrow \matp^k$, some of which are related by an unknown homography.\\
-\textit{Output:} homography matrix $\matH$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, some of which are related by an unknown homography.\\
+\textit{Output:} homography matrix $\mat H$.\\
 
 \subsection{Boosted random forests}
 
-\textit{Input:} set of sample points $\{\mat p^i \in \R^n \}$ and corresponding function values $\{ f(\mat p^i) \}$.\\
+\textit{Input:} set of sample points $\{\vec p^i \in \R^n \}$ and corresponding function values $\{ f(\vec p^i) \}$.\\
 \textit{Output:} piecewise constant function $g$ that approximates $f$.\\
 
 \subsection{Convolutional neural networks}

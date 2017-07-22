@@ -23,7 +23,7 @@ Finally, the 6 degrees of freedom of the head and the 4 degrees of freedom of th
 \section{Face Tracking}
 
 \textit{Input:} reference image $R$ and current image $I$.\\
-\textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\mat p} |\textrm{R}(\mat p) - \textrm{I}(T(\mat p))|^2$ is minimal.\\
+\textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(T(\vec p))|^2$ is minimal.\\
 
 \todo{rewrite this outdated paragraph}
 Our program supports two methods of face tracking, which represent two major groups of tracking techniques in general.
@@ -69,7 +69,7 @@ The extension of this method to homographic cells (i.e., a quadrangular mesh) re
 \section{Eye Tracking}
 
 \textit{Input:} iris radius $r \in \R$ and image $I$ centered at an expected eye location.\\
-\textit{Output:} iris center $\mat p \in \R^2$.\\
+\textit{Output:} iris center $\vec p \in \R^2$.\\
 
 Once the face itself has been tracked, the eyes can be easily located using their reference position.
 The iris radius can also be extracted by multiplying the reference radius with a scale factor given by the face tracker.
@@ -138,14 +138,14 @@ For the case that skin masking (described below) fails or is disabled altogether
 
 \begin{itemize}
 \item
-Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{I}(\mat p)|$ where $\arctan(\mat p) = \alpha$ and $|\mat p| = r$.
+Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{I}(\vec p)|$ where $\arctan(\vec p) = \alpha$ and $|\vec p| = r$.
 
 \item
-Radial color $\textrm{mean}(t)$ is a mean value of the set $\{\textrm{I}(\mat p) \text{ for all } |\mat p| = t \}$.
+Radial color $\textrm{mean}(t)$ is a mean value of the set $\{\textrm{I}(\vec p) \text{ for all } |\vec p| = t \}$.
 
 \item
-Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of the set $\{\textrm{I}(\mat p)$ for all $\arctan(\mat p) = \alpha \}$.
-The weight is $\textrm{w}(\mat p) = t \cdot (c - |\textrm{image}(\mat p) - \textrm{mean}(t)|)$, clamped to zero, with $t = |\mat p|$ and $c$ being a value appropriately chosen.
+Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of the set $\{\textrm{I}(\vec p)$ for all $\arctan(\vec p) = \alpha \}$.
+The weight is $\textrm{w}(\vec p) = t \cdot (c - |\textrm{image}(\vec p) - \textrm{mean}(t)|)$, clamped to zero, with $t = |\vec p|$ and $c$ being a value appropriately chosen.
 
 \end{itemize}
 

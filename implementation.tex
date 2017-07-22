@@ -62,6 +62,14 @@ The extension of this method to homographic cells (i.e., a quadrangular mesh) re
 
 \section{Eye Tracking}
 
+\textit{Input:} iris radius $R \in \R$; function $\textrm{image}: \R^2 \rightarrow \R^3$ centered at an expected eye location.\\
+\textit{Output:} vector $\mat p \in \R^2$, the precise iris center.\\
+
+Once the face itself has been tracked, the eyes can be easily located using their reference position.
+The iris radius can also be extracted by multiplying the reference radius with a scale factor given by the face tracker.
+Most of the face trackers induce non-uniform scaling, so it might seem appropriate that the eye shape will be an ellipse.
+However, we assume that eyes are always directed towards the camera, so the limbus should retain a circular shape even if the face is stretched.
+
 There are a plenty of eye trackers available in our program.
 From a broader perspective, we took four different approaches:
 \begin{itemize}
@@ -107,13 +115,56 @@ This template requires the user to open wide their eyes, so that the whole limbu
 For tracking a colored object, it is again reasonable to use the normalized correlation.
 
 \subsection{Iris radial symmetry}
-We can define a model with few free parameters, relying only on the radial symmetry around the iris.
-Being highly nonlinear, it is also difficult to optimize and may be trapped in a local minimum.
-\todo{explain in detail!}
 
-\subsection{Skin segmentation}
-This is yet to be coded and tested.
-It should be a switch that just disables processing of skin regions.
+It may be considerably difficult to obtain a reliable iris image, and generally speaking it is a calibration step that we wish to avoid.
+Instead, we can use the sole fact that the iris is a radially symmetric object on a white background.
+The iris colors are recalculated for each frame and each eye position, so only few free parameters remain.
+
+For the case that skin masking (described below) fails or is disabled altogether, whole segments of the iris are ignored where the limbus is not visible.
+
+\begin{itemize}
+\item
+Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{image}(\mat p)|$ where $\arctan(\mat p) = \alpha$ and $|\mat p| = R$.
+
+\item
+Radial color $\textrm{mean}(r)$ is a mean value of the set $\{\textrm{image}(\mat p) \text{ for all } |\mat p| = r \}$.
+
+\item
+Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of the set
+$$\{\textrm{image}(\mat p) \text{ for all } \arctan(\mat p) = \alpha \}.$$
+The weight is $\textrm{w}(\mat p) = r \cdot (W - |\textrm{image}(\mat p) - \textrm{mean}(r)|)$, clamped to zero, with $r = |\mat p|$ and $W$ being a value appropriately chosen.
+
+\end{itemize}
+
+The total score is defined as $\int_\alpha \textrm{limbus}(\alpha) \cdot \textrm{iris}(\alpha)$.
+
+Note that the formula for $\textrm{mean}(r)$ has not been specified yet.
+Using the arithmetic mean may have a bad impact on the overall success rate.
+It is appropriate here to use a more robust formula such as the median.
+
+There are essentialy two ways how to generaze the median to color pixels.
+Firstly, we can pick the median value as sorted by a scalar value (e.g., brightness).
+This approach becomes unpredictable if many different colors have the same brightness, and specifically in the case of skin tones and iris color, this may be an issue.
+
+The second option is to define the median of set $S$ as the value $m \in S$ such that the sum of distances $\sum_{x \in S} |m - x|$ is minimized.
+This formula is consistent with the one-dimensional case(@cite) and is valid in any metric space.
+Unfortunately, efficient algorithms to compute this value are too sophisticated, so we loop over $S$ explicitly.
+
+This function is computationally expensive and, depending on the method for mean color calculation, difficult to optimize locally.
+Our program does not even contain the code to calculate the derivatives.
+This tracker uses exhaustive search to find the global minimum within a crop-out image.
+
+\subsection{Skin masking}
+
+Skin, and most importantly the eyelids, can be often detected by simple analysis of its color.
+We allow each of the eye trackers presented so far to be coupled with a HSV (hue-saturation-value) detector tuned for skin tones.
+Areas masked out by this detector are excluded from eye fitting.
+
+\todo{formula}
+
+Since there are usually many distractive features around the eyes, such as the eyelashes and makeup, the mask is pre-processed so as to have a smooth boundary and to cover nearby black splotches.
+
+\todo{This is yet to be coded and tested.}
 
 \subsection{Random forest regression}
 This is yet to be coded and tested, but it is not going to work anyway.

@@ -22,7 +22,8 @@ Finally, the 6 degrees of freedom of the head and the 4 degrees of freedom of th
 
 \section{Face Tracking}
 
-\todo{problem i/o}
+\textit{Input:} reference image $R$ and current image $I$.\\
+\textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\mat p} |\textrm{R}(\mat p) - \textrm{I}(T(\mat p))|^2$ is minimal.\\
 
 \todo{rewrite this outdated paragraph}
 Our program supports two methods of face tracking, which represent two major groups of tracking techniques in general.
@@ -67,8 +68,8 @@ The extension of this method to homographic cells (i.e., a quadrangular mesh) re
 
 \section{Eye Tracking}
 
-\textit{Input:} iris radius $R \in \R$; function $\textrm{image}: \R^2 \rightarrow \R^3$ centered at an expected eye location.\\
-\textit{Output:} vector $\mat p \in \R^2$, the precise iris center.\\
+\textit{Input:} iris radius $r \in \R$ and image $I$ centered at an expected eye location.\\
+\textit{Output:} iris center $\mat p \in \R^2$.\\
 
 Once the face itself has been tracked, the eyes can be easily located using their reference position.
 The iris radius can also be extracted by multiplying the reference radius with a scale factor given by the face tracker.
@@ -84,7 +85,7 @@ From a broader perspective, we took four different approaches:
 \item Machine learning. Instead of modeling, we can feed the image into a regression engine.
 \end{itemize}
 
-Acknowledging that the scale (e.g., the radius $R$) can be only a few pixels, we aim for a subpixel precision.
+Acknowledging that the scale (e.g., the radius $r$) can be only a few pixels, we aim for a subpixel precision.
 That is a meaningful pursuit thanks to the continuous image model defined in Section \ref{s.imagemodel}.
 
 However, many of the algorithms to be presented are based on pixel by pixel evaluation of a scoring function.
@@ -137,21 +138,20 @@ For the case that skin masking (described below) fails or is disabled altogether
 
 \begin{itemize}
 \item
-Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{image}(\mat p)|$ where $\arctan(\mat p) = \alpha$ and $|\mat p| = R$.
+Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{I}(\mat p)|$ where $\arctan(\mat p) = \alpha$ and $|\mat p| = r$.
 
 \item
-Radial color $\textrm{mean}(r)$ is a mean value of the set $\{\textrm{image}(\mat p) \text{ for all } |\mat p| = r \}$.
+Radial color $\textrm{mean}(t)$ is a mean value of the set $\{\textrm{I}(\mat p) \text{ for all } |\mat p| = t \}$.
 
 \item
-Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of the set
-$$\{\textrm{image}(\mat p) \text{ for all } \arctan(\mat p) = \alpha \}.$$
-The weight is $\textrm{w}(\mat p) = r \cdot (W - |\textrm{image}(\mat p) - \textrm{mean}(r)|)$, clamped to zero, with $r = |\mat p|$ and $W$ being a value appropriately chosen.
+Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of the set $\{\textrm{I}(\mat p)$ for all $\arctan(\mat p) = \alpha \}$.
+The weight is $\textrm{w}(\mat p) = t \cdot (c - |\textrm{image}(\mat p) - \textrm{mean}(t)|)$, clamped to zero, with $t = |\mat p|$ and $c$ being a value appropriately chosen.
 
 \end{itemize}
 
 The total score is defined as $\int_\alpha \textrm{limbus}(\alpha) \cdot \textrm{iris}(\alpha)$.
 
-Note that the formula for $\textrm{mean}(r)$ has not been specified yet.
+Note that the formula for $\textrm{mean}(t)$ has not been specified yet.
 Using the arithmetic mean may have a bad impact on the overall success rate.
 It is appropriate here to use a more robust formula such as the median.
 

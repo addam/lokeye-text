@@ -16,11 +16,11 @@ The system matrix in our case is of shape $K \cdot (n - 1) \times m$, which lead
 \textit{Input:} matrix $\matA$\\
 \textit{Output:} vector $\matx$ such that $|\matx| = 1$ and $|\matA \matx|$ is minimal.\\
 
-Let us consider the SVD of $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.
-The result is simply the $i$-th column of $\mat V \T$, where $i$ is chosen so that $\mat s_i^2$ is minimal.
+Let us consider the SVD\todo{abbreviation} of $\matA = \mat U \cdot \diag(\mat s) \cdot \mat V\T$.
+The result $\matx$ is the $i$-th column of $\mat V \T$, where $i$ is chosen so that $\mat s_i^2$ is minimal.
 
 \begin{proof}
-Let us also define a vector $\mat v = \mat V \matx$.
+Let us define a vector $\mat v = \mat V \matx$.
 This is effectively a change of basis, and because $\mat V$ is an orthonormal matrix, the norm $|\mat v| = |\mat x|$ is preserved.
 Because also $\mat U$ is an orthonormal matrix, it can be safely crossed out of the norm $|\matA \matx| = |\diag(\mat s) \cdot \mat v|$.
 This in turn can be expressed as the square root of $\sum_i (\mat s_i \mat v_i)^2 = \sum_i \mat s_i^2 \mat v_i^2$.
@@ -28,24 +28,44 @@ This in turn can be expressed as the square root of $\sum_i (\mat s_i \mat v_i)^
 Finally, this constrained minimization problem can be solved by the method of Lagrange multipliers.
 Equating $\nabla(\sum_i \mat s_i^2 \mat v_i^2) = \lambda \nabla (\sum_i \mat v_i^2)$ leads to the system of equations $\mat s_i^2 \mat v_i = \lambda \mat v_i$ for all $i$.
 These necessary constraints are satisfied only by choosing $\lambda = \mat s_i^2$ for some $i$.
-Assuming that all $\mat s_j^2 \neq \mat s_i^2$ for $j \neq i$, we must also set the remaining elements $\mat v_j = 0$, and therefore $\mat v_i = 1$.
+Deliberately assuming that all $\mat s_j^2 \neq \mat s_i^2$ for all $j \neq i$, we must also set the remaining elements $\mat v_j = 0$, and therefore $\mat v_i = 1$.
 In order to find a global minimum, we pick $i$ such that $\mat s_i^2 \mat v_i^2 = \mat s_i^2$ is minimal.
+The result is $\mat x = \mat V \inv \mat v = \mat V \T \mat v$.
 \end{proof}
 
 If $\mat s_i^2 = \mat s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway.
 This can be proven by adding a small perturbation to $\mat s_j$.
 
+\subsection{Principal Component Analysis}
+\todo{is this used in the program?}
+
 \section{Nonlinear optimization}
 
-\todo{Newton's method}
+\todo{Gradient descent}
 
 \todo {line search}
 
 \section{Fourier Analysis}
 
+\subsection{Fast Fourier Transform}
+\textit{Input:} vector $\mat v \in \C^n$.\\
+\textit{Output:} vector $\mat f \in \C^n$ such that $\mat x_i = \sum_j \mat f_j \omega^{i j}$ for all $i$, where $\omega$ is $n$-th root of unity.\\
+
+Let us define the function $\mathrm{FFT}: \R^{2m} \rightarrow \R^m$.
+
+\begin{proof}
+@cite CLRS
+\end{proof}
+
 \subsection{Convolution}
 
+\textit{Input:} matrices $\mat M \in \R^{n \times m}, \mat T \in \R^{k \times l}$.\\
+\textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
+
 \subsection{Normalized Cross-Correlation}
+
+\textit{Input:} matrices $\mat M \in \R^{n \times m}, \mat T \in \R^{k \times l}$.\\
+\textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
 
 \todo {there are more use cases beyond the obvious one.}
 
@@ -53,10 +73,9 @@ This can be proven by adding a small perturbation to $\mat s_j$.
 
 \subsection{Direct Linear Transformation}
 
-\textit{Input:} a set of point pairs $\matx^k \leftrightarrow \matp^k$ related by an unknown homography.\\
+\textit{Input:} set of point pairs $\matx^k \leftrightarrow \matp^k$ related by an unknown homography.\\
 \textit{Output:} homography matrix $\matH$.\\
 
-The correspondence between measured values and the appropriate results is assumed to be a homography.
 There are, loosely speaking, two difficulties in homography fitting as compared to affine transformations.
 Firstly, it has a nonlinear component so an algebraic least-squares solution is generally different from a geometric least-squares solution.
 The former can be obtained in a much more stable way than the latter, so we start with algebraic least squares fitting and use the result for initialization of a nonlinear optimization method.
@@ -82,7 +101,7 @@ Clearly, a minimal solution would form a basis of the subspace $\R^n / \matp$ or
 Some sources\cite{MVG} suggest to pick an arbitrary subset of size $n - 1$ from the matrices defined above and use these for the whole data set.
 A more proper solution is to select these matrices specifically for each correspondence pair $\matx^k \leftrightarrow \matp^k$ so as to avoid possible degeneracies.
 In particular, we find the largest vector element $\matp_l$ (in absolute value) and then select all matrices $\matM^{i, j}$ such that $i = l$ or $j = l$.
-Each of the vectors generated this way contains the value of $\matp_l$ at a different position (i.e., different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \matp$.
+Each of the vectors generated this way contains the value of $\matp_l$ at a different position (i.e., a different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \matp$.
 
 Now we can formulate the linear system.
 It will consist of $K \cdot (n - 1)$ equations, where $K$ is the number of correspondence pairs $\matx^k \leftrightarrow \matp^k$.
@@ -102,10 +121,12 @@ However, if the input vectors are degenerate and only span a subspace of $\R^m$,
 In particular, it is possible that a solution will produce points at infinity, meaning that $\matp_n \approx 0$ and that the Cartesian counterpart of $\matp$ is undefined.
 Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.
 
+\todo{normalization: subtract mean, enforce unity variance}
+
 \subsection{Four-point homography}
 
 A minimal case of a 2-dimensional homography estimation is a correspondence of 4 point pairs.
-The general formula as generated by DLT would be needlessly bloated for this setting.
+The general formula as generated by DLT\todo{abbreviation?} would be needlessly bloated for this setting.
 
 Let us write the point sets as columns of a $3 \times 4$ matrix, and let us denote the equivalence of two point sets up to scale by the $\sim$ (tilde) character:
 $$\matA \sim \matB \Leftrightarrow \exists \alpha_1 \dots \alpha_4 : \matA \cdot \begin{pmatrix}
@@ -148,12 +169,29 @@ The resulting mapping is linear with respect to the last column of $\matB$.
 \todo{what are the overall computational requirements?}
 
 \subsection{Derivatives of a homography}
+\label{s.homderivatives}
 
 We wish to calculate the derivative of a four-point homography with respect to the coordinates of its four control points.
 The linearity of $\mathrm{dec}(\matA)$ implies that the derivative $\frac{\partial} {\partial \mat{d}_i} \mathrm{dec} \left( \mat{a}, \mat{b}, \mat{c}, \mat{d} \right) = \mathrm{dec} \left( \mat{a}, \mat{b}, \mat{c}, \mat{e}_i \right)$, where $\mat{e}_i$ is the unit vector for the coordinate axis $i$.
 
-Derivative with respect to $\mat a$, $\mat b$ and $\mat c$ cannot be easily calculated from this formula because there are many scale factors in effect.
-The suggested approach is to explicitly permute the points so that the point in question becomes the last one, and to repeat the original scheme.
+Furthermore, we need to calculate derivatives with respect to $\mat a$, $\mat b$ and $\mat c$.
+Theoretically, we could use the fact that any permutation of the canonical points can be expressed as a homography,\footnote{
+The homography $\mat{R} = \begin{pmatrix}
+ 0 & 0 & 1 \\
+ -1 & 0 & 1 \\
+ 0 & -1 & 1
+ \end{pmatrix}$ has the effect $\mat{R} \cdot \matC \sim \begin{pmatrix}
+ 1 & 1 & 0 & 0 \\
+ 1 & 0 & 1 & 0 \\
+ 1 & 0 & 0 & 1
+ \end{pmatrix}$.
+} and incorporate these homographies into the formulas above.
+Unfortunately, there are several unknown scale factors involved that make such an approach inefficient.
+The preferable method is to explicitly permute the points so that the point in question becomes the last one, and to repeat the original scheme.
 
 \todo{what are the overall computational requirements, per pixel?}
 
+\section{Machine learning}
+
+\todo{Ransac}
+\todo{Boosted random forests}

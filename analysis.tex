@@ -5,8 +5,9 @@ We discuss the anatomy of human face and eyes in particular, and all relevant te
 
 \section{Conditions}
 
-We assume that the user is working with their personal computer, or a similar device such as a tablet.
+We expect that the user is working with their personal computer, or a similar device such as a tablet.
 The user and the device can freely move around; the only constraint there is that the camera must be fixed to the computer screen.
+Throughout the calculation, we rely on that the user's face is visible, and that the angle difference of gaze and camera direction is small.
 
 For a good calibration, we require active cooperation from the user: they are asked to watch a dot moving around the screen.
 If necessary, this requirement can be somewhat lifted by using a calibration file defined earlier or completely different means of calibration.
@@ -124,22 +125,22 @@ On the other hand, they also decrease with the lens size, and cameras with a nar
 
 \item
 Moiré.
-In low- and mid-cost cameras, image colors are obtained by attaching different color filters to each cell of the light sensor.
+In most consumer cameras, image colors are obtained by attaching different color filters to each cell of the light sensor.
 \todo{explain some more}
 Contrast on subpixel level makes each color channel sum up to a different amount, even if there are no colored objects in the scene.
 When imaging fine black-and-white colored structures, spurious and highly saturated colors may appear.
 
-This effect can hardly cause any issues when displaying human faces.
+This effect can hardly occur when displaying human faces.
 Quite to the contrary, it can be used for manual focusing of the camera, if necessary.
 Moiré is an optical effect between the imaged object and the light sensor, and usually will not be affected by image processing such as denoising algorithms.
-We can put a black and white grid nearby the user's head and tune the camera focus until color moiré appears
+We can put a black and white grid nearby the user's head and tune the camera focus until color moiré appears.
 
 \end{itemize}
 
 \section{Image}
-The image as acquired from the camera is assumed to be a rectangular grid of colored points.
+The image as acquired from the camera is a rectangular grid of colored points.
 However, certain parts of the computation require a continuous and smooth image model in order to obtain sub-pixel precision.
-In order to apply classic optimization methods, we need to geometrically transform (i.e., stretch) the image and its partial derivatives.
+In order to apply classic optimization methods, we need to geometrically transform (i.e., stretch) the image, and evaluate its partial derivatives at random points.
 
 This problem has three possible solutions:
 

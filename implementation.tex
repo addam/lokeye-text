@@ -5,9 +5,9 @@ After sketching out the basic traits of the program, we continue by listing out 
 There are indeed many options which make difference in computational difficulty, precision and robustness to possible difficulties in the input data.
 They are presented here, and will be evaluated in the next section under varying conditions.
 
-\section{Schema of Operation}
+\section{Overview}
 
-On a first run, the program needs a calibration step to learn specific parameters related to the user.
+On a first run, the program needs a calibration procedure to learn specific parameters related to the user.
 Some calibration is also necessary on each run and during longer periods of execution because of changing light conditions.
 
 The pipeline of computation is presented in Drawing @ref.
@@ -20,21 +20,10 @@ This steps requires the face to be localized properly in the image but since the
 
 Finally, the 6 degrees of freedom of the head and the 4 degrees of freedom of the eyes are fed into a gaze estimator that outputs coordinates in screen reference frame.
 
-\section{Calibration}
-
-The specific parameters being calculated during the calibration step depend on the particular methods being used for the remaining subtasks.
-However, the calibration session always remains the same from user's point of view, so that is what will be described here.
-
 \section{Face Tracking}
 
 Our program supports two methods of face tracking, which represent two major groups of tracking techniques in general.
 First is feature-based, second is appearance-based.
-
-\subsection{Feature Tracking}
-Along the lines of (@cite wang shi 16), we adopted a local feature-based tracking system.
-
-\subsection{Active Appearance Models}
-
 A surface within the face is tracked pixel per pixel.
 Depending on the transformation allowed, we get different methods:
 
@@ -42,12 +31,38 @@ Depending on the transformation allowed, we get different methods:
 \item Similarity transformation. 4 DoF. Aligning in grid makes no sense at all.
 \item Affinity. 6 DoF. Aligning in grid makes little sense.
 \item Barycentric transformation. 6 DoF. Possible to align in grid.
-\item Perspectivity. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
+\item Homography. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
 \end{itemize}
+
+\todo{blabla}.
+There is a \textit{master tracker} that covers the whole face.
+It provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
+In order to gain some robustess against changes in lighting, the master trackers is color-normalized.
+
+\subsection{Markers}
+
+In addition to the master tracker, several small trackers are arbitrarily placed within the face area that are supposed to track specific small features.
+Technically, it is possible to track any skin region with a distinctive texture, so an automated feature detection performs well enough.
+
+Each of the markers is allowed to freely move around.
+They are tracked from their previous known position relatively to the master tracker.
+If the tracking score drops below a certain limit or a marker escapes the face area, it is reset to its original position and tracking continues from there.
+
+\subsection{Grid}
+
+This method follows the approach of Active Appearance Models.
+The master tracker is subdivided into a planar mesh, and each cell is responsible of tracking the corresponding part of the image.
+
+In order for the cells to form a contiguous mesh, certain parameters of neighboring cells are bound together and need to be optimized concurrently.
+Our implementation of the corresponding tracker methods does this explicitly since their parameters are the planar coordinates of their corner vertices.
+During optimization, the derivatives are summed up in each grid vertex (nevertheless the number of cells that share it) and all grid vertices are updated at once.
+
+This process is commonly done with barycentric cells (i.e., a triangular mesh), where the derivatives wrt. vertex coordinates are quite easy to derive.
+The extension of this method to homographic cells (i.e., a quadrangular mesh) relies on the theory developed in Section \ref{s.homderivatives}.
 
 \section{Eye Tracking}
 
-There are a plenty of eye trackers in our program.
+There are a plenty of eye trackers available in our program.
 From a broader perspective, we took four different approaches:
 \begin{itemize}
 \item Tracking the limbus. There should be a circle with a strong gradient directed outwards.
@@ -56,11 +71,11 @@ From a broader perspective, we took four different approaches:
 \item Machine learning. Instead of modeling, we can feed the image into a regression engine.
 \end{itemize}
 
-These approaches have been combined in many different ways, resulting in the following methods available to the user:
+These approaches have been combined in many different ways, resulting in the following methods available to the host application:
 
 \subsection{Limbus gradient}
 This method relies on the edge between the iris and the sclera.
-Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be displayed as a circle of high contrast.
+Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be sensed as a circle of high contrast.
 We assume the eyelids to be of uniform color, so they have zero value in the gradient domain and can be neglected.
 
 \subsection{Limbus polynomial gradient}
@@ -72,7 +87,7 @@ If designed with care, the method can still operate at nearly the same speed.
 \subsection{Hough transformation}
 We can use a voting scheme to find the limbus center.
 This allows us to apply a sophisticated heuristic filter at almost no cost.
-However, there is a free parameter: the resolution of the voting grid.
+However, a free parameter is necessary to define: the resolution of the voting grid.
 Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
 
 \subsection{Dark iris correlation}
@@ -119,11 +134,43 @@ If the face and the eyes were also planar objects, then the gaze in screen coord
 This is obviously not the case, and the face transformation has many more degrees of freedom than a planar rigid body would.
  
 In order to properly model the mapping from our face and eye parameter space to two-dimensional gaze, we would have to actually estimate the three-dimensional model of the face.
-Many programs have been published that follow this path (@cite), but we decided for a simpler approach.
-Modeling the face would either require us to provide a strong a priori model, or it would require a longer calibration phase.
+Many programs have been published that follow this path (@cite).
+In general, it requires some prior information about the shape of the face, and much tuning to calibrate a 3d model precisely enough.
+To avoid these issues, we decided for a simpler approach.
 
-We decided to actually assume the gaze to be given by a projective transformation of the face and eye parameters.
-This approach is limited and does never perfectly fit the data, but it is also very robust against overfitting. 
-Only one method is available since both theory and measurements show that it works reliably and well.
-It is a perspectivity.
-\todo{\dots}
+We decided to actually assume the gaze is given by a projective transformation of the face and eye parameters.
+This approach is limited and even in theory, it does never perfectly fit the data.
+On the other hand, homographies have a solid mathematical background, and they can be estimated quickly and robustly from data.
+All invertible homographies form a group that contains the group of invertible affine transformations, and they can implicitly model inverse proportionalities among their parameters.
+
+
+\todo{combine with the following section in a meaningful manner}
+
+\section{Calibration}
+
+The purpose of calibration is to learn all necessary parameters about the user's face and the geometry of the screen relatively to the camera.
+Depending on the tracking quality, the time spent to measure all necessary information may vary.
+
+During the calibration, roughly speaking, the user is asked to watch specific points on screen and their face and eyes are tracked.
+For each screen position measured this way, the face tracker provides many parameters.
+Some of these have an implicit meaning, others can be processed to extract useful information and yet others are just noise.
+We fit a homography mapping some of the face parameters and the eye parameters to each known gaze position.
+
+In the beginning of the calibration session, a single frame is acquired from the camera.
+Depending on the application, either the program locates the user's face and eyes, or asks the user to do so manually.
+For the automatic face and eye localization, a boosted random forest classifier is used within a sliding window.
+
+The calibration session proceeds by presenting the user with a dot moving around the screen.
+The user is asked to watch the dot carefully until it disappears.
+In order to make the movement more predictable, the dot moves along a smooth curve with piecewise constant curvature, and a patch of this curve is being drawn ahead of time.
+The calculated parameters from face tracking are recorded along with the current on-screen position of the dot.
+
+It is meaningful to extract four basic parameters about a face tracker: its position within the image, its on-screen rotation and scale.
+The head (as a rigid body) has two more parameters to be covered, but there is a virtually unlimited number of extra parameters can be obtained from detailed tracking of the face.
+Face pose is unknown in each frame, and possibly constant, so there is a high danger of overfitting.
+We cut down the dimensionality by Principal Component Analysis: out of the extra parameters, only the two largest principal components are preserved.
+
+It is possible that the user's gaze twitches for a moment, or that the gaze tracking fails in several frames.
+In order to ignore these faulty measurements, we employ a Ransac fitting repetitively.
+As soon as a fit collects a large enough support of measurements, the calibration procedure stops and outputs the homography it acquired.
+

@@ -18,7 +18,9 @@ Hereby we offer an open-source solution in the belief that it will help further 
 The task itself is by certainly new, and as will be detailed in the following section, there are many software libraries that solve it.
 Unfortunately, it is rare that such a library would be released with open source code, and these few are usually incomplete or outdated.
 
-\todo{contributions: homography, radial iris locator}
+\todo{idea contributions: homography, radial iris locator}\\
+\todo{code contributions: face and eye trackers}\\
+\todo{the survey in Related Work is also noteworthy}
 
 By the author's preference, the program tends to rely on complex, rigid models.
 Such an approach is also beneficial because models with more free parameters would require too much training data.
@@ -51,6 +53,7 @@ Details on other purely analog methods such as this can be found in a 1967 book 
 The various methods suggested for eye tracking since the end of 19th century are a story of human curiosity and can be seen as a proof of the effort directed towards this area.
 
 \section{Related Work}
+\todo{split into subsections}
 
 Rapid development of computers and digital video cameras has removed most of the hardware constraints mentioned so far.
 The demand for non-intrusive gaze tracking is high in many branches of science; for example, it is obvious that the results of a psychological experiment can greatly vary with emotional influence of the environment.
@@ -103,6 +106,8 @@ If an infrared light source is placed next to the camera, eyes in the image
 
 \todo{youtubers}
 
+\todo{@cite wang shi 16 etc. thoroughly}
+
 \section{Notation}
 
 We mostly follow the notation used in the classical book Multiple View Geometry \cite{b:hartley04}.
@@ -110,5 +115,6 @@ Boldface letters (e.g., $\vec x$) denote real column vectors.
 Monospace letters (e.g., $\mat C$) denote real matrices.
 An upper index next to these (e.g., $\mat C^i$) identifies the $i$-th matrix within a list, $n$-th power of matrix would be always expressed using parentheses, e.g., $(\mat S)^n$.
 The central dot $\cdot$ can mean either scalar or matrix multiplication.
+Bounds in the summation symbol are not explicitly written down where they are obvious from the context (e.g., matrix dimensions).
 
-\todo{Something more: $\vec, \diag$}
+\todo{Something more: $\vec, \diag, \omega$}

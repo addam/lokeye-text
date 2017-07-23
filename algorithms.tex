@@ -2,7 +2,9 @@
 
 This chapter provides mathematical tools and computational methods for the problems to be presented in the next section.
 
-\section{Linear algebra}
+\section{Numeric Tools}
+
+\todo{describe what the heading means}
 
 \subsection{Singular Value Decomposition}
 \textit{Input:} matrix $\mat A$\\
@@ -46,15 +48,13 @@ In order to find a global minimum, we pick $i$ such that $\vec s_i^2 \vec v_i^2 
 The result is $\vec x = \mat V \inv \vec v = \mat V \T \vec v$.
 \end{proof}
 
-If $\vec s_i^2 = \vec s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway.
-This can be proven by adding a small perturbation to $\vec s_j$.
+If $\vec s_i^2 = \vec s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway, as can be proven by adding a small perturbation to $\vec s_j$.
 
 \subsection{Quadratic polynomial fitting}
-\textit{Input:} set of samples $P = \{\vec p^i \in \R^2 \}$ and function $\textrm{score}: \R^2 \to \R$.\\
+\textit{Input:} set of samples $P = \{\vec p^i \in \R^2 \}$ of function $\textrm{score}: \R^2 \to \R$.\\
 \textit{Output:} quadratic polynomial $Q \in \R^2 \to \R$ minimizing $\sum_i |\textrm{score}(\vec p^i) - Q(\vec p^i)|^2$ and vector $\vec x$ maximizing $Q(\vec x)$.\\
 
 Given several samples of a real function nearby its maximum, we would like to get a precise estimate of the maximum location.
-Although this topic belongs to real analysis, it is listed here because most of the actual computations involved belong to linear algebra.
 
 Let us express the least-squares fit as a linear system:
 $$(x^2, xy, x, y^2, y, 1)\T \vec q = \textrm{score}(\vec p^i) \text{ for each } i, \text{ where } \vec p^i = (x, y)\T.$$
@@ -73,7 +73,7 @@ $$\mat A = \begin{pmatrix}
  \vec q_3 \\
  \vec q_5 \\
 \end{pmatrix}.$$
-The global extremum $\vec x$ of this polynomial satisfies $\mat A \vec x = -\vec b$.
+The global extremum $\vec x$ of this polynomial is obtained by solving $\mat A \vec x = -\vec b$.
 
 \begin{proof}
 \todo{\dots}
@@ -83,8 +83,8 @@ The global extremum $\vec x$ of this polynomial satisfies $\mat A \vec x = -\vec
 \textit{Input:} set of samples $P = \{\vec p^i \in \R^n \}$.\\
 \textit{Output:} orthonormal basis $\{\vec q^i\}$ such that the orthogonal projection of $P$ onto each $\vec q^i$ has maximal variance with all $\vec q^j, j < i$ being fixed.\\
 
-Given several random samples, we want to find the most prominent aspects the data.
-The basis vectors are supposed to capture (and extract) covariance of the data, and when expressed in the basis $\{\vec q^i\}$, the data will be decorrelated.
+Given several random samples, we want to find the most prominent aspects of the data.
+The basis vectors are supposed to capture (and extract) all covariance, so that when expressed in the basis $\{\vec q^i\}$, the data will be decorrelated.
 
 Let us consider the covariance matrix $\mat C = \sum_{i,j} (\vec p^i - \vec m) \left(\vec p^j - \vec m \right) \T$ (up to scale), where $\vec m = \frac 1 {|P|} \sum_i \vec p^i$ is the center of mass. Let us further consider the Singular Value Decomposition of this symmetrical matrix $\mat C = \mat U \cdot \diag(\vec s) \cdot \mat U\T$.
 The sought basis vectors are the columns of $\mat U\T$, in their order.
@@ -96,7 +96,7 @@ If each point $\vec x$ of data with covariance $\mat C$ is transformed to $\mat 
 \begin{proof}
 We can view the data as a single random vector following a normal distribution with covariance matrix $\mat C$.
 \todo{or maybe not?}
-Using the fact that 
+Using the fact that covariance is a linear quantity, we derive:
 \begin{multline}
 \cov\big( (\mat A \vec x)_i, (\mat A \vec x)_j \big) = \cov\Big( \sum_k(\mat A_{ik} \vec x_k), \sum_l(\mat A_{jl} \vec x_l) \Big) = \sum_k \Big( \mat A_{ik} \sum_l \cov( \vec x_k, \vec x_l ) \mat A_{jl} \Big) \\
 = \sum_k \Big( \mat A_{ik} \sum_l \mat C_{kl} \mat A_{lj}\T \Big) = \sum_k \mat A_{ik} (\mat C \mat A \T)_{kj} = (\mat A \mat C \mat A\T)_{ij},
@@ -107,11 +107,9 @@ Using the fact that
 Setting $\mat A = \mat U\T$, we obtain $\mat A \mat C \mat A \T = \mat U\T \mat U \cdot \diag(\vec s) \cdot \mat U\T \mat U = \diag(\vec s)$.
 This means that if the data are expressed in the orthonormal basis  $\mat U$, their vector components are no longer correlated.
 
-Picking the first basis vector $\vec q^1$ (such that the variance of the orthogonal projection of $\mat P$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
+Picking the first basis vector $\vec q^1$ (such that the variance of the orthogonal projection of $\mat P$ onto $\vec q^1$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
 
 \end{proof}
-
-\section{Nonlinear optimization}
 
 \subsection{Gradient descent}
 \textit{Input:} function $f \in \R^n \to \R$ and its gradient $\nabla f$.\\
@@ -119,17 +117,7 @@ Picking the first basis vector $\vec q^1$ (such that the variance of the orthogo
 
 \todo {line search}
 
-\section{Fourier analysis}
-
-\subsection{Fast Fourier Transform}
-\textit{Input:} vector $\vec v \in \C^n$.\\
-\textit{Output:} vector $\vec f \in \C^n$ such that $\vec x_i = \sum_j \vec f_j \omega^{i j}$ for all $i$, where $\omega$ is $n$-th root of unity.\\
-
-Let us define the function $\mathrm{FFT}: \R^{2m} \to \R^m$.
-
-\begin{proof}
-@cite CLRS
-\end{proof}
+\section{Computer vision}
 
 \subsection{Convolution}
 
@@ -142,6 +130,21 @@ Let us define the function $\mathrm{FFT}: \R^{2m} \to \R^m$.
 \textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
 
 \todo {there are more use cases beyond the obvious one.}
+
+\subsection{Circle Hough Transformation}
+
+\textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle.\\
+\textit{Output:} center and radius of the circle.\\
+
+\todo{is this necessary?}
+\todo{the trick with curvature}
+
+\subsection{Circle Hough Transformation With Known Radius}
+
+\textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle and radius of the circle $r \in \R$.\\
+\textit{Output:} center of the circle.\\
+
+\todo{\dots}
 
 \section{Geometry}
 
@@ -174,7 +177,7 @@ The vectors $\left\{ \mat M^{i, j} \vec p \right\}, 1 \leq i < j \leq n$, are al
 
 With increasing dimension, this set of vectors becomes heavily redundant.
 Clearly, a minimal solution would form a basis of the subspace $\R^n / \vec p$ orthogonal to $\vec p$ and thus would consist of $n - 1$ vectors, whereas this approach generates $\frac {1} {2} n \cdot (n - 1)$ vectors.
-Some sources\cite{MVG} suggest to pick an arbitrary subset of size $n - 1$ from the matrices defined above and use these for the whole data set.
+Some sources suggest to pick an arbitrary subset of size $n - 1$ from the matrices defined above and use these for the whole data set.\cite{b:hartley03}
 A more proper solution is to select these matrices specifically for each correspondence pair $\vec x^k \leftrightarrow \vec p^k$ so as to avoid possible degeneracies.
 In particular, we find the largest vector element $\vec p_l$ (in absolute value) and then select all matrices $\mat M^{i, j}$ such that $i = l$ or $j = l$.
 Each of the vectors generated this way contains the value of $\vec p_l$ at a different position (i.e., a different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \vec p$.

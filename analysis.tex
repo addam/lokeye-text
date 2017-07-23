@@ -7,16 +7,16 @@ We discuss the anatomy of human face and eyes in particular, and all relevant te
 
 We expect that the user is working with their personal computer, or a similar device such as a tablet.
 The user and the device can freely move around; the only constraint there is that the camera must be fixed to the computer screen.
-Throughout the calculation, we rely on that the user's face is visible, and that the angle difference of gaze and camera direction is small.
+Throughout the calculation, we rely on that the user's face and both eyes are visible, and that the angle difference of the gaze and the camera direction is small.
 
 For a good calibration, we require active cooperation from the user: they are asked to watch a dot moving around the screen.
-If necessary, this requirement can be somewhat lifted by using a calibration file defined earlier or completely different means of calibration.
+If necessary, this requirement can be somewhat lifted by using a calibration file defined earlier or by some completely different means of calibration.
 We allow the user to move their head but we cannot \textit{rely} on this because many users (e.g. disabled ones) may have difficulties to move.
 
 Ambient lighting must be good enough for the camera to deliver a high-contrast and sharp image.
-The image brightness, white balance etc. may change abruptly and by all means.
+The image brightness, white balance etc. are allowed to change abruptly and always.
 There is, however, a strong requirement on the light being rather diffuse than directional, and making no sharp shadows on the user's face.
-If the light conditions substantially change, it may be necessary to re-calibrate.
+If the light conditions substantially start to differ from the ones during calibration, it may be necessary to re-calibrate.
 
 \section{Face}
 
@@ -30,6 +30,7 @@ The chin is especially prominent and easy to track, but may become completely mi
 
 \section{Eye}
 \subsection{Eye Anatomy}
+\label{s.eyeanatomy}
 
 The eyeball consists of several parts, most notably:
 \begin{itemize}
@@ -78,6 +79,9 @@ Thanks to it, the effect of eye roll can be implicitly precalculated during cali
 \todo{saccades, fixation, smooth pursuit}
 
 \section{Gaze}
+
+The gaze is the direction of focus of the user, and we assume that it is pointed at a point on the computer screen.
+\todo{geometric description of the scene}
 
 Under the assumption of small angle divergence, we can model movement of the pupil as a simple translation.
 

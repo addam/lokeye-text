@@ -18,7 +18,7 @@ This first step results in a 3-dimensional translation and rotation mapping from
 Next, the precise position of both eyes is established within a reasonable region in the face.
 This steps requires the face to be localized properly in the image but since the eyes can move very quickly, this uses no prior from the previous frame.
 
-Finally, the 6 degrees of freedom of the head and the 4 degrees of freedom of the eyes are fed into a gaze estimator that outputs coordinates in screen reference frame.
+Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of each eye are fed into a gaze estimator that outputs coordinates in screen reference frame.
 
 \section{Face Tracking}
 
@@ -71,6 +71,9 @@ The extension of this method to homographic cells (i.e., a quadrangular mesh) re
 \textit{Input:} iris radius $r \in \R$ and image $I$ centered at an expected eye location.\\
 \textit{Output:} iris center $\vec p \in \R^2$.\\
 
+\todo{further assumptions on the image necessary for good recognition}
+\todo{list out the difficult factors and reference the table in Results}
+
 Once the face itself has been tracked, the eyes can be easily located using their reference position.
 The iris radius can also be extracted by multiplying the reference radius with a scale factor given by the face tracker.
 Most of the face trackers induce non-uniform scaling, so it might seem appropriate that the eye shape will be an ellipse.
@@ -110,6 +113,8 @@ We can use a voting scheme to find the limbus center.
 This allows us to apply a sophisticated heuristic filter at almost no cost.
 However, a free parameter is necessary to define: the resolution of the voting grid.
 Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
+
+\todo{explain the advantage when radius is known}
 
 \subsection{Dark iris correlation}
 Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
@@ -201,8 +206,8 @@ Computer screen is a plane in space, with pixels aligned in a regular square gri
 If the face and the eyes were also planar objects, then the gaze in screen coordinates would be related to the face and eyes position by a projectivity.
 This is obviously not the case, and the face transformation has many more degrees of freedom than a planar rigid body would.
  
-In order to properly model the mapping from our face and eye parameter space to two-dimensional gaze, we would have to actually estimate the three-dimensional model of the face.
-Many programs have been published that follow this path (@cite).
+In order to properly model the mapping from our face and eye parameter space to two-dimensional gaze, we would have to actually approximate the three-dimensional model of the face.
+Many programs have been published that follow this path.\cite{b:fanelli11}
 In general, it requires some prior information about the shape of the face, and much tuning to calibrate a 3d model precisely enough.
 To avoid these issues, we decided for a simpler approach.
 

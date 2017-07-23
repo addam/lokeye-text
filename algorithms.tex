@@ -4,19 +4,19 @@ This chapter provides mathematical tools and computational methods for the probl
 
 \section{Numeric Tools}
 
-\todo{describe what the heading means}
+Firstly, we shall describe a few algorithms commonly used to solve generic mathematical problems.
 
 \subsection{Singular Value Decomposition}
 \textit{Input:} matrix $\mat A$\\
 \textit{Output:} orthonormal matrices $\mat U, \mat V$ and a vector $\vec s$ such that $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$, $\vec s_i \geq 0$ and $\vec s_i \geq \vec s_j$ for all $i \leq j$.\\
 
-\todo{Jacobi algorithm!}
+\todo{householder reflections to bidiagonal, gradient descent}
 
 The SVD always exists and is unique.
 
 In the specific case where $\mat A$ is symmetric, then $\mat U = \mat V$.
 
-\subsection{Linear Solving}
+\subsection{Linear solving}
 \textit{Input:} matrix $\mat A \in \R^{n \times m}$ of rank $n$, vector $\vec b \in \R^n$.\\
 \textit{Output:} vector $\vec x$ such that $|\mat A \vec x - \vec b|$ is minimal.\\
 
@@ -27,7 +27,7 @@ The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \cdot \vec b$,
 \todo{\dots}
 \end{proof}
 
-\subsection{Homogeneous Linear Solving}
+\subsection{Homogeneous linear solving}
 \textit{Input:} matrix $\mat A$\\
 \textit{Output:} vector $\vec x$ such that $|\vec x| = 1$ and $|\mat A \vec x|$ is minimal.\\
 
@@ -112,72 +112,90 @@ Picking the first basis vector $\vec q^1$ (such that the variance of the orthogo
 \end{proof}
 
 \subsection{Gradient descent}
-\textit{Input:} function $f \in \R^n \to \R$ and its gradient $\nabla f$.\\
-\textit{Output:} local minimum of $f$.\\
+\textit{Input:} function $F \in \R^n \to \R$, its gradient $\nabla F$ and initial location $\vec p \in \R^n$.\\
+\textit{Output:} local minimum of $F$.\\
 
+We approximate the function $F$ by a quadratic polynomial using its value $F(\vec p)$ and its gradient $\nabla F(\vec p)$ at initial location.
 \todo {line search}
+
+This algorithm is provided without a proof of convergence.
+In fact, if supplied with a quadratic polynomial $F$, this algorithm finds the global optimum after \todo{how many} steps.
+However, we intend to use this algorithm on functions of overwhelming complexity.
+Ensuring that some necessary conditions are satisfied by the function $F$ can be much more difficult than the proof itself.
+We consider this minimization scheme an intuitive heuristic, and we admit that it may fail to converge in some circumstances.
 
 \section{Computer vision}
 
 \subsection{Convolution}
 
-\textit{Input:} matrices $\mat M \in \R^{n \times m}, \mat T \in \R^{k \times l}$.\\
+\textit{Input:} matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$.\\
 \textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
 
 \subsection{Normalized Cross-Correlation}
 
-\textit{Input:} matrices $\mat M \in \R^{n \times m}, \mat T \in \R^{k \times l}$.\\
+\textit{Input:} matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$.\\
 \textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
 
 \todo {there are more use cases beyond the obvious one.}
 
 \subsection{Circle Hough Transformation}
 
-\textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle.\\
-\textit{Output:} center and radius of the circle.\\
-
-\todo{is this necessary?}
-\todo{the trick with curvature}
-
-\subsection{Circle Hough Transformation With Known Radius}
-
 \textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle and radius of the circle $r \in \R$.\\
 \textit{Output:} center of the circle.\\
 
 \todo{\dots}
+
+\todo{the curvature trick belongs to the footnote}
 
 \section{Geometry}
 
 \subsection{Direct Linear Transformation}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by an unknown homography.\\
-\textit{Output:} homography matrix $\mat H$.\\
+\textit{Output:} matrix $\mat H$ minimizing \todo{what}.\\
 
-\todo{describe as a short solution and its proof}
+We are presented with a set projective correspondences of the form
+\begin{equation} \label{e:homography-input}
+\mat H \vec x^k = \alpha_k \vec p^k, 1 \leq k \leq m,
+\end{equation}
+where $\alpha_k$ are unknown scalars and $\mat H$ is an unknown matrix that we want to calculate.
+
+Let us define the sets of \textit{normalized points} $\{ \hatvec x^k \}$ and $\{ \hatvec p^k \}$ using affine transformations $\hatvec x^k = \mat A \vec x^k$ and $\hatvec p^k = \mat B \vec p^k$, where $\mat A, \mat B$ are chosen so that the respective point set has zero mean and unity variance.
+\todo{$\vec x$ and $\vec p$ need not have the same dimension}
+Let us also define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
+\begin{equation} \label{e:homography-antisymm}
+\mat M^{i, j}_{i, j} = 1,
+\mat M^{i, j}_{j, i} = -1.
+\end{equation}
+Finally, let us formulate a homogeneous linear system:
+\begin{equation} \label{e:homography-system}
+\mathrm{vec} \left(({\hatvec p}^k)\T \mat M^{i, j} {\hatvec x}^k \right)\T \cdot \mathrm{vec}(\hatmat H) = 0,
+\end{equation}
+for all $i, j, k$ such that $i < j$ and either $\hatvec p^k_i$ or $\hatvec p^k_j$ is the maximal element of $\hatvec p^k$.
+The result is $\mat H = \mat B \inv \hatmat H \mat A$.
 
 There are, loosely speaking, two difficulties in homography fitting as compared to affine transformations.
 Firstly, it has a nonlinear component so an algebraic least-squares solution is generally different from a geometric least-squares solution.
-The former can be obtained in a much more stable way than the latter, so we start with algebraic least squares fitting and use the result for initialization of a nonlinear optimization method.
-Secondly, the measured data points are defined only up to scale, so it is not possible to formulate a linear system straight away.
-A technique called Direct Linear Transformation is widely used to overcome this issue.
+The Direct Linear Transformation computes only former of these two, since it can be obtained in a much more stable way than the latter.
+For better precision, it is recommended to use the result for initialization of a nonlinear optimization method.\todo{separate the linear and nonlinear method clearly}
+One such method is detailed in the next section.
 
-We are presented with a set projective correspondences of the form
-$$\mat H \vec x^k = \alpha_k \vec p^k, 1 \leq k \leq m,$$
-where $\alpha_k$ are unknown scalars and $\mat H$ is an unknown matrix that we want to calculate.
-
-Unfortunately, these equations do not form a linear system with respect to the unknown matrix $\mat H$ because there is an unknown scale factor $\alpha_k$ involved in each equation.
+Secondly, it is not possible to formulate a linear system straight away.
+The equations \eqref{e:homography-input} do not form a linear system with respect to the unknown matrix $\mat H$ because the measured data points are defined only up to scale---there is an unknown scale factor $\alpha_k$ involved in each equation.
 Differences among the scale factors make up the perspective part of the homography, so although they can make the problem numerically unstable, we cannot impose any limits on these values.
 The core idea of Direct Linear Transformation is to find a set of vectors that must be orthogonal to the solution, and then solve the resulting homogeneous system.
 
-Let us define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
-$$\mat M^{i, j}_{i, j} = 1,
-\mat M^{i, j}_{j, i} = -1.$$
-From this definition it follows that for any $\vec p \in \R^n$, the product $\vec p\T \mat M^{i, j} \vec p = \vec p_{i} \vec p_{j} - \vec p_{j} \vec p_{i} = 0$.
-The vectors $\left\{ \mat M^{i, j} \vec p \right\}, 1 \leq i < j \leq n$, are all orthogonal to a given $\vec p \in \R^n$.
+\begin{lemma} \label{l:homography-orthogonal}
+The vectors $\left\{ \mat M^{i, j} \vec p \right\}, 1 \leq i < j \leq n$, where $\mat M^{i,j}$ is defined by \eqref{e:homography-antisymm}, are all orthogonal to a given $\vec p \in \R^n$.
+\end{lemma}
+\begin{proof}
+This follows from the definition of $\mat M^{i,j}$: for any $\vec p \in \R^n$, the product $\vec p\T \mat M^{i, j} \vec p = \vec p_{i} \vec p_{j} - \vec p_{j} \vec p_{i} = 0$.
+\end{proof}
 
-With increasing dimension, this set of vectors becomes heavily redundant.
-Clearly, a minimal solution would form a basis of the subspace $\R^n / \vec p$ orthogonal to $\vec p$ and thus would consist of $n - 1$ vectors, whereas this approach generates $\frac {1} {2} n \cdot (n - 1)$ vectors.
-Some sources suggest to pick an arbitrary subset of size $n - 1$ from the matrices defined above and use these for the whole data set.\cite{b:hartley03}
+We intend to construct a basis of the subspace $\R^n / \vec p$ orthogonal to $\vec p$.
+With increasing dimension, the set of vectors from Lemma \ref{l:homography-orthogonal} becomes heavily redundant.
+Although $\left\{ \mat M^{i, j} \vec p \right\}$ generate the subspace in question, there are $\frac {1} {2} n \cdot (n - 1)$ of such vectors, whileas only $n-1$ vectors are necessary to form a basis.
+Some sources suggest to pick an arbitrary subset of size $n - 1$ from the matrices $\left\{ \mat M^{i, j} \right\}$ and use these for the whole data set.\cite{hartley03}
 A more proper solution is to select these matrices specifically for each correspondence pair $\vec x^k \leftrightarrow \vec p^k$ so as to avoid possible degeneracies.
 In particular, we find the largest vector element $\vec p_l$ (in absolute value) and then select all matrices $\mat M^{i, j}$ such that $i = l$ or $j = l$.
 Each of the vectors generated this way contains the value of $\vec p_l$ at a different position (i.e., a different vector element), therefore the vectors are linear independent and they form a basis of $\R^n / \vec p$.
@@ -185,42 +203,40 @@ Each of the vectors generated this way contains the value of $\vec p_l$ at a dif
 Now we can formulate the linear system.
 It will consist of $m \cdot (n - 1)$ equations, where $m$ is the number of correspondence pairs $\vec x^k \leftrightarrow \vec p^k$.
 Its unknowns will be precisely the elements of the matrix $\mat H$.
-Each equation of the system represents a constraint of the form $\vec p\T \mat M \mat H \vec x = 0$, which is the orthogonality constraint as proposed above.
+Each equation of the system represents a constraint of the form $\vec p\T \mat M \mat H \vec x = 0$, which is the orthogonality constraint as proposed above (from now on, the row-dependent indices $i, j, k$ are omitted for readability).
 This constraint can be reformulated in terms of the Frobenius inner product $\langle \mat A, \mat B \rangle_F = \sum_{i, j} \mat A_{i, j} \cdot \mat B_{i, j}$ and the vector outer product as follows:
 $$\vec p\T \mat M \mat H \vec x = \sum_{i, j} (\vec p\T \mat M)_i \mat H_{i, j} \vec x_j = \langle \vec p\T \mat M \vec x\T, \mat H \rangle_F = 0.$$
-Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form:
-$$\mathrm{vec} (\vec p\T \mat M \vec x\T)\T \cdot \mathrm{vec}(\mat H) = 0,$$
+Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form \eqref{e:homography-system},
 where $\mathrm{vec} : \R^{m \times n} \to \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
-Each correspondence pair and each selected antisymmetric matrix $\mat M^{i, j}$ for that pair provide one such equation, and the row vectors $\mathrm{vec} ({\vec p^k}\T \mat M^{i, j} {\vec x^k}\T)\T$ can be stacked to form the system matrix.
+Each correspondence pair and each selected antisymmetric matrix $\mat M$ for that pair provide one such equation, and the row vectors $\mathrm{vec} ({\vec p}\T \mat M \vec x)\T$ can be stacked to form the system matrix.
 
-Homogeneous linear systems such as this one can be solved using the Singular Value Decomposition (SVD).
-
-\todo{\dots}
+In real scenarios, the input point sets are disrupted by noise.
+Solving this system in least squares sense provides the algebraic least-squares solution as suggested above.
 However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\mat H \vec x^k = \alpha_k \vec p^k$.
 In particular, it is possible that a solution will produce points at infinity, meaning that $\vec p_n \approx 0$ and that the Cartesian counterpart of $\vec p$ is undefined.
 Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.
 
 \todo{normalization: subtract mean, enforce unity variance}
 
-The system matrix in our case is of shape $m \cdot (n - 1) \times m$, which leads to an overall time complexity of $O(m^2 K (n - 1))$.
+\subsection{Fitting homography locally} 
+
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by roughly estimated homography $\mat H$.\\
+\textit{Output:} homography matrix $\mat G$ that minimizes $\sum_k |\mathrm{cart}(\mat G \vec x^k) - \mathrm{cart}(\vec p^k)|^2$.\\
+
+We minimize the energy function by gradient descent.
 
 \subsection{Four-point homography}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$.\\
 \textit{Output:} homography matrix $\mat H$.\\
 
-A minimal case of a 2-dimensional homography estimation is a correspondence of 4 point pairs.
+A minimal case of a two-dimensional homography estimation is a correspondence of four point pairs.
 If the input points are in a general configuration (none three are collinear), then there is an exact solution---least squares fitting is not necessary here.
 The general formula as generated by Direct Linear Transformation would be needlessly bloated for this setting.
 
 \todo{rewrite this as lemmas, definitions and proofs.}
 
-Let us write the point sets as columns of a $3 \times 4$ matrix, and let us denote the equivalence of two point sets up to scale by the $\sim$ (tilde) character:
-$$\mat A \sim \mat B \Leftrightarrow \exists \alpha_1 \dots \alpha_4 : \mat A \cdot \begin{pmatrix}
- \alpha_1 & & \\
-  & \ddots & \\
- & & \alpha_4
- \end{pmatrix} = \mat B.$$
+Let us write the point sets as columns of a $3 \times 4$ matrix, and let us denote the equivalence of two point sets up to scale by the $\sim$ (tilde) character \todo{ref to definition}.
 Also, let us declare the following set as the \textit{canonical configuration}:
 $$\mat C = \begin{pmatrix}
  1 & 0 & 0 & 1 \\
@@ -285,15 +301,12 @@ The preferable method is to explicitly permute the points so that the point in q
 
 \section{Machine learning}
 
-\subsection{Ransac}
+\subsection{Random sample consensus}
 
-\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, some of which are related by an unknown homography.\\
-\textit{Output:} homography matrix $\mat H$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d$.\\
+\textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)| < d$.\\
 
 \subsection{Boosted random forests}
 
 \textit{Input:} set of sample points $\{\vec p^i \in \R^n \}$ and corresponding function values $\{ f(\vec p^i) \}$.\\
 \textit{Output:} piecewise constant function $g$ that approximates $f$.\\
-
-\subsection{Convolutional neural networks}
-\todo{is this necessary?}

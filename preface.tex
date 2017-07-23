@@ -2,7 +2,7 @@
 
 The main idea behind this program is to view human eye as a means of communication.
 It is rather intuitive for us to recognize other people's gaze just by looking at their face thanks to high contrast coloring of the eye itself.
-The corresponding brain circuitry develops early in infants (@cite) and is equivalent among individuals.
+The corresponding brain circuitry develops early in infants \todo{cite} and is equivalent among individuals.
 This seems to be an evidence of evolutionary purpose---the human eye is built in a way so as to display the gaze clearly.
 Therefore it should also be possible for a computer to estimate gaze from the data us humans have available, that is, a color image.
 
@@ -10,7 +10,7 @@ Thanks to the fact that almost every laptop computer or cell phone is now equipp
 Future programs built on top of this library will also exhibit minimal hardware requirements that enable them to be used almost immediately upon download and completely for free.
 
 Eye trackers can actually be used for communication, namely for human-computer interaction.
-Wide variety of algorithms have been proposed (@cite In the Eye of the Beholder [95]) for on-screen keyboard and general desktop control.
+Wide variety of algorithms have been proposed for on-screen keyboard and general desktop control \cite{majaranta02}.
 The user's center of attention can also serve as a cue for adaptive rendering in video games because the rest of the screen need not be displayed in full detail.
 Possible applications of gaze tracking in cell phones are a vast topic, such as locking the screen when not looked at or displaying a note when somebody looks over your shoulder.
 
@@ -23,13 +23,15 @@ In fact, we evaluate many popular approaches to these problems and our implement
 Of special interest is our homography-based face tracker and our eye tracker based on iris radial symmetry.
 To the author's knowledge, these two methods are entirely novel.
 \todo{mention the testing data}
+\todo{talk about available data sets}
+\todo{what about dataset http://csr.bu.edu/headtracking/uniform-light/}
 
 Where possible, we try to employ complex and rigid models that are specific to the tasks at hand.
 There are several reasons.
 In order to learn a generic machine learning algorithm, we would need much training data.
 Unfortunately, none of the publicly available datasets for face and gaze tracking are suitable for our problem setting---most of them are designed for recognition from a static image, and some even lack color information.
 Anyway, there has been much progress in the field of machine learning currently, and we can hardly compete with the manpower and computational capacity of these scientific teams.
-Configuring a machine learning tool is simply not the aim of this thesis, by the author's intuitive preference.
+Configuring a machine learning tool is simply not the aim of this thesis, by the author's personal preference.
 
 \section{History}
 
@@ -45,7 +47,7 @@ In order to record data with a reasonable precision, sophisticated mechanical st
 Eye movement was then measured either directly from an object attached to the eye, or indirectly from small displacements in the eye region.
 For example, an especially precise technique was developed by Yarbus in 1954 and requires to stick a mirror to the surface of the eye using a small suction cup.\footnote{
 The article is not cited here because it has been published only in Russian and does not seem generally available.
-However, Yarbus provides details on the method in \cite{b:yarbus67}.
+However, Yarbus provides details on the method in \cite{yarbus67}.
 }
 Eye movement can then be recorded directly on a piece of photographic film via the reflection of a point light source shining at the eyes.
 We should note here that many other attachment mechanisms were less user-friendly as the suction cups.
@@ -56,7 +58,7 @@ Rotation of this small dipole generates a measurable magnetic field, so it is po
 The advantage gained is temporal resolution: this method allows to draw a graph of angle against time.
 However, the actual direction is an integral of the measured value, and therefore tends to deteriorate and the spatial resolution is generally poor.
 
-Details on other purely analog methods such as this can be found in a 1967 book by Yarbus \cite{b:yarbus67}.
+Details on other purely analog methods such as this can be found in a 1967 book by Yarbus \cite{yarbus67}.
 The various methods suggested for eye tracking since the end of 19th century are a story of human curiosity and can be seen as a proof of the effort directed towards this area.
 
 \section{Related Work}
@@ -69,43 +71,50 @@ Only few approaches are able to encompass both of these tasks within a single mo
 
 \subsection{Face Tracking}
 Many substantially different approaches have been suggested for head pose estimation, and there seems to be no consensus so far.
-The tracker by Kanade, Lucas and Tomasi\cite{b:kanade81} is based on matching a template image using gradient descent optimization and can be considered the cornerstone of object tracking.
+The tracker by Kanade, Lucas and Tomasi \cite{lucas81} is based on matching a template image using gradient descent optimization and can be considered the cornerstone of object tracking.
 The original paper describes tracking a rectangular grayscale template by horizontal and vertical shift.
-Nowadays, such a simple problem can also be solved on a global scale, i.e. using normalized cross-correlation and the Fast Fourier Transform.
-However, there have been numerous generalizations of this concept to a broader class of motion models such as affine(@cite) or perspective(@cite) transformations where global optimization is not feasible.
-Our program uses several such generalizations extensively.
+Nowadays, such a simple problem can also be solved on a global scale, e.g., using normalized cross-correlation and the Fast Fourier Transform.
+However, there have been numerous generalizations of this concept to a broader class of motion models such as affine (e.g., \cite{bouguet01}) or perspective transformations, in which cases a global optimization is not feasible.
+These are often referred to as the \textit{deformable template models}.
+Our program uses several of such generalizations extensively.
 
-An especially sophisticated generalization are the Adaptive Appearance Models(@cite) (AAM).
+An especially sophisticated generalization are the Active Appearance Models (AAM) \cite{cootes01,stegmann00}.
 In this method, a planar mesh is overlaid on the object, subdividing the template image into polygon-shaped cells.
 Each of the cells is responsible of stretching its cut-out image part when its vertices are displaced.
 All vertices of the mesh can be displaced separately, and they are essentially the model parameters to be optimized.
 The degrees of freedom of this model can be customized to application needs, so that the method will handle either rigid or soft-body transformations gracefully.
+The original paper suggests to learn the constraints by a Principal Component Analysis of manually 
 
 Purely geometric image transformations exhibit poor invariance to changes in lighting, so they are well combined with element-wise image transformations.
-A simple option is to acquire multiple templates of the object in question, and either just select the best candidate for each input image, or allow their arbitrary linear combinations.(@cite)
+A simple option is to acquire multiple templates of the object in question, and either just select the best candidate for each input image, or allow their arbitrary linear combinations.
 If the amount of training data grows large, more efficient and robust schemes are necessary.
 The template images can be arranged in a search structure to speed up the lookup of the most similar template (i.e., nearest neighbor).
 
-A template need not be limited to a single image.
-Instead, each of these images can be extended to a reasonable neighborhood by a per-pixel linear function.
-The linear coefficients are typically estimated from several nearby templates using Principal Component Analysis, and this approach is widely known as Eigenfaces(@cite).
+A template need not be limited to a single image, and may be given implicitly as in \cite{gourier06}.
+It is especially common to extend each template by a per-pixel linear function in a small neighborhood.
+The linear coefficients are typically estimated from several nearby templates using Principal Component Analysis, and this approach is widely known as Eigenfaces \cite{srinivasan02,morency03}.
 This approach leads to a mathematical concept of a high-dimensional manifold that covers all feasible face images.
-By a further extension, each point in the high-dimensional space can be assigned six values that correspond to the six degrees of freedom of a rigid body.
-In this view, a face tracker simply extracts these six parameters from the corresponding point in space.
-Methods using this approach typically rely on high-level algebraic concepts to improve their performance.
+Each point in the high-dimensional space can be assigned a feature vector that correspond to the modeled degrees of freedom \cite{balasubramanian07}.
+In this view, a face tracker simply extracts these parameters from the corresponding point in space.
 
-\todo{@cite hlavac uricar since they are in the thesis assignment}
-\todo{wang shi 16\cite{b:wang16} etc. thoroughly}
+
+\todo{hlavac uricar \cite{uricar12} since they are in the thesis assignment}
+\todo{wang shi 16 \cite{wang16} etc. thoroughly}
 
 \todo{approaches using a depth map}
-\todo{Pose estimation using 3D view-based eigenspaces Morency\cite{b:morency03}}
+\todo{Pose estimation using 3D view-based eigenspaces Morency \cite{morency03}}
 
-For a thorough comparison of all the face tracking methods in terms of performance and requirements upon the input data, we can recommend the excellent (althought slightly outdated) survey by (@cite Head pose estimation in computer vision).
+For a thorough comparison of all the face tracking methods in terms of performance and requirements upon the input data, we can recommend the excellent (althought slightly outdated) survey \cite{murphy-chutorian09}.
 
 There have also been many software tools published aside from the scientific journals.
-Some of them are available including the source code such as \cite{p:pupil} \todo{\dots}.
-Other 
-\todo{youtubers}
+Some of them are available including the source code such as \todo{eyeseecam}.
+Others are shared only as a video recorded from the system running\footnote{
+As an example, several videos on the Youtube website:
+https://www.youtube.com/watch?v=Etj_aktbnwM
+https://www.youtube.com/watch?v=dZXz3egT7MI
+https://www.youtube.com/watch?v=1aNTsrEGM-8 \todo{používá hough křivost}
+https://www.youtube.com/watch?v=wlrR33JC3zw
+}
 
 \subsection{Gaze Tracking}
 Eye tracking is rather a simple task once the head pose is known---it almost feels that the eyes are designed for easy tracking.
@@ -118,13 +127,12 @@ Many alternative but quite similar models are tested in this thesis and availabl
 \todo{mean shift algorithm}
 
 It is quite common to model some more specific aspects of the eye.
-A reasonable start are the eye corners\cite{b:zhu12} and the eyelids \todo{@cite In the Eye of the Beholder: [5], [42], [23], [77]}
+A reasonable choice are the eye corners \cite{zhu12} and the eyelids \cite{yuille92}.
 
-It is possible and sometimes more robust to use an appearance-based method, that is, crop out a small image in the eye region and consider its all pixels a high-dimensional vector.
+It is possible and sometimes more robust to use an appearance-based method \cite{tan02}, that is, crop out a small image in the eye region and consider its all pixels a high-dimensional vector.
 This approach usually requires the eye position to be precisely normalized to a center point, so that eye images with varying gaze directions only differ in the iris and pupil position.
 Obviously, there are many free parameters (such as iris color, skin tone, shape of the eyelids and amount of eyelashes) that ought to be ignored by the gaze tracker.
 To this end, it is necessary to provide enough training data that covers all these cases, to prevent overfitting.
-\todo{add more specific examples with citations}
 
 Contrary to these methods based solely on an image, many rely on some extra hardware, such as cameras or lights.
 Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on its outer and the inner surface.
@@ -134,20 +142,23 @@ The pupil shape can be obtained by contrasting this image to the one when the in
 
 Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface.
 The shape of the eye is just quite enough complex (as detailed in Section \ref{s.eyeanatomy}) and quite the same across individuals, so the eye pose can be deduced from such glares by geometric calculations.
-There has been \todo{\dots}\cite{b:villanueva08}
-This approach is popular both among amateurs \cite{b:yucel09}\cite{b:wolski16}\todo{more citations\dots} and in high performance industrial tools \cite{p:tobii}.
+There has been \todo{\dots}\cite{villanueva08}
+This approach is popular both among amateurs \cite{yucel09,wolski16}\todo{more citations\dots} and in high performance industrial tools \cite{p:tobii}.\footnote{
+The algorithm behind the software \cite{p:tobii} has not been published.
+We claim it is based on infrared reflections, based on personal research.
+}
 
 If even higher precision is required, it may still be necessary to attach a camera to the user's head and point it closely to the eyes.
 Although such methods are slowly being deprecated by the less intrusive ones presented so far, it is important to note that there have also been much advancement in camera manufacturing.
-Indeed, it is possible to build very small and lightweight cameras that will make almost no obtrusion to the user's view and comfort (@cite what?).
+Indeed, it is possible to build very small and lightweight cameras that will make almost no obtrusion to the user's view and comfort \cite{p:pupil}.
 Such a tracking rig may be preferred in many controlled scenarios such as in psychological laboratories.
 
 \todo{@cite contact lenses approach from A Survey on Eye-Gaze Tracking Techniques. Chennamma}
 
-\todo{survey \cite{b:hansen10}}
+For a thorough survey of eye trackers including the obscure historical ones, the reader is directed to \cite{hansen10}.
 
-Regarding the relation between eye rotation and on-screen gaze position, some sources suggest that only a linear function is necessary.\cite{b:zhu12}
-While this may be true in a well controlled setup, others use much more flexible models such as the Radial Basis Functions \todo{@cite what?}
+Regarding the relation between eye rotation and on-screen gaze position, some sources suggest that only a linear function is necessary \cite{zhu12}.
+On the other hand, if the head and scene model is precise enough, it may be appropriate to calculate the gaze explicitly as a ray in space \cite{wang16}.
 
 \section{Organization}
 \todo{describe each chapter}
@@ -156,9 +167,10 @@ The directory structure of the accompanying data medium is explained in Attachme
 
 \section{Notation}
 
-Italic lowercase letters (e.g., $c$) are denote scalars, italic uppercase letters (e.g., $I$) and regular lowercase words (e.g., $\mathrm{mean}$) denote functions.
+Italic lowercase letters (e.g., $c$) are denote scalars.
+Regular lowercase words (e.g., $\mathrm{mean}$), and in some cases italic uppercase letters (e.g., $I$) denote functions.
 
-For matrix algebra we follow the notation used in the classical book Multiple View Geometry \cite{b:hartley03}.
+For matrix algebra we follow the notation used in the classical book Multiple View Geometry \cite{hartley03}.
 Boldface letters (e.g., $\vec x$) denote real column vectors.
 Monospace letters (e.g., $\mat H$) denote real matrices.
 An upper index next to these (e.g., $\mat H^i$) identifies the $i$-th matrix within a list, $n$-th power of matrix would be always expressed using parentheses, e.g., $(\mat R)^n$.
@@ -169,3 +181,14 @@ Bounds in the summation symbol $\sum$ are not explicitly written down where they
 \todo{$\textrm{vec}$}
 \todo{$\diag$}
 \todo{$\omega$ root of unity}
+
+The similarity operator $\sim$ is used to denote the equality of homogeneous vectors \todo{\dots}.
+Sometimes, we view a set of points \todo{\dots} as a matrix.
+In this context, similarity of two such matrices means the similarity of the corresponding point sets:
+\begin{equation}
+\mat A \sim \mat B \Leftrightarrow \exists \alpha_1 \dots \alpha_n : \mat A \cdot \begin{pmatrix}
+ \alpha_1 & & \\
+  & \ddots & \\
+ & & \alpha_n
+ \end{pmatrix} = \mat B.
+\end{equation}

@@ -10,7 +10,7 @@ They are presented here, and will be evaluated in the next section under varying
 On a first run, the program needs a calibration procedure to learn specific parameters related to the user.
 Some calibration is also necessary on each run and during longer periods of execution because of changing light conditions.
 
-The pipeline of computation is presented in Drawing @ref.
+The pipeline of computation is presented in Drawing \todo{draw it}.
 Firstly, the face is locally tracked from the previous frame.
 Only if this step fails, the program starts a global face localization procedure.
 This first step results in a 3-dimensional translation and rotation mapping from the initial pose.
@@ -191,35 +191,44 @@ Since there are usually many distractive features around the eyes, such as the e
 \subsection{Random forest regression}
 \todo{This is yet to be coded and tested, but it is not going to work anyway.}
 
-\subsection{Convolutional neural networks}
-\todo{This is yet to be coded and tested.}
-
 \subsection{Combined estimator}
 
 Choosing several trackers that are sensitive to different deteriorations of the image, we can trade off some computational time for much robustness and precision.
 Each of the trackers chosen should obviously fail in different conditions so that a majority of them is correct on every image.
 Reasonable selection of trackers for a combined estimator is discussed in the next chapter.
 
-\section{Gaze Estimation}
+\section{Gaze estimation}
+
+\textit{Input:} vectors $\vec e \in \R^n$ and $\vec f \in \R^m$ and \textit{gaze parameters} as defined below.\\
+\textit{Output:} vector $\vec p \in \R^2$.\\
+
+\begin{definition} \label{d:gaze-parameters}
+The \textit{gaze parameters} consist of an orthonormal basis $\mat P \in \R^{2\times n}$ and a homography $\mat H \in \R^{3 \times (m+3)}$.
+\end{definition}
+
+Given the vector $\vec f$ obtained from face tracking and vector $\vec e$ obtained from eye tracking, and using the scene model described in Section \ref{s:gaze-model}, we wish to estimate the on-screen position $\vec p$ (in pixel units).
 
 Computer screen is a plane in space, with pixels aligned in a regular square grid.
 If the face and the eyes were also planar objects, then the gaze in screen coordinates would be related to the face and eyes position by a projectivity.
 This is obviously not the case, and the face transformation has many more degrees of freedom than a planar rigid body would.
  
 In order to properly model the mapping from our face and eye parameter space to two-dimensional gaze, we would have to actually approximate the three-dimensional model of the face.
-Many programs have been published that follow this path.\cite{b:fanelli11}
+Many programs have been published (e.g., \cite{fanelli11}) that follow this path.
 In general, it requires some prior information about the shape of the face, and much tuning to calibrate a 3d model precisely enough.
 To avoid these issues, we decided for a simpler approach.
 
 We decided to actually assume the gaze is given by a projective transformation of the face and eye parameters.
 This approach is limited and even in theory, it does never perfectly fit the data.
 On the other hand, homographies have a solid mathematical background, and they can be estimated quickly and robustly from data.
-All invertible homographies form a group that contains the group of invertible affine transformations, and they can implicitly model inverse proportionalities among their parameters.
+All invertible homographies form a group that contains the group of invertible affine transformations, and they can also implicitly model inverse proportionalities among their parameters.
 
 
 \todo{combine with the following section in a meaningful manner}
 
 \section{Calibration}
+
+\textit{Input:} interactive session with the user.\\
+\textit{Output:} gaze parameters from Definition \ref{d:gaze-parameters}.\\
 
 The purpose of calibration is to learn all necessary parameters about the user's face and the geometry of the screen relatively to the camera.
 Depending on the tracking quality, the time spent to measure all necessary information may vary.

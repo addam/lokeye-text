@@ -42,12 +42,13 @@ The eyeball consists of several parts, most notably:
 \item The light-sensitive retina
 \end{itemize}
 
-Furthermore, each eyeball is embedded in a hole called \todo{what---eye chamber, perhaps?} that provides fixation and actuation.
-There are \todo{how many} separately controlled muscles stretching between to the eyeball and the eye chamber.
+Furthermore, each eyeball is embedded in a hole called the orbit that provides fixation and actuation.
+There are six separately controlled muscles stretching between to the eyeball and the orbit.
 
 Throughout the literature, eye is modeled either as a sphere, or with an extra spherical section for the cornea.
 Some sources also explicitly model the eyelids.
 
+\todo{rewrite this in a more educated manner}
 Sclera is white and pupil is black.
 Iris is something in between.
 The iris diameter remains constant but the pupil diameter can change dramatically.
@@ -73,12 +74,13 @@ Assuming that each muscle can apply force only by stretching, and not extending 
 A third DoF, namely rotation around the optical axis (the \textit{roll}) is actively used by the brain.
 The effect is slight, but because fovea is offset from the optical axis, this could make the gaze direction unpredictable given the optical axis only.
 Fortunately, the roll is deterministic with respect to the remaining two rotation angles.
-This fact is known as the \textit{Donder's Law}.
+This fact is known as the \textit{Donder's Law} \cite{hansen10}.
 Thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
 
 \todo{saccades, fixation, smooth pursuit}
 
 \section{Gaze}
+\label{s:gaze-model}
 
 The gaze is the direction of focus of the user, and we assume that it is pointed at a point on the computer screen.
 \todo{geometric description of the scene}
@@ -158,8 +160,11 @@ This is the approach applied in this thesis.
 This is the solution implicitly used by many software libraries.
 
 \item Interpolate using a sophisticated function.
-Surprisingly enough, commonly used interpolation functions are not suitable for a precise model.
+Surprisingly enough, most of commonly used interpolation functions are not suitable for a precise model.
 An interpolator should obviously not be biased towards zero, and therefore, functions such as $\mathrm{sinc}$ cannot be used directly.
+\todo{mention Lanczos function $\mathrm{sinc}(x) \cdot \mathrm{sinc}(x/2)$}
+\todo{mention $\frac 1 2 (\cos(x) + 1)$ is symmetric, just somewhat too sharp}
+\todo{the only polynomial is the linear one, and that's not sophisticated}
 
 Bias disappears if we use the function value only as a weight in a weighted average formula.
 However, that often makes image derivatives prohibitively hard to calculate.

@@ -37,6 +37,7 @@
 \newtheorem{thm}{Theorem}
 \newtheorem{lemma}[thm]{Lemma}
 \newtheorem{claim}[thm]{Claim}
+\newtheorem{definition}[thm]{Definition}
 
 \theoremstyle{plain}
 \newtheorem{defn}{Definition}
@@ -97,6 +98,8 @@
 %%% Matrix and vector
 \renewcommand\vec[1]{\mathbf{#1}}
 \newcommand{\mat}[1]{\mathtt{#1}}
+\newcommand\hatvec[1]{\hat{\vec{#1}}}
+\newcommand\hatmat[1]{\hat{\mat{#1}}}
 
 % TODO pred odevzdanim prace je nutne zkontrolovat, ze toto makro se uz v textu nevyskytuje
 \newcommand\todo[1]{(\textit{\underline{TODO:} #1})}

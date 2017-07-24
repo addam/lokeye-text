@@ -34,18 +34,18 @@ The chin is especially prominent and easy to track, but may become completely mi
 
 The eyeball consists of several parts, most notably:
 \begin{itemize}
-\item Transparent cornea, which makes a fixed lens and provides some mechanical protection
-\item Flexible and reflective iris
-\item Flexible lens stretched by several muscles to control its optical magnitude
-\item Purely white sclera, which serves as a hard shell of the eyeball
-\item The vitreous body, consisting mostly of transparent gel to maintain inner pressure
-\item The light-sensitive retina
+\item Transparent \textit{cornea}, which makes a fixed lens and provides some mechanical protection
+\item Flexible and reflective \textit{iris}, which serves as a diaphragm
+\item Flexible \textit{lens} stretched by several muscles to control its optical magnitude
+\item Purely white \textit{sclera}, which serves as a hard shell of the eyeball
+\item \textit{Vitreous body} consisting mostly of a transparent gel to maintain the inner pressure
+\item Light-sensitive \textit{retina}
 \end{itemize}
 
-Furthermore, each eyeball is embedded in a hole called the orbit that provides fixation and actuation.
+Furthermore, each eyeball is embedded in a hole called the \textit{orbit} that provides fixation and actuation.
 There are six separately controlled muscles stretching between to the eyeball and the orbit.
 
-Throughout the literature, eye is modeled either as a sphere, or with an extra spherical section for the cornea.
+Throughout the literature, eye is modeled either as a sphere \cite{zhang13}, or with an extra spherical section for the cornea \cite{villanueva08}.
 Some sources also explicitly model the eyelids.
 
 \todo{rewrite this in a more educated manner}
@@ -56,7 +56,10 @@ The iris diameter remains constant but the pupil diameter can change dramaticall
 In a healthy case, the inner and outer boundary of the iris (the pupil and the limbus, respectively) should have a precisely circular shape.
 Generally, the inner shape of the iris is less reliable of these two.
 Its radius changes depending on the amount of incoming light and the emotional state of the user.
-This motion is controlled from \todo{which brain region---thalamus?} and therefore cannot be directly controlled by will.
+The constriction is controlled by the \textit{parasympathicus}, a nervous system generally related to comfortable actions such as eating and sleeping.
+The dilation is controlled by the \textit{sympathicus}, which in turn is the main actuator of the so-called \textit{fight or flight} stress response.
+Both sympathicus and parasympathicus are parts of the \textit{autonomous nervous system} and therefore cannot be directly controlled by will.
+
 In case of a disease or an injury, it is also possible that some of the muscles stop working properly and the inner iris shape is no longer a circle.\todo{image}
 
 \subsection{Eye Movement}
@@ -65,11 +68,12 @@ Human eyes have developed not only as an organ of sight, but also as a means of 
 When attending to an object or another person, people will usually turn their eyes directly towards it.
 
 The main reason of this is that the overall acuity of our visual system increases towards an area near the optical axis.
-The corresponding spot on the retina is called the fovea, and it is located about \todo{how many?} degrees horizontally towards the nose.
-The density of photopic (daylight-sensitive) cells is up to \todo{how much} times more than in the peripheral areas of the retina.
+The corresponding spot on the retina is called the \textit{fovea}, and it is located about $5\degree$ horizontally towards the nose \cite{villanueva08}.
+It covers only about $1.5\degree$ of the visual field.
+The density of photopic (daylight-sensitive) cells in the fovea is up to 20 times more than in the peripheral areas of the retina.
 
 Although gaze can be precisely controlled by will, there are many peculiarities about eye motion that depend on old brain circuitry and are common to all humans.
-Assuming that each muscle can apply force only by stretching, and not extending itself, the \todo{how many} muscles provide \todo{how many} degrees of freedom to the eye motion---but only two DoF are necessary to control the gaze direction.
+Assuming that each muscle can apply force only by stretching, and not extending itself, the six muscles provide three degrees of freedom to the eye motion---but only two DoF are necessary to control the gaze direction.
 
 A third DoF, namely rotation around the optical axis (the \textit{roll}) is actively used by the brain.
 The effect is slight, but because fovea is offset from the optical axis, this could make the gaze direction unpredictable given the optical axis only.
@@ -77,6 +81,7 @@ Fortunately, the roll is deterministic with respect to the remaining two rotatio
 This fact is known as the \textit{Donder's Law} \cite{hansen10}.
 Thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
 
+\todo{citations: čihák and student's guide to cognitive science}
 \todo{saccades, fixation, smooth pursuit}
 
 \section{Gaze}

@@ -63,13 +63,13 @@ In order for the cells to form a contiguous mesh, certain parameters of neighbor
 Our implementation of the corresponding tracker methods does this explicitly since their parameters are the planar coordinates of their corner vertices.
 During optimization, the derivatives are summed up in each grid vertex (nevertheless the number of cells that share it) and all grid vertices are updated at once.
 
-This process is commonly done with barycentric cells (i.e., a triangular mesh), where the derivatives wrt. vertex coordinates are quite easy to derive.
-The extension of this method to homographic cells (i.e., a quadrangular mesh) relies on the theory developed in Section \ref{s.homderivatives}.
+This process is commonly done with a triangular mesh (i.e., barycentric cells), where the derivatives wrt. vertex coordinates are quite easy to derive.
+Our extension of this method to a quadrangular mesh (i.e., homographic cells) relies on the theory developed in Section \ref{s.homderivatives}.
 
 \section{Eye Tracking}
 
 \textit{Input:} iris radius $r \in \R$ and image $I$ centered at an expected eye location.\\
-\textit{Output:} iris center $\vec p \in \R^2$.\\
+\textit{Output:} iris center $\vec c \in \R^2$.\\
 
 \todo{further assumptions on the image necessary for good recognition}
 \todo{list out the difficult factors and reference the table in Results}
@@ -102,16 +102,16 @@ This method relies on the edge between the iris and the sclera.
 Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be sensed as a circle of high contrast.
 We assume the eyelids to be of uniform color, so they have zero value in the gradient domain and can be neglected.
 
-\subsection{Limbus polynomial gradient}
 The eye region of the face is actually not uniform as it contains many wrinkles and directional light may cause strong shadow.
 These facts cause a low-magnitude gradient that might modify the global optimum of the method described above.
 In order to gain some robustness, we can apply a heuristic filter to the gradient values.
 If designed with care, the method can still operate at nearly the same speed.
+This extension is available as a separate method, using a polynomial function upon the gradient.
 
-\subsection{Hough transformation}
+\subsection{Hough Transformation}
 We can use a voting scheme to find the limbus center.
-This allows us to apply a sophisticated heuristic filter at almost no cost.
-However, a free parameter is necessary to define: the resolution of the voting grid.
+
+A free parameter is yet to define: the resolution of the voting grid.
 Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
 
 \todo{explain the advantage when radius is known}

@@ -110,10 +110,10 @@ There have also been many software tools published aside from the scientific jou
 Some of them are available including the source code such as \todo{eyeseecam}.
 Others are shared only as a video recorded from the system running\footnote{
 As an example, several videos on the Youtube website:
-https://www.youtube.com/watch?v=Etj_aktbnwM
-https://www.youtube.com/watch?v=dZXz3egT7MI
-https://www.youtube.com/watch?v=1aNTsrEGM-8 \todo{používá hough křivost}
-https://www.youtube.com/watch?v=wlrR33JC3zw
+{\tt https://youtu.be/Etj\_aktbnwM},
+{\tt https://youtu.be/dZXz3egT7MI},
+{\tt https://youtu.be/1aNTsrEGM\-8} \todo{používá hough křivost},
+{\tt https://youtu.be/wlrR33JC3zw}.
 }
 
 \subsection{Gaze Tracking}
@@ -140,12 +140,12 @@ The retina of the human eye is distincly reflective in red and near infrared lig
 If an infrared light source is placed next to the camera, the user's pupils will shine brightly, whileas the rest of the eye and the scene brightens only subtly.
 The pupil shape can be obtained by contrasting this image to the one when the infrared light is turned off.
 
-Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface.
+Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface, called the \textit{Purkinje images}.
 The shape of the eye is just quite enough complex (as detailed in Section \ref{s.eyeanatomy}) and quite the same across individuals, so the eye pose can be deduced from such glares by geometric calculations.
 There has been \todo{\dots}\cite{villanueva08}
 This approach is popular both among amateurs \cite{yucel09,wolski16}\todo{more citations\dots} and in high performance industrial tools \cite{p:tobii}.\footnote{
 The algorithm behind the software \cite{p:tobii} has not been published.
-We claim it is based on infrared reflections, based on personal research.
+Our claim is based on own research.
 }
 
 If even higher precision is required, it may still be necessary to attach a camera to the user's head and point it closely to the eyes.

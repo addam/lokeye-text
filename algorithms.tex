@@ -124,7 +124,7 @@ However, we intend to use this algorithm on functions of overwhelming complexity
 Ensuring that some necessary conditions are satisfied by the function $F$ can be much more difficult than the proof itself.
 We consider this minimization scheme an intuitive heuristic, and we admit that it may fail to converge in some circumstances.
 
-\section{Computer vision}
+\section{Image processing}
 
 \subsection{Convolution}
 
@@ -143,11 +143,39 @@ We consider this minimization scheme an intuitive heuristic, and we admit that i
 \textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle and radius of the circle $r \in \R$.\\
 \textit{Output:} center of the circle.\\
 
+Each sample of the image gradient assumes for a moment that the limbus is passing through it, and makes a guess where the center of the circle would be.
+The gradient value provides just enough information: given a gradient sample at 
+$$\vec c = -r \frac {\nabla I(\vec p)} {|\nabla I(\vec p)|}.$$
+
+and casts a weighted vote into a 2-dimensional accumulator.
+% why was this here? This allows us to apply a sophisticated heuristic filter at almost no cost.
+Each sample from the image gradient casts a weighted vote into a 2-dimensional accumulator that represents the limbus center.
+
+The vote is applied 
+
+This is essentially a simplified version of the Circle Hough Transformation\footnote{
+If the radius is not known, we can estimate it from the \textit{isophote curvature}, using the 2nd image derivative
+\todo{\dots}
+}
 \todo{\dots}
 
-\todo{the curvature trick belongs to the footnote}
-
 \section{Geometry}
+
+\subsection{Three-point affinity}
+
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 3$, $x^k \in \R^2$, $p^k \in \R^2$.\\
+\textit{Output:} affinity matrix $\mat A$ such that $\mat A \vec x^k = \vec p^k$.\\
+
+\todo{explain this portion of the code}
+
+The \textit{barycentric transformation} is an affine transformation defined by two planar triangles.
+
+\subsection{Derivatives of an affinity}
+
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 3$.\\
+\textit{Output:} \todo{what}.\\
+
+\todo{explain this portion of the code}
 
 \subsection{Direct Linear Transformation}
 
@@ -228,7 +256,7 @@ We minimize the energy function by gradient descent.
 \subsection{Four-point homography}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$.\\
-\textit{Output:} homography matrix $\mat H$.\\
+\textit{Output:} matrix $\mat H$ such that $\mat H \vec x^k \sim \vec p^k$.\\
 
 A minimal case of a two-dimensional homography estimation is a correspondence of four point pairs.
 If the input points are in a general configuration (none three are collinear), then there is an exact solution---least squares fitting is not necessary here.
@@ -274,11 +302,30 @@ The resulting mapping is linear with respect to the last column of $\mat B$.
 \subsection{Derivatives of a homography}
 \label{s.homderivatives}
 
-\textit{Input:} \todo{what}.\\
-\textit{Output:} \todo{what}.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$ and vector $\vec v \in \R^2$.\\
+\textit{Output:} Jacobian matrices $\partial \vec v / \partial \vec x^k$.\\
 
+The Jacobian matrix wrt. the last point is given by
+\begin{equation}
+\partial \vec v / \partial \vec x^4 = 
+\end{equation}
+% to druhé konverguje k prvnímu, jak se patří:
+projection\_derivative(get\_hom($[aa,bb,cc,dd], [a,b,c,d])$, p) * get\_hom([aa,bb,cc,dd], [a,b,c,dy]) * p\\
+$u=1e-7$; (projection(get\_hom($[aa,bb,cc,dd], [a,b,c,d+u*dy]), p$) - projection(get\_hom($[aa,bb,cc,dd], [a,b,c,d]), p)) / u$
+% get_hom(p1, p2) * p1 ~ p2
+function $H$ = get\_hom($p1,p2$)\\
+ $H$ = decanonize($p2$) * canonize($p1$);\\
+end
+
+% projection_derivative(H, v) * H * v = dHv / dP(:,4) for HX ~ P
+function $dPi$ = projection\_derivative($H, v$)\\
+ $w = H(3,:) * v$;\\
+ proj = $H(1:2,:) * v / w$;\\
+ dPi = $[1, 0, -proj(1); 0, 1, -proj(2)] / w$;\\
+end
 \todo{rewrite as a short solution and its proof}
 
+\begin{proof}
 We wish to calculate the derivative of a four-point homography with respect to the coordinates of its four control points.
 The linearity of $\mathrm{dec}(\mat A)$ implies that the derivative $\frac{\partial} {\partial \vec d_i} \mathrm{dec} \left( \vec a, \vec b, \vec c, \vec d \right) = \mathrm{dec} \left( \vec a, \vec b, \vec c, \vec e_i \right)$, where $\vec e_i$ is the unit vector for the coordinate axis $i$.
 
@@ -296,6 +343,7 @@ The homography $\mat R = \begin{pmatrix}
 } and incorporate these homographies into the formulas above.
 Unfortunately, there are several unknown scale factors involved that make such an approach inefficient.
 The preferable method is to explicitly permute the points so that the point in question becomes the last one, and to repeat the original scheme.
+\end{proof}
 
 \todo{what are the overall computational requirements, per pixel?}
 

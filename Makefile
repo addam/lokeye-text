@@ -4,6 +4,8 @@ all: thesis.pdf
 thesis.pdf: thesis.tex $(wildcard *.tex) bibliography.bib
 	pdflatex $<
 	bibtex thesis
+	rm -f thesis.glsdefs
+	makeglossaries thesis
 	pdflatex $<
 	pdflatex $<
 

@@ -53,6 +53,30 @@
 \usepackage[usenames]{xcolor}  % typesetting in color
 \usepackage{gensymb} % the degree symbol
 
+\usepackage[acronym,nomain]{glossaries}              % use glossaries-package
+\setlength{\glsdescwidth}{15cm}
+\newglossary[slg]{symbolslist}{syi}{syg}{Symbolslist} % create add. symbolslist
+\makeglossaries                                   % activate glossaries-package
+
+\newglossarystyle{notationlong}{%
+\setglossarystyle{long}% base this style on the list style
+\renewenvironment{theglossary}{% Change the table type --> 3 columns
+  \begin{longtable}{lp{0.6\glsdescwidth}}}%
+  {\end{longtable}}%
+
+\renewcommand*{\glossaryheader}{%  Change the table header
+  \bfseries Sign & \bfseries Description \\
+ \hline
+  \endhead}
+\renewcommand*{\glossentry}[2]{%  Change the displayed items
+  \glstarget{##1}{\glossentryname{##1}} %
+  & \glossentrydesc{##1}
+  \tabularnewline
+}
+\renewcommand{\glossarysection}[2][]{}
+
+}
+
 %%% Basic information on the thesis
 
 % Thesis title in English (exactly as in the formal assignment)

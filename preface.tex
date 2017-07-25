@@ -159,6 +159,23 @@ Italic lowercase letters (e.g., $c$) are denote scalars.
 Regular lowercase words (e.g., $\mathrm{mean}$), and in some cases italic uppercase letters (e.g., $I$) denote functions.
 
 For matrix algebra we follow the notation used in the classical book Multiple View Geometry \cite{hartley03}.
+
+    \newglossaryentry{symb:Pi}{name=\ensuremath{\pi},
+        description={An unimportant number just like any other},
+        type=symbolslist}
+
+    \newglossaryentry{height}{name=\ensuremath{h},
+        description={he, he, he.},
+        type=symbolslist}
+
+    \newglossaryentry{energyconsump}{name=\ensuremath{P},
+        description={Energy consumption},
+        type=symbolslist}
+
+\printglossary[type=symbolslist,style=notationlong]   % list of symbols
+
+\glsaddall
+
 Boldface letters (e.g., $\vec x$) denote real column vectors.
 Monospace letters (e.g., $\mat H$) denote real matrices.
 An upper index next to these (e.g., $\mat H^i$) identifies the $i$-th matrix within a list, $n$-th power of matrix would be always expressed using parentheses, e.g., $(\mat R)^n$.

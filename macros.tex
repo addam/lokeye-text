@@ -21,7 +21,7 @@
 }}
 \makeatother
 
-% This macro defines a chapter, which is not numbered, but is included
+% This macro defines a chapter which is not numbered but is included
 % in the table of contents.
 \def\chapwithtoc#1{
 \chapter*{#1}
@@ -73,8 +73,7 @@
 \DeclareMathOperator{\var}{\textrm{var}}
 \DeclareMathOperator{\cov}{\textrm{cov}}
 \DeclareMathOperator{\sd}{\textrm{sd}}
-\renewcommand{\vec}[0]{\textrm{vec}}
-\newcommand{\diag}[0]{\textrm{diag}}
+\newcommand{\diag}[0]{\mathrm{diag}}
 
 %%% Transposition of a vector/matrix
 \def\T{^{\!\mathsf{T}}}

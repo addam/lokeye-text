@@ -1,11 +1,11 @@
 \chapter{Problem Analysis}
 
-This chapter provides a thorough analysis of available data from the camera and the objects displayed therein.
+This chapter provides a thorough analysis of the data stream provided by the camera, and the objects displayed therein.
 We discuss the anatomy of human face and eyes in particular, and all relevant technical details about commonly used web cameras.
 
 \section{Conditions}
 
-We expect that the user is working with their personal computer, or a similar device such as a tablet.
+We expect that the user is working with their personal computer or a similar device such as a tablet.
 The user and the device can freely move around; the only constraint there is that the camera must be fixed to the computer screen.
 Throughout the calculation, we rely on that the user's face and both eyes are visible, and that the angle difference of the gaze and the camera direction is small.
 We do not impose any further constraints on the face pose relatively to the camera.
@@ -20,17 +20,23 @@ The image brightness, white balance etc. are allowed to change abruptly and alwa
 There is, however, a strong requirement on the light being rather diffuse than directional, and making no sharp shadows on the user's face.
 If the light conditions substantially start to differ from the ones during calibration, it may be necessary to re-calibrate.
 
-\section{Face}
+\section{Human head}
 
-Human face consists of many muscles.
-Like the pupil, they mainly serve for communication.
+\subsection{Face Anatomy}
+The face is the frontal part of human head.
+There are \textit{mimic muscles} attached to the facial skin that serve for communication.
+As seen in Figure \todo{@ref}, the mimic muscles cover almost all of the face.
+Although they can be controlled by will, they often actuate subconsciously.
+There are kinds of subtle movements, usually induced by basic emotions such as fear, that can not be prevented by will.
+Generally, the facial skin is flexible with many degrees of freedom and the motion can affect almost all regions.
+
 Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
-\todo{image}
 These include most notably the chin, base of the nose and small outer regions around and slightly below the eyes.
 The chin is especially prominent and easy to track, but may become completely misleading if the user opens their jaw.
 \todo{\dots}
 
-\section{Eye}
+\todo{describe stuff like eyebrows, eyelashes, eyelids}
+
 \subsection{Eye Anatomy}
 \label{s.eyeanatomy}
 
@@ -89,13 +95,20 @@ Thanks to it, the effect of eye roll can be implicitly precalculated during cali
 \section{Gaze}
 \label{s:gaze-model}
 
-The gaze is the direction of focus of the user, and we assume that it is pointed at a point on the computer screen.
+The gaze is the direction of focus of the user.
+We assume that it is pointed to somewhere on the computer screen.
+
+Gaze is affected by both the head pose and eye rotation.
+Although it may seem more efficient to only move our eyes when using a computer, people usually move their heads.
+In fact, prolonged static pose of the head can induce painful angle wear \todo{@cite čihák}.
+
 \todo{geometric description of the scene}
+\todo{accompanied by a figure}
 
 Under the assumption of small angle divergence, we can model movement of the pupil as a simple translation.
+It is important to note that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
 
-Given the eye--face offset, onscreen gaze center is assumed to be a homography.
-This saves us from explicitly modeling the viewed scene.
+We avoid explicit modeling of the viewed scene by assuming that the gaze is given by a homography, as it will be detailed in Section \todo{@ref}.
 The non-linear factor is quite huge, unfortunately.
 
 \section{Camera}
@@ -152,33 +165,35 @@ We can put a black and white grid nearby the user's head and tune the camera foc
 
 \section{Image}
 \label{s.imagemodel}
-The image as acquired from the camera is a rectangular grid of colored points.
-However, certain parts of the computation require a continuous and smooth image model in order to obtain sub-pixel precision.
-In order to apply classic optimization methods, we need to geometrically transform (i.e., stretch) the image, and evaluate its partial derivatives at random points.
 
-This problem has three possible solutions:
+The image acquired from the camera is a rectangular grid of colored points, expressed as a matrix $\mat M \in \R^{n\times m}$.
+However, certain parts of the computation require a continuous and smooth image model in order to obtain a sub-pixel precision.
+In such cases, the image function is defined as
+$$I(\vec p) = \todo{formula}.$$
 
-\begin{itemize}
-
-\item Use simple interpolation and ignore the inaccuracy induced.
+We need to geometrically transform (i.e., stretch) the image, and evaluate it at random positions.
+In general, this problem has three possible solutions.
+Firstly, we can use simple interpolation and ignore the inaccuracy induced.
 This is the approach applied in this thesis.
 
-\item Use simple interpolation on a blurred image so that the inaccuracy disappears.
-This is the solution implicitly used by many software libraries.
+The second option is to use simple interpolation on a blurred image in the hope that the inaccuracy disappears.
+This solution is implicitly used by many software libraries.
 
-\item Interpolate using a sophisticated function.
-Surprisingly enough, most of commonly used interpolation functions are not suitable for a precise model.
-An interpolator should obviously not be biased towards zero, and therefore, functions such as $\mathrm{sinc}$ cannot be used directly.
+Finally, it is possible to interpolate using a sophisticated function.
+We need to calculate image derivatives up to 2nd order, so , such as
 \todo{mention Lanczos function $\mathrm{sinc}(x) \cdot \mathrm{sinc}(x/2)$}
 \todo{mention $\frac 1 2 (\cos(x) + 1)$ is symmetric, just somewhat too sharp}
-\todo{the only polynomial is the linear one, and that's not sophisticated}
 
-Bias disappears if we use the function value only as a weight in a weighted average formula.
-However, that often makes image derivatives prohibitively hard to calculate.
-This may lead us to only estimating the image derivatives by a simple formula---but by making such a step we effectively classify to the first category above.
+However, many commonly used interpolation functions are not suitable for a precise model.
+An interpolator should obviously not be biased towards zero, i.e., interpolation of a constant image should be a constant.
+Because of this, functions such as $\mathrm{sinc}$ can only serve as weights in a weighted average.
+The vector formula  often makes image derivatives prohibitively hard to calculate.
+In the end,  may lead us to only estimating the image derivatives by a simple formula---but by making such a step we effectively classify to the first category above.
 
-\end{itemize}
+\subsection{Image derivatives}
+The partial derivatives of an image are estimated as
+$$\todo{formula}.$$
 
-\todo{what is our image model, then.}
-\todo{shifted derivatives}
-
+Note that each derivative is sampled at a slightly shifted position.
+While this may seem needlessly picky, precise coordinates become very important when working with downscaled images (e.g., in Section \todo{@ref pyramid}).
+A half-pixel shift in a downscaled image can represent a very large distance in the original pixel grid, and ignoring this displacement would actually make our algorithms fail.

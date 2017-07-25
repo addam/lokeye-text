@@ -24,7 +24,7 @@ Indeed, before we get to the overview of our software competitors, we should sho
 Its history spans half a century before the computer era.
 
 The interest in eye tracking originates in the field of psychology.
-Gaze designates the focus of attention of the subject, which in turn can tell much about ongoing cognitive processes.
+Gaze designates the focus of attention of the subject which in turn can tell much about ongoing cognitive processes.
 Furthermore, eye movement itself is the result of a rather complex neural system; nowadays, it is perhaps the best studied part of human cognition.
 
 In order to record data with a reasonable precision, sophisticated mechanical structures used to be constructed around the subject's head.
@@ -34,7 +34,7 @@ The article is not cited here because it has been published only in Russian and 
 However, Yarbus provides details on the method in \cite{yarbus67}.
 }
 Eye movement can then be recorded directly on a piece of photographic film via the reflection of a point light source shining at the eyes.
-We should note here that many other attachment mechanisms were less user-friendly as the suction cups.
+We should note here that many other attachment mechanisms were less user-friendly than the suction cups.
 
 A method known as \textit{electrooculography} provides a less invasive alternative.
 Physiologically, there is a constant voltage gradient across the eye from back to front, in magnitude of about 1 mV.
@@ -123,9 +123,9 @@ Obviously, there are many free parameters (such as iris color, skin tone, shape 
 To this end, it is necessary to provide enough training data that covers all these cases, to prevent overfitting.
 
 Contrary to these methods based solely on an image, many rely on some extra hardware, such as cameras or lights.
-Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on its outer and the inner surface.
+Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on its inner and its outer surfaces.
 The retina of the human eye is distincly reflective in red and near infrared light, which is the cause of the red-eye effect commonly observed in photography.
-If an infrared light source is placed next to the camera, the user's pupils will shine brightly, whileas the rest of the eye and the scene brightens only subtly.
+If an infrared light source is placed next to the camera, the user's pupils will shine brightly, whereas the rest of the eye and the scene brightens only subtly.
 The pupil shape can be obtained by contrasting this image to the one when the infrared light is turned off.
 
 Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface, called the \textit{Purkinje images}.
@@ -160,32 +160,27 @@ Regular lowercase words (e.g., $\mathrm{mean}$), and in some cases italic upperc
 
 For matrix algebra we follow the notation used in the classical book Multiple View Geometry \cite{hartley03}.
 
-    \newglossaryentry{symb:Pi}{name=\ensuremath{\pi},
-        description={An unimportant number just like any other},
-        type=symbolslist}
+\newglossaryentry{vector}{name=$\vec x$,
+	description={real column vector},
+	type=symbolslist}
 
-    \newglossaryentry{height}{name=\ensuremath{h},
-        description={he, he, he.},
-        type=symbolslist}
+\newglossaryentry{matrix}{name=$\mat H$,
+	description={real matrix},
+	type=symbolslist}
 
-    \newglossaryentry{energyconsump}{name=\ensuremath{P},
-        description={Energy consumption},
-        type=symbolslist}
+\newglossaryentry{cdot}{name=$\cdot$,
+	description={scalar or matrix multiplication},
+	type=symbolslist}
 
 \printglossary[type=symbolslist,style=notationlong]   % list of symbols
 
 \glsaddall
 
-Boldface letters (e.g., $\vec x$) denote real column vectors.
-Monospace letters (e.g., $\mat H$) denote real matrices.
-An upper index next to these (e.g., $\mat H^i$) identifies the $i$-th matrix within a list, $n$-th power of matrix would be always expressed using parentheses, e.g., $(\mat R)^n$.
-The central dot $\cdot$ can mean either scalar or matrix multiplication.
+An upper index next to a matrix (e.g., $\mat H^i$) identifies the $i$-th matrix within a list.
+In contrast, the $n$-th power of a matrix would always be expressed using parentheses, e.g., $(\mat R)^n$.
 
+\todo{move to a footnote where first used}
 Bounds in the summation symbol $\sum$ are not explicitly written down where they are obvious from the context (e.g., matrix dimensions).
-
-\todo{$\textrm{vec}$}
-\todo{$\diag$}
-\todo{$\omega$ root of unity}
 
 The similarity operator $\sim$ is used to denote the equality of homogeneous vectors \todo{\dots}.
 Sometimes, we view a set of points \todo{\dots} as a matrix.

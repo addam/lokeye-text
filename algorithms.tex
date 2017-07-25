@@ -4,23 +4,28 @@ This chapter provides mathematical tools and computational methods for the probl
 
 \section{Numeric Tools}
 
-Firstly, we shall describe a few algorithms commonly used to solve generic mathematical problems.
+Firstly, we shall describe a several classical algorithms that we use to solve generic mathematical problems.
 
-\subsection{Singular Value Decomposition}
-\textit{Input:} matrix $\mat A$\\
-\textit{Output:} orthonormal matrices $\mat U, \mat V$ and a vector $\vec s$ such that $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$, $\vec s_i \geq 0$ and $\vec s_i \geq \vec s_j$ for all $i \leq j$.\\
+\begin{definition}
+The \textit{diagonal matrix constructor} $\diag \in \R^n \to \R^{n\times n}$ creates a matrix with a given vector along the main diagonal, with all remaining entries set to zero:
+$$\diag(\vec d)_{i, i} = \vec d_i, \diag(\vec d)_{i,j} = 0 \textrm{ for all } i \neq j.$$
+\end{definition}
 
-\todo{householder reflections to bidiagonal, gradient descent}
+\begin{definition}
+The \textit{Singular Value Decomposition} (SVD) of a given matrix $\mat A$ are orthonormal matrices $\mat U, \mat V$ and a vector $\vec s$ such that $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$, $\vec s_i \geq 0$ and $\vec s_i \geq \vec s_j$ for all $i \leq j$.
+The dimension of $\vec s$ is the greater of the dimensions of $\mat A$.
+\end{definition}
 
-The SVD always exists and is unique.
-
+\begin{claim}
+The Singular Value Decomposition (SVD) always exists and is unique.
 In the specific case where $\mat A$ is symmetric, then $\mat U = \mat V$.
+\end{claim}
 
 \subsection{Linear solving}
 \textit{Input:} matrix $\mat A \in \R^{n \times m}$ of rank $n$, vector $\vec b \in \R^n$.\\
 \textit{Output:} vector $\vec x$ such that $|\mat A \vec x - \vec b|$ is minimal.\\
 
-Let us consider the SVD\todo{abbreviation} of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
+Let us consider the SVD of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
 The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \cdot \vec b$, where $\vec t$ is given by $\vec t_i = \vec s_i ^{-1}$.
 
 \begin{proof}
@@ -31,8 +36,8 @@ The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \cdot \vec b$,
 \textit{Input:} matrix $\mat A$\\
 \textit{Output:} vector $\vec x$ such that $|\vec x| = 1$ and $|\mat A \vec x|$ is minimal.\\
 
-Let us consider the SVD\todo{abbreviation} of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
-The result $\vec x$ is last column of $\mat V \T$.
+Let us consider the SVD of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
+The result $\vec x$ is the last column of $\mat V \T$.
 
 \begin{proof}
 Let us define a vector $\vec v = \mat V \vec x$.
@@ -83,14 +88,15 @@ The global extremum $\vec x$ of this polynomial is obtained by solving $\mat A \
 \textit{Input:} set of samples $P = \{\vec p^i \in \R^n \}$.\\
 \textit{Output:} orthonormal basis $\{\vec q^i\}$ such that the orthogonal projection of $P$ onto each $\vec q^i$ has maximal variance with all $\vec q^j, j < i$ being fixed.\\
 
-Given several random samples, we want to find the most prominent aspects of the data.
-The basis vectors are supposed to capture (and extract) all covariance, so that when expressed in the basis $\{\vec q^i\}$, the data will be decorrelated.
-
 Let us consider the covariance matrix $\mat C = \sum_{i,j} (\vec p^i - \vec m) \left(\vec p^j - \vec m \right) \T$ (up to scale), where $\vec m = \frac 1 {|P|} \sum_i \vec p^i$ is the center of mass. Let us further consider the Singular Value Decomposition of this symmetrical matrix $\mat C = \mat U \cdot \diag(\vec s) \cdot \mat U\T$.
 The sought basis vectors are the columns of $\mat U\T$, in their order.
 
+Given several random samples, we want to find the most prominent aspects of the data.
+The basis vectors are supposed to capture (and extract) all covariance, so that when expressed in the basis $\{\vec q^i\}$, the data will be decorrelated.
+Before we explain the formulas presented above, let us start with a lemma:
+
 \begin{lemma}
-If each point $\vec x$ of data with covariance $\mat C$ is transformed to $\mat A \vec x$, the resulting points have covariance matrix $\mat A \mat C \mat A \T$.
+If each point $\vec x$ of data with covariance matrix $\mat C$ is transformed to $\mat A \vec x$, the resulting points have covariance matrix $\mat A \mat C \mat A \T$.
 \end{lemma}
 
 \begin{proof}
@@ -112,23 +118,47 @@ Picking the first basis vector $\vec q^1$ (such that the variance of the orthogo
 \end{proof}
 
 \subsection{Gradient descent}
-\textit{Input:} function $F \in \R^n \to \R$, its gradient $\nabla F$ and initial location $\vec p \in \R^n$.\\
+\textit{Input:} function $F \in \R^n \to \R$, its gradient $\nabla F$ and initial location $\vec p_0 \in \R^n$.\\
 \textit{Output:} local minimum of $F$.\\
 
-We approximate the function $F$ by a quadratic polynomial using its value $F(\vec p)$ and its gradient $\nabla F(\vec p)$ at initial location.
-\todo {line search}
+This algorithm is an iterative scheme.
+The next step is given by the formula
+$$\vec p^{i+1} = \vec p^i - s \cdot \nabla F(\vec p^i),$$
+where $s$ defines the step length.
+The step length is, too, defined by an iterative scheme:
+$$s_{j+1} = s_j - \frac 1 2 \frac {G'(0)} {G(1) - G(0) - G'(0)},$$
+where $G: \R \to \R$ is defined as $G(t) = F \big( \vec p^i - t \cdot s_j \cdot \nabla F(\vec p^i) \big)$.
+The initial step length $s_0$, and the number of iterations both in the inner and the outer loops, are heuristically chosen constant values.
+
+The iterative scheme for $s_j$ is inspired by the fact that we would evaluate $F(\vec p^{i+1})$ anyway, to ensure that it is an improvement over $F(\vec p^i)$.
+Having computed these values, we can already approximate the function $G$ as a quadratic polynomial, and find its minimum.
+If the improvement is small enough, it is reasonable to accept the so-obtained step length and proceed with the outer iteration.
+
+We should note that it is possible to calculate the optimal step length $s$ using second derivatives.
+However, such an approach has shown rather unstable in our experiments.
+
+\begin{claim}
+When supplied with a function of the form $F(\vec x) = a|\vec x - \vec x_0|^2 + b$ for $\vec x_0 \in \R^n$ and $a, b \in \R$, this algorithm finds the global optimum $\vec x_0$ on the first iteration.
+\end{claim}
+This algorithm is provided without a proof of convergence.
+We intend to use it on functions that are very noisy and a radially symmetric quadratic polynomial can hardly even serve as an approximation.
+Ensuring that some necessary conditions are satisfied by the function $F$ can be much more difficult than the proof itself.
+We consider this minimization scheme an intuitive heuristic, and we admit that it may fail to converge in some circumstances.
 
 This algorithm belongs to the simplest optimization schemes, and its performance can be hindered by many issues that are quite common.
 For example, it is important that $F$ resembles a radially symmetric paraboloid, that is, all the parameters are expressed in units of a similar scale.
 In our implementation, we take care of this explicitly either by expressing all the parameters in the same unit (e.g., pixels) or by scaling them by a heuristic factor.
 
-This algorithm is provided without a proof of convergence.
-In fact, if supplied with a quadratic polynomial $F$, this algorithm finds the global optimum after \todo{how many} steps.
-However, we intend to use this algorithm on functions of overwhelming complexity.
-Ensuring that some necessary conditions are satisfied by the function $F$ can be much more difficult than the proof itself.
-We consider this minimization scheme an intuitive heuristic, and we admit that it may fail to converge in some circumstances.
+Functions based on image pixel data may change strongly from a pixel to its neighbor.
+In order for this algorithm not to skip such important details, the initial step length $s_0$ is set to one pixel.
 
 \section{Image processing}
+
+%\begin{definition}
+%The number $\omega_n \in \C$ is the $n$-th fundamental root of unity:
+%$$\omega_n = \exp(2 \pi i / n),$$
+%where $i$ is the imaginary unit.
+%\end{definition}
 
 \subsection{Convolution}
 
@@ -186,6 +216,11 @@ The \textit{barycentric transformation} is an affine transformation defined by t
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by an unknown homography.\\
 \textit{Output:} matrix $\mat H$ minimizing \todo{what}.\\
 
+\begin{definition}
+The \textit{vectorization} operator $\mathrm{vec} : \R^{m \times n} \to \R^{mn}$ is defined as
+$$\mathrm{vec}(\mat M)_{m i + j} = \mat M_{i,j} \textrm{ for all } i, j.$$
+\end{definition}
+
 We are presented with a set projective correspondences of the form
 \begin{equation} \label{e:homography-input}
 \mat H \vec x^k = \alpha_k \vec p^k, 1 \leq k \leq m,
@@ -226,7 +261,7 @@ This follows from the definition of $\mat M^{i,j}$: for any $\vec p \in \R^n$, t
 
 We intend to construct a basis of the subspace $\R^n / \vec p$ orthogonal to $\vec p$.
 With increasing dimension, the set of vectors from Lemma \ref{l:homography-orthogonal} becomes heavily redundant.
-Although $\left\{ \mat M^{i, j} \vec p \right\}$ generate the subspace in question, there are $\frac {1} {2} n \cdot (n - 1)$ of such vectors, whileas only $n-1$ vectors are necessary to form a basis.
+Although $\left\{ \mat M^{i, j} \vec p \right\}$ generate the subspace in question, there are $\frac {1} {2} n \cdot (n - 1)$ of such vectors, whereas only $n-1$ vectors are necessary to form a basis.
 Some sources suggest to pick an arbitrary subset of size $n - 1$ from the matrices $\left\{ \mat M^{i, j} \right\}$ and use these for the whole data set.\cite{hartley03}
 A more proper solution is to select these matrices specifically for each correspondence pair $\vec x^k \leftrightarrow \vec p^k$ so as to avoid possible degeneracies.
 In particular, we find the largest vector element $\vec p_l$ (in absolute value) and then select all matrices $\mat M^{i, j}$ such that $i = l$ or $j = l$.

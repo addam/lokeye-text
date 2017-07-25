@@ -93,6 +93,8 @@ The iris radius can also be extracted by multiplying the reference radius with a
 Most of the face trackers induce non-uniform scaling, so it might seem appropriate that the eye shape will be an ellipse.
 However, we assume that eyes are always directed towards the camera, so the limbus should retain a circular shape even if the face is stretched.
 
+\todo{explain that we do not impose many constraints on the pupil occlusion, so the problem is actually very hard.}
+
 There are a plenty of eye trackers available in our program.
 From a broader perspective, we took four different approaches:
 \begin{itemize}
@@ -116,14 +118,25 @@ This method relies on the edge between the iris and the sclera.
 Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be sensed as a circle of high contrast.
 We assume the eyelids to be of uniform color, so they have zero value in the gradient domain and can be neglected.
 
-The eye region of the face is actually not uniform as it contains many wrinkles and directional light may cause strong shadow.
-These facts cause a low-magnitude gradient that might modify the global optimum of the method described above.
-In order to gain some robustness, we can apply a heuristic filter to the gradient values.
-If designed with care, the method can still operate at nearly the same speed.
-This extension is available as a separate method, using a polynomial function upon the gradient.
+\todo{formulate the energy function}
+This function is minimized by gradient descent.
+It is important to note that optimization of a function based on image gradient requires image derivatives of second order to be calculated.
+\todo{if there is a citation for this:}
+These are often considered unstable and avoided in the literature.
+In our case, the function to be optimized appears to be smooth enough, and the algorithm converges well if initialized a few pixels from the correct solution.
+
+This method is designed for refining an estimated eye position on the subpixel level, so it performs well when coupled with another eye tracking method.
+If executed alone, it often fails to locate the global optimum.
+
+% deleted for now \todo
+%The eye region of the face is actually not uniform as it contains many wrinkles and directional light may cause strong shadow.
+%These facts cause a low-magnitude gradient that might modify the global optimum of the method described above.
+%In order to gain some robustness, we can apply a heuristic filter to the gradient values.
+%If designed with care, the method can still operate at nearly the same speed.
+%This extension is available as a separate method, using a polynomial function upon the gradient.
 
 \subsection{Hough Transformation}
-We can use a voting scheme to find the limbus center.
+We can use a voting scheme to find the limbus center, as described in Section \todo{@ref}.
 
 A free parameter is yet to define: the resolution of the voting grid.
 Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
@@ -134,6 +147,8 @@ Using each pixel as a voting bin is usually the best choice, but it may fail on 
 Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
 An appropriately fast and reliable one is the normalized correlation, using a slightly blurred black circle as the template.
 
+\todo{formula for the kernel}
+
 This method appears to work especially well when tested in regions where the majority of people are brown-eyed and with white skin.
 It can also easily get confused by dark spots around the eyes, such as glass rims or strong makeup.
 Finally, this method requires most of the iris to be visible, which need not be true because of the viewing angle and the user's personal habit.
@@ -141,11 +156,9 @@ Finally, this method requires most of the iris to be visible, which need not be 
 \subsection{Personalized iris correlation}
 The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
 We can, however, rely on the whole iris region (including the pupil) to be a constant, radially symmetric image, and locate it using a personalized template.
-This template requires the user to open wide their eyes, so that the whole limbus is visible.
+Acquiring this template requires the user to wide open their eyes, so that the whole limbus is visible.
 
 For tracking a colored object, it is again reasonable to use the normalized correlation.
-
-\todo{This is yet to be coded and tested.}
 
 \subsection{Iris radial symmetry}
 

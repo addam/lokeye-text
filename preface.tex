@@ -2,20 +2,28 @@
 
 The main idea behind this program is to view human eye as a means of communication.
 It is rather intuitive for us to recognize other people's gaze just by looking at their face thanks to high contrast coloring of the eye itself.
-The corresponding brain circuitry develops early in infants \todo{cite} and is equivalent among individuals.
+The relevant brain circuitry develops early in infants and is equivalent among individuals.
 This seems to be an evidence of evolutionary purpose---the human eye is built in a way so as to display the gaze clearly.
 Therefore it should also be possible for a computer to estimate gaze from the data us humans have available, that is, a color image.
 
 Thanks to the fact that almost every laptop computer or cell phone is now equipped with a video camera, the hardware requirements of this software are easy to satisfy.
 Future programs built on top of this library will also exhibit minimal hardware requirements that enable them to be used almost immediately upon download and completely for free.
 
-Eye trackers can actually be used for communication, namely for human-computer interaction.
+The possible applications are a vast topic.
+Along the communication concept, eye trackers can be used for human-computer interaction.
 Wide variety of algorithms have been proposed for on-screen keyboard and general desktop control \cite{majaranta02}.
-The user's center of attention can also serve as a cue for adaptive rendering in video games because the rest of the screen need not be displayed in full detail.
-Possible applications of gaze tracking in cell phones are a vast topic, such as locking the screen when not looked at or displaying a note when somebody looks over your shoulder.
+In contrast to classical input devices, they make computers accessible to disabled users that have difficulty to move their limbs.
+They can also improve the user comfort, such as by speeding up mouse motion in accordance to the gaze.
 
-\todo{applications in advertisement}
-\todo{tracking of driver's attention}
+Running a gaze tracker quietly in the background (perhaps in a low quality) can also be helpful.
+When the screen of a cell phone is not looked at, it can automatically lock to improve security.
+On the other hand, it can display a message when somebody reads over your shoulder.
+
+The gaze provides valuable information even when we do not concentrate on it.
+In psychological experiments, it is often used as a synonym of the subject's attention.
+An industrial application of this method is found in marketing and user experience design, where gaze recordings can be used to evaluate the quality of presentation of a product, or of an interface layout.
+Knowing the user's center of attention can also serve as a cue for adaptive rendering in video games because the rest of the screen need not be displayed in full detail.
+Tracking the gaze of a car driver can be used to improve safety \cite{murphy-chutorian07}.
 
 \section{History}
 
@@ -128,17 +136,17 @@ The retina of the human eye is distincly reflective in red and near infrared lig
 If an infrared light source is placed next to the camera, the user's pupils will shine brightly, whereas the rest of the eye and the scene brightens only subtly.
 The pupil shape can be obtained by contrasting this image to the one when the infrared light is turned off.
 
-Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface, called the \textit{Purkinje images}.
-The shape of the eye is just quite enough complex (as detailed in Section \ref{s.eyeanatomy}) and quite the same across individuals, so the eye pose can be deduced from such glares by geometric calculations.
-There has been \todo{\dots}\cite{villanueva08}
-This approach is popular both among amateurs \cite{yucel09,wolski16}\todo{more citations\dots} and in high performance industrial tools \cite{tobii}.\footnote{
-The algorithm behind the software \cite{tobii} has not been published.
-Our claim is based on own research.
-}
-\todo{talk some more about tobii: it was the first single camera tracker. We have the recorded videos.}
+Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface, called the \textit{Purkinje images} \cite{hansen10}.
+The shape of the eye is just quite enough complex (as detailed in Section \ref{s.eyeanatomy}) and almost the same across individuals, so the eye pose can be deduced from such glares by geometric calculations.
+As shown in \cite{villanueva08}, this approach can be used for precise tracking with only minimal calibration.
+
+Devices using Purkinje reflections can be identified easily, since they contain several infrared lights that quickly switch on and off.
+According to the author's experience, the Tobii EyeX tracker \cite{tobii} belongs to this group.
+The tracker has been used to obtain some of our testing data; for a more detailed description, see Attachment \ref{s:testingdata}.
+Tobii is one of the pioneer corporations in eye tracking, and many of their products are available on the market.
 
 If even higher precision is required, it may still be necessary to attach a camera to the user's head and point it closely to the eyes.
-Although such methods are slowly being deprecated by the less intrusive ones presented so far, it is important to note that there have also been much advancement in camera manufacturing.
+Although such methods are slowly being deprecated by the less intrusive ones presented so far, it is important to note that there has also been much advancement in camera manufacturing.
 Indeed, it is possible to build very small and lightweight cameras that will make almost no obtrusion to the user's view and comfort \cite{pupil,kassner14}.
 Such a tracking rig may be preferred in many controlled scenarios such as in psychological laboratories.
 
@@ -146,6 +154,9 @@ For a thorough survey of eye trackers including the obscure historical ones, the
 
 Regarding the relation between eye rotation and on-screen gaze position, some sources suggest that only a linear function is necessary \cite{zhu12}.
 On the other hand, if the head and scene model is precise enough, it may be appropriate to calculate the gaze explicitly as a ray in space \cite{wang16}.
+
+\todo{talk about available data sets}
+\todo{what about dataset http://csr.bu.edu/headtracking/uniform-light/}
 
 \section{Organization}
 \todo{describe each chapter}

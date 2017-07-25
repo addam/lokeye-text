@@ -1,21 +1,33 @@
 \chapter{Goals}
 
-\todo{short intro, itemize, explanation.}
-Hereby we offer an open-source solution in the belief that it will help further development in this scientific field.
-The task itself is by no means new, and as will be detailed in the following section, there are many software libraries that solve it.
-Unfortunately, it is rare that such a library would be released with open source code, and these few are usually incomplete or outdated.
+Given the fact that a majority of laptop computers are capable of constrantly recording the users using a video camera, it is attractive to analyse this stream.
+We set off to the following goals:
+\begin{itemize}
 
-The purpose of the software presented here is also to serve as a benchmark rig for face tracking and eye tracking methods.
-In fact, we evaluate many popular approaches to these problems and our implementation of the algorithms can easily be reused elsewhere.
-Of special interest is our homography-based face tracker and our eye tracker based on iris radial symmetry.
-To the author's knowledge, these two methods are entirely novel.
-\todo{mention the testing data}
-\todo{talk about available data sets}
-\todo{what about dataset http://csr.bu.edu/headtracking/uniform-light/}
+\item Build an \textbf{open-source} solution for interactive gaze tracking.
+Gaze tracking is by no means a new task, and has been detailed in the previous section, there are many software libraries that solve it.
+Unfortunately, it is rare that such a library would be released with open source code, and these few are usually incomplete or outdated.
+We believe that sharing the source code will help further development in this scientific field.
+
+\item Create a \textbf{benchmark rig} for evaluation of the tools in terms of performance.
+By implementing several different methods for each of the subtasks at hand, we intend to compare them in terms of performance.
+Further evaluation can help choose an appropriate method for a specific application.
+
+Because our problem setting is already quite specific, we also provide testing data sets that fit the given conditions.
+In order to properly evaluate the reasons why some methods perform better than others, it is necessary to make extra annotations about each testing sample.
+Publicly available data sets lack this kind of information.
+
+\item We decided to design a \textbf{novel algorithm} for face tracking, and another one for eye tracking.
+Given the amount of algorithms that have been already presented in the literature, this plan may seem pointless.
+However, it seems that there is still room for improvement, and discovering new methods may bring more insight.
+
+\end{itemize}
 
 Where possible, we try to employ complex and rigid models that are specific to the tasks at hand.
-There are several reasons.
-In order to learn a generic machine learning algorithm, we would need much training data.
-Unfortunately, none of the publicly available datasets for face and gaze tracking are suitable for our problem setting---most of them are designed for recognition from a static image, and some even lack color information.
-Anyway, there has been much progress in the field of machine learning currently, and we can hardly compete with the manpower and computational capacity of these scientific teams.
+There are two reasons for this.
+First and foremost, we would need too much training data in order to learn a generic machine learning algorithm.
+It turns out that none of the publicly available datasets for face and gaze tracking are well suitable for our problem setting.
+For example, most of them are designed for recognition from a static image, and some even lack color information.
+
+Secondly, there has been much progress in the field of machine learning currently, and we can hardly compete with the manpower and computational capacity of these scientific teams.
 Configuring a machine learning tool is simply not the aim of this thesis, by the author's personal preference.

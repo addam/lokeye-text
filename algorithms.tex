@@ -43,7 +43,9 @@ The result $\vec x$ is the last column of $\mat V \T$.
 Let us define a vector $\vec v = \mat V \vec x$.
 This is effectively a change of basis, and because $\mat V$ is an orthonormal matrix, the norm $|\vec v| = |\vec x|$ is preserved.
 Because also $\mat U$ is an orthonormal matrix, it can be safely crossed out of the norm $|\mat A \vec x| = |\diag(\vec s) \cdot \vec v|$.
-This in turn can be expressed as the square root of $\sum_i (\vec s_i \vec v_i)^2 = \sum_i \vec s_i^2 \vec v_i^2$.
+This in turn can be expressed as the square root of $\sum_i (\vec s_i \vec v_i)^2 = \sum_i \vec s_i^2 \vec v_i^2$, and the root can be omitted in optimization.\footnote{
+We also omit the summation bounds for $i$. We hope this improves readability since the bounds are unambiguously implied by the vector dimensions.
+}
 
 Finally, this constrained minimization problem can be solved by the method of Lagrange multipliers.
 Equating $\nabla(\sum_i \vec s_i^2 \vec v_i^2) = \lambda \nabla (\sum_i \vec v_i^2)$ leads to the system of equations $\vec s_i^2 \vec v_i = \lambda \vec v_i$ for all $i$.
@@ -151,6 +153,11 @@ We consider this minimization scheme an intuitive heuristic, and we admit that i
 This algorithm is perhaps the simplest optimization scheme applicable on our problems, and its performance can be hindered by many issues that are quite common.
 For example, it is important that all the parameters of $F$ are expressed in units of a similar scale.
 In our implementation, we take care of this explicitly either by expressing all the parameters in the same unit (e.g., pixels) or by scaling them by a heuristic factor.
+
+\subsection{Random sample consensus}
+
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d$.\\
+\textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)| < d$.\\
 
 \section{Image processing}
 
@@ -400,15 +407,3 @@ The preferable method is to explicitly permute the points so that the point in q
 \end{proof}
 
 \todo{what are the overall computational requirements, per pixel?}
-
-\section{Machine learning}
-
-\subsection{Random sample consensus}
-
-\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d$.\\
-\textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)| < d$.\\
-
-\subsection{Boosted random forests}
-
-\textit{Input:} set of sample points $\{\vec p^i \in \R^n \}$ and corresponding function values $\{ f(\vec p^i) \}$.\\
-\textit{Output:} piecewise constant function $g$ that approximates $f$.\\

@@ -22,8 +22,11 @@ Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of ea
 
 \section{Face Tracking}
 
-\textit{Input:} reference image $R$ and current image $I$.\\
-\textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(T(\vec p))|^2$ is minimal.\\
+\textit{Input:} reference image $\textrm{R}$ and current image $\textrm{I}$.\\
+\textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2$ is minimal.\footnote{
+Because we do not actually intend to use integral calculus, the integral is only written in an informal way.
+The full form would read: $\int_{\vec p \in \Omega} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2 \mathrm{d}\vec p$, where $\Omega$ is the image domain.
+}\\
 
 The tracking is split into two parts: a \textit{master tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
 All of the trackers are deformable templates along the lines of \todo{cite klt and generalization}.
@@ -32,7 +35,7 @@ The master tracker provides a reference frame for all other features (e.g., eye 
 In order to gain some robustess against changes in lighting, the master trackers is color-normalized.
 
 A surface within the face is tracked pixel per pixel, minimizing the following energy function:
-$$\todo{formula}$$,
+$$\todo{formula},$$
 where $T: \R^2 \to \R^2$ is a differentiable image transformation.
 The reference image $R$ is a single frame that is used during the whole course of operation.
 Although this approach does not tolerate long term changes (such as when the user takes on their glasses), it is robust against slow drift.
@@ -215,9 +218,6 @@ Since there are usually many distractive features around the eyes, such as the e
 
 \todo{This is yet to be coded and tested.}
 
-\subsection{Random forest regression}
-\todo{This is yet to be coded and tested, but it is not going to work anyway.}
-
 \subsection{Combined estimator}
 
 Choosing several trackers that are sensitive to different deteriorations of the image, we can trade off some computational time for much robustness and precision.
@@ -277,7 +277,7 @@ All invertible homographies form a group that contains the group of invertible a
 \section{Calibration}
 
 \textit{Input:} interactive session with the user.\\
-\textit{Output:} gaze parameters from Definition \ref{d:gaze-parameters}.\\
+\textit{Output:} gaze parameters (see Definition \ref{d:gaze-parameters}).\\
 
 The purpose of calibration is to learn all necessary parameters about the user's face and the geometry of the screen relatively to the camera.
 Depending on the tracking quality, the time spent to measure all necessary information may vary.

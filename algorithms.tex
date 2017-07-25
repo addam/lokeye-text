@@ -125,17 +125,20 @@ This algorithm is an iterative scheme.
 The next step is given by the formula
 $$\vec p^{i+1} = \vec p^i - s \cdot \nabla F(\vec p^i),$$
 where $s$ defines the step length.
-The step length is, too, defined by an iterative scheme:
-$$s_{j+1} = s_j - \frac 1 2 \frac {G'(0)} {G(1) - G(0) - G'(0)},$$
-where $G: \R \to \R$ is defined as $G(t) = F \big( \vec p^i - t \cdot s_j \cdot \nabla F(\vec p^i) \big)$.
+In our implementation, even the step length is calculated by an iteration:
+$$s_{j+1} = s_j - \frac 1 2 \frac {G_j'(0)} {G_j(1) - G_j(0) - G_j'(0)},$$
+where $G_j(t) = F \big( \vec p^i - s_j \cdot t \cdot \nabla F(\vec p^i) \big)$.
 The initial step length $s_0$, and the number of iterations both in the inner and the outer loops, are heuristically chosen constant values.
 
 The iterative scheme for $s_j$ is inspired by the fact that we would evaluate $F(\vec p^{i+1})$ anyway, to ensure that it is an improvement over $F(\vec p^i)$.
 Having computed these values, we can already approximate the function $G$ as a quadratic polynomial, and find its minimum.
-If the improvement is small enough, it is reasonable to accept the so-obtained step length and proceed with the outer iteration.
+If the improvement is small enough, we accept the so-obtained step length and proceed with the outer iteration.
 
-We should note that it is possible to calculate the optimal step length $s$ using second derivatives.
+It is possible to calculate the optimal step length $s$ using second derivatives.
 However, such an approach has shown rather unstable in our experiments.
+
+Functions based on image pixel data may change strongly from a pixel to its neighbor.
+In order for this algorithm not to skip such important details, the initial step length $s_0$ is set to one pixel.
 
 \begin{claim}
 When supplied with a function of the form $F(\vec x) = a|\vec x - \vec x_0|^2 + b$ for $\vec x_0 \in \R^n$ and $a, b \in \R$, this algorithm finds the global optimum $\vec x_0$ on the first iteration.
@@ -145,12 +148,9 @@ We intend to use it on functions that are very noisy and a radially symmetric qu
 Ensuring that some necessary conditions are satisfied by the function $F$ can be much more difficult than the proof itself.
 We consider this minimization scheme an intuitive heuristic, and we admit that it may fail to converge in some circumstances.
 
-This algorithm belongs to the simplest optimization schemes, and its performance can be hindered by many issues that are quite common.
-For example, it is important that $F$ resembles a radially symmetric paraboloid, that is, all the parameters are expressed in units of a similar scale.
+This algorithm is perhaps the simplest optimization scheme applicable on our problems, and its performance can be hindered by many issues that are quite common.
+For example, it is important that all the parameters of $F$ are expressed in units of a similar scale.
 In our implementation, we take care of this explicitly either by expressing all the parameters in the same unit (e.g., pixels) or by scaling them by a heuristic factor.
-
-Functions based on image pixel data may change strongly from a pixel to its neighbor.
-In order for this algorithm not to skip such important details, the initial step length $s_0$ is set to one pixel.
 
 \section{Image processing}
 
@@ -290,12 +290,27 @@ Instead of avoiding such degeneracies explicitly, we loop through the resultant 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by roughly estimated homography $\mat H$.\\
 \textit{Output:} homography matrix $\mat G$ that minimizes $\sum_k |\mathrm{cart}(\mat G \vec x^k) - \mathrm{cart}(\vec p^k)|^2$.\\
 
+\begin{definition}
+The \textit{Cartesian conversion} function $\mathrm{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
+$$
+\mathrm{cart}(\vec x) = (\vec x_1 / \vec x_n, \dots, \vec x_{n - 1} / \vec x_n)\T.
+$$
+\end{definition}
+
 We minimize the energy function by gradient descent.
 
 \subsection{Four-point homography}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$.\\
 \textit{Output:} matrix $\mat H$ such that $\mat H \vec x^k \sim \vec p^k$.\\
+
+\begin{definition}
+The similarity operator $\sim$ denotes the equality of homogeneous vectors up to scale.
+When applied to matrices $\mat A, \mat B \in \R^{n \times m}$, the equality is posed between their corresponding columns:
+$$
+\mat A \sim \mat B \Leftrightarrow \exists \vec c \in \R^n : \mat A \cdot \diag(\vec c) = \mat B.
+$$
+\end{definition}
 
 A minimal case of a two-dimensional homography estimation is a correspondence of four point pairs.
 If the input points are in a general configuration (none three are collinear), then there is an exact solution---least squares fitting is not necessary here.

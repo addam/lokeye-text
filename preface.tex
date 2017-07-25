@@ -155,29 +155,22 @@ The directory structure of the accompanying data medium is explained in Attachme
 
 \section{Notation}
 
-Italic lowercase letters (e.g., $c$) are denote scalars.
-Regular lowercase words (e.g., $\mathrm{mean}$), and in some cases italic uppercase letters (e.g., $I$) denote functions.
-
 For matrix algebra we follow the notation used in the classical book Multiple View Geometry \cite{hartley03}.
 
-\newglossaryentry{vector}{name=$\vec x$,
-	description={real column vector},
-	type=symbolslist}
-
-\newglossaryentry{matrix}{name=$\mat H$,
-	description={real matrix},
-	type=symbolslist}
-
-\newglossaryentry{cdot}{name=$\cdot$,
-	description={scalar or matrix multiplication},
-	type=symbolslist}
-
-\printglossary[type=symbolslist,style=notationlong]   % list of symbols
-
-\glsaddall
-
-An upper index next to a matrix (e.g., $\mat H^i$) identifies the $i$-th matrix within a list.
-In contrast, the $n$-th power of a matrix would always be expressed using parentheses, e.g., $(\mat R)^n$.
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+$c$ & lowercase letter \dotfill real constant \\
+$\diag$ & regular type word \dotfill function \\
+$F$ & uppercase letter \dotfill function \\
+$\vec x$ & boldface letter \dotfill real column vector \\
+$\mat M$ & uppercase monospace letter \dotfill real matrix \\
+$\mat M\inv$ & \dotfill inverse matrix \\
+$\mat M^i$ & \dotfill $i$-th matrix in a list of matrices \\
+$\cdot$ & central dot symbol \dotfill scalar or matrix multiplication \\
+$|\vec x|$ & vertical bars \dotfill vector $L_2$ norm \\
+\end{tabularx}
+\end{table}
 
 \todo{move to a footnote where first used}
 Bounds in the summation symbol $\sum$ are not explicitly written down where they are obvious from the context (e.g., matrix dimensions).

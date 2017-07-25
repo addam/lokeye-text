@@ -110,7 +110,7 @@ However, there has not yet been a clear consensus on the appropriate method.
 
 Much research relies on the fact that both human iris and pupil are circles, so their camera projection is always an ellipse.
 When the gaze direction is reasonably bounded, these projected shapes can safely be considered to remain circular.
-For example, the generalized Hough Transform \todo{there is no point in citing this. Write about it in the algorithms}(@cite Kimme, Carolyn, Dana Ballard, and Jack Sklansky. "Finding circles by an array of accumulators." Communications of the ACM 18.2 (1975): 120-122.) provides a global method of searching for circles with one-pixel precision.
+For example, the generalized Hough Transform provides a global method of searching for circles with one-pixel precision.
 Many alternative but quite similar models are tested in this thesis and available in the accompanying source code.
 \todo{mean shift algorithm}
 
@@ -135,13 +135,12 @@ This approach is popular both among amateurs \cite{yucel09,wolski16}\todo{more c
 The algorithm behind the software \cite{tobii} has not been published.
 Our claim is based on own research.
 }
+\todo{talk some more about tobii: it was the first single camera tracker. We have the recorded videos.}
 
 If even higher precision is required, it may still be necessary to attach a camera to the user's head and point it closely to the eyes.
 Although such methods are slowly being deprecated by the less intrusive ones presented so far, it is important to note that there have also been much advancement in camera manufacturing.
 Indeed, it is possible to build very small and lightweight cameras that will make almost no obtrusion to the user's view and comfort \cite{pupil,kassner14}.
 Such a tracking rig may be preferred in many controlled scenarios such as in psychological laboratories.
-
-\todo{@cite contact lenses approach from A Survey on Eye-Gaze Tracking Techniques. Chennamma}
 
 For a thorough survey of eye trackers including the obscure historical ones, the reader is directed to \cite{hansen10}.
 

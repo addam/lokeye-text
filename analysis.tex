@@ -61,9 +61,10 @@ Sclera is white and pupil is black.
 Iris is something in between.
 The iris diameter remains constant but the pupil diameter can change dramatically.
 
-In a healthy case, the inner and outer boundary of the iris (the pupil and the limbus, respectively) should have a precisely circular shape.
+The inner and outer boundary of the human iris (the pupil and the limbus, respectively) are concentric circles.
 Generally, the inner shape of the iris is less reliable of these two.
-Its radius changes depending on the amount of incoming light and the emotional state of the user.
+The pupil shape can also be permanently distorted or non-circular due to a damage or a disease \cite{bowyer16}.
+In a healthy case, its radius changes depending on the amount of incoming light and the emotional state of the user.
 The constriction is controlled by the \textit{parasympathicus}, a nervous system generally related to comfortable actions such as eating and sleeping.
 The dilation is controlled by the \textit{sympathicus}, which in turn is the main actuator of the so-called \textit{fight or flight} stress response.
 Both sympathicus and parasympathicus are parts of the \textit{autonomous nervous system} and therefore cannot be directly controlled by will.
@@ -188,7 +189,7 @@ However, many commonly used interpolation functions are not suitable for a preci
 An interpolator should obviously not be biased towards zero, i.e., interpolation of a constant image should be a constant.
 Because of this, functions such as $\mathrm{sinc}$ can only serve as weights in a weighted average.
 The vector formula  often makes image derivatives prohibitively hard to calculate.
-In the end,  may lead us to only estimating the image derivatives by a simple formula---but by making such a step we effectively classify to the first category above.
+In the end, this may lead us to only estimating the image derivatives by a simple formula---but by making such a step we effectively classify to the first category above.
 
 \subsection{Image derivatives}
 The partial derivatives of an image are estimated as

@@ -10,13 +10,13 @@ They are presented here, and will be evaluated in the next section under varying
 On a first run, the program needs a calibration procedure to learn specific parameters related to the user.
 Some calibration is also necessary on each run and during longer periods of execution because of changing light conditions.
 
-The pipeline of computation is presented in Drawing \todo{draw it}.
+The pipeline of computation is presented in Drawing \todo{@ref}.
 Firstly, the face is locally tracked from the previous frame.
 Only if this step fails, the program starts a global face localization procedure.
 This first step results in a 3-dimensional translation and rotation mapping from the initial pose.
 
 Next, the precise position of both eyes is established within a reasonable region in the face.
-This steps requires the face to be localized properly in the image but since the eyes can move very quickly, this uses no prior from the previous frame.
+This step requires the face to be localized properly in the image but since the eyes can move very quickly, no information from previous frames is taken into account.
 
 Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of each eye are fed into a gaze estimator that outputs coordinates in screen reference frame.
 
@@ -32,7 +32,7 @@ The tracking is split into two parts: a \textit{master tracker} that covers the 
 All of the trackers are deformable templates along the lines of \todo{cite klt and generalization}.
 
 The master tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
-In order to gain some robustess against changes in lighting, the master trackers is color-normalized.
+In order to gain some robustness against changes in lighting, the master trackers is color-normalized.
 
 A surface within the face is tracked pixel per pixel, minimizing the following energy function:
 $$\todo{formula},$$
@@ -67,13 +67,13 @@ Several small trackers are arbitrarily placed within the face area, each of them
 Technically, it is possible to track any distinctive texture, so an automated feature detection such as the Harris detector \todo{@cite} performs well enough.
 
 Each of the markers is allowed to freely move around.
-(In contrast to the classical Deformable Parts Model \todo{@cite}, we do not impose any penalty to their relative configuration.)
+(In contrast to the classical Deformable Parts Model such as in \cite{uricar12}, we do not calculate any penalty from their relative configuration.)
 They are tracked from their previous known position relatively to the master tracker.
 If the tracking score of a marker drops below a certain limit or a marker escapes the face area, it is reset to its original position and tracking continues from there.
 
 \subsection{Grid}
 
-This method follows the approach of Active Appearance Models \todo{@cite}.
+This method follows the approach of Active Appearance Models \cite{cootes01}.
 The master tracker is subdivided into a planar mesh, and each cell is responsible of tracking the corresponding part of the image.
 
 In order for the cells to form a contiguous mesh, certain parameters of neighboring cells are bound together and need to be optimized concurrently.
@@ -316,7 +316,7 @@ In order to make the movement more predictable, the dot moves along a smooth cur
 The calculated parameters from face tracking are recorded along with the current on-screen position of the dot.
 
 It is meaningful to extract four basic parameters about a face tracker: its position within the image, its on-screen rotation and scale.
-The head (as a rigid body) has two more parameters to be covered, but there is a virtually unlimited number of extra parameters can be obtained from detailed tracking of the face.
+The head (as a rigid body) has two more parameters to be covered, but there is a virtually unlimited number of extra parameters that can be obtained from detailed tracking of the face.
 Face pose is unknown in each frame, and possibly constant, so there is a high danger of overfitting.
 We cut down the dimensionality by Principal Component Analysis: out of the extra parameters, only the two largest principal components are preserved.
 

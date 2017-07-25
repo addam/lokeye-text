@@ -119,7 +119,11 @@ The following methods are available to the host application:
 \subsection{Limbus gradient}
 This method relies on the edge between the iris and the sclera.
 Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be sensed as a circle of high contrast.
-We assume the eyelids to be of uniform color, so they have zero value in the gradient domain and can be neglected.
+Curve fitting to detected edge pixels can provide very precise results \cite{kassner14}.
+Given the image resolution we work with, the usual approach based on a Canny filter and ellipse fitting is not viable.
+Instead, we propose an iterative optimization scheme that will directly fit a circle to the image gradient.
+
+We assume the eyelids be of uniform color, so they have zero value in the gradient domain and can be neglected.
 
 \todo{formulate the energy function}
 This function is minimized by gradient descent.
@@ -140,6 +144,7 @@ If executed alone, it often fails to locate the global optimum.
 
 \subsection{Hough Transformation}
 We can use a voting scheme to find the limbus center, as described in Section \todo{@ref}.
+\cite{leo14,zhang13}
 
 A free parameter is yet to define: the resolution of the voting grid.
 Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
@@ -147,7 +152,9 @@ Using each pixel as a voting bin is usually the best choice, but it may fail on 
 \todo{explain the advantage when radius is known}
 
 \subsection{Dark iris correlation}
+
 Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
+This technique is very popular \cite{zhu12,george16}
 An appropriately fast and reliable one is the normalized correlation, using a slightly blurred black circle as the template.
 
 \todo{formula for the kernel}
@@ -158,6 +165,7 @@ Finally, this method requires most of the iris to be visible, which need not be 
 
 \subsection{Personalized iris correlation}
 The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
+In fact, the iris image varies so greatly among individuals that it is often advocated as a means of identification or authentification \cite{bowyer16}.
 We can, however, rely on the whole iris region (including the pupil) to be a constant, radially symmetric image, and locate it using a personalized template.
 Acquiring this template requires the user to wide open their eyes, so that the whole limbus is visible.
 
@@ -167,9 +175,12 @@ For tracking a colored object, it is again reasonable to use the normalized corr
 
 It may be considerably difficult to obtain a reliable iris image, and generally speaking it is a calibration step that we wish to avoid.
 Instead, we can use the sole fact that the iris is a radially symmetric object on a white background.
+An example of a filter based on radial symmetry can be found in \cite{leo14}.
+In contrast to that paper, we exploit the color information.
+
 The iris colors are recalculated for each frame and each eye position, so only few free parameters remain.
 
-For the case that skin masking (described below) fails or is disabled altogether, whole segments of the iris are ignored where the limbus is not visible.
+This algorithm has built-in skin masking, so that whole segments of the iris are ignored where the limbus is not visible.
 
 \begin{itemize}
 \item
@@ -204,7 +215,9 @@ This tracker uses exhaustive search to find the global minimum within a crop-out
 
 \subsection{Skin masking}
 
-Skin, including the eyelids, can easily be detected by an analysis of its color.
+Skin, including the eyelids, can be detected quite easily by an analysis of its color.
+This approach is perhaps too naive to be widely advocated in the literature, but it can be found in software libraries such as \cite{deepgaze}.
+
 We allow each of the eye trackers presented so far to be coupled with a HSV (hue-saturation-value) detector tuned for skin tones.
 Pixels whose HSV vector lies within a user-defined cube are excluded from eye fitting.
 
@@ -220,11 +233,16 @@ Since there are usually many distractive features around the eyes, such as the e
 
 \subsection{Combined estimator}
 
+Having implemented several algorithms for the same task, it is possible to adaptively combine their results.
+An example of two different algorithms summing their results can be found in \cite{leo14}.
+A more common approach is to run several trackers in sequence, such as in \cite{wang16,george16,zhu12}.
+Our program supports can combine both of these options in a tree-like manner arbitrarily.
+
 Choosing several trackers that are sensitive to different deteriorations of the image, we can trade off some computational time for much robustness and precision.
 Each of the trackers chosen should obviously fail in different conditions so that a majority of them is correct on every image.
-Reasonable selection of trackers for a combined estimator is discussed in the next chapter.
+For an empiric comparison on reasonable selection of trackers for a combined estimator, see Section \ref{s:results-eyecovar}.
 
-After letting each of the selected trackers cast a vote, it is possible to combine them in a more robust manner than the arithmetic average would be.
+After letting each of the selected trackers cast a vote, it is possible to combine them robustly (as compared to the arithmetic average).
 It is very much possible that one or more of the trackers fail.
 We have very little prior information about the eye position, but we can exploit the distances among the votes.
 
@@ -256,6 +274,7 @@ The \textit{gaze parameters} consist of an orthonormal basis $\mat P \in \R^{2\t
 \end{definition}
 
 Given the vector $\vec f$ obtained from face tracking and vector $\vec e$ obtained from eye tracking, and using the scene model described in Section \ref{s:gaze-model}, we wish to estimate the on-screen position $\vec p$ (in pixel units).
+Commonly used approximation methods for this purpose vary greatly from simple approximations \cite{zhu12} more flexible ones \cite{kassner14,yucel09} and thorough geometrical models \cite{villanueva08,wang16}.
 
 Computer screen is a plane in space, with pixels aligned in a regular square grid.
 If the face and the eyes were also planar objects, then the gaze in screen coordinates would be related to the face and eyes position by a projectivity.

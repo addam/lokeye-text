@@ -118,6 +118,10 @@ Picking the first basis vector $\vec q^1$ (such that the variance of the orthogo
 We approximate the function $F$ by a quadratic polynomial using its value $F(\vec p)$ and its gradient $\nabla F(\vec p)$ at initial location.
 \todo {line search}
 
+This algorithm belongs to the simplest optimization schemes, and its performance can be hindered by many issues that are quite common.
+For example, it is important that $F$ resembles a radially symmetric paraboloid, that is, all the parameters are expressed in units of a similar scale.
+In our implementation, we take care of this explicitly either by expressing all the parameters in the same unit (e.g., pixels) or by scaling them by a heuristic factor.
+
 This algorithm is provided without a proof of convergence.
 In fact, if supplied with a quadratic polynomial $F$, this algorithm finds the global optimum after \todo{how many} steps.
 However, we intend to use this algorithm on functions of overwhelming complexity.

@@ -1,0 +1,20 @@
+\chapter{Goals}
+
+Hereby we offer an open-source solution in the belief that it will help further development in this scientific field.
+The task itself is by no means new, and as will be detailed in the following section, there are many software libraries that solve it.
+Unfortunately, it is rare that such a library would be released with open source code, and these few are usually incomplete or outdated.
+
+The purpose of the software presented here is also to serve as a benchmark rig for face tracking and eye tracking methods.
+In fact, we evaluate many popular approaches to these problems and our implementation of the algorithms can easily be reused elsewhere.
+Of special interest is our homography-based face tracker and our eye tracker based on iris radial symmetry.
+To the author's knowledge, these two methods are entirely novel.
+\todo{mention the testing data}
+\todo{talk about available data sets}
+\todo{what about dataset http://csr.bu.edu/headtracking/uniform-light/}
+
+Where possible, we try to employ complex and rigid models that are specific to the tasks at hand.
+There are several reasons.
+In order to learn a generic machine learning algorithm, we would need much training data.
+Unfortunately, none of the publicly available datasets for face and gaze tracking are suitable for our problem setting---most of them are designed for recognition from a static image, and some even lack color information.
+Anyway, there has been much progress in the field of machine learning currently, and we can hardly compete with the manpower and computational capacity of these scientific teams.
+Configuring a machine learning tool is simply not the aim of this thesis, by the author's personal preference.

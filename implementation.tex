@@ -25,38 +25,52 @@ Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of ea
 \textit{Input:} reference image $R$ and current image $I$.\\
 \textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(T(\vec p))|^2$ is minimal.\\
 
-\todo{rewrite this outdated paragraph}
-Our program supports two methods of face tracking, which represent two major groups of tracking techniques in general.
-First is feature-based, second is appearance-based.
-A surface within the face is tracked pixel per pixel.
-Depending on the transformation allowed, we get different methods:
+The tracking is split into two parts: a \textit{master tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
+All of the trackers are deformable templates along the lines of \todo{cite klt and generalization}.
 
+The master tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
+In order to gain some robustess against changes in lighting, the master trackers is color-normalized.
+
+A surface within the face is tracked pixel per pixel, minimizing the following energy function:
+$$\todo{formula}$$,
+where $T: \R^2 \to \R^2$ is a differentiable image transformation.
+The reference image $R$ is a single frame that is used during the whole course of operation.
+Although this approach does not tolerate long term changes (such as when the user takes on their glasses), it is robust against slow drift.
+
+Depending on the motion model expressed by the transformation, we get different kinds of trackers:
 \begin{itemize}
 \item Similarity transformation. 4 DoF. Aligning in grid makes no sense at all.
-\item Affinity. 6 DoF. Aligning in grid makes little sense.
-\item Barycentric transformation. 6 DoF. Possible to align in grid.
+\item Affinity over a triangle. 6 DoF. Possible to align in grid.
+\item Affinity over a quadrangle. 6 DoF. Aligning in grid makes no sense.
 \item Homography. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
 \end{itemize}
+For performance reasons, a motion model must be chosen at compilation time, and it is shared by all the trackers.
 
-\todo{pyramid}
+We discretize the formula as a pixel-by-pixel sum and optimize it by gradient descent.
+The derivatives of the transformation are computed analytically.
+In case of the two motion models that are possible to align in grid (the triangle affinity and the homography), the derivatives are considered interesting enough and have been described in Section \todo{@ref}.
+The remaining two use only simplistic formulas that have been omitted.
 
-\todo{why}
-There is a \textit{master tracker} that covers the whole face.
-It provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
-In order to gain some robustess against changes in lighting, the master trackers is color-normalized.
+In order to allow large-scale movement, all of the trackers operate upon an \textit{image pyramid}.
+\todo{define the pyramid}
+
+Our program supports two methods how the child trackers are managed.
+These represent two major groups of tracking techniques in general: the feature-based and the appearance-based method.
 
 \subsection{Markers}
 
-In addition to the master tracker, several small trackers are arbitrarily placed within the face area that are supposed to track specific small features.
-Technically, it is possible to track any skin region with a distinctive texture, so an automated feature detection performs well enough.
+This method relies on small-scale features that are usually present in the face and on skin---such as the eyebrows, nostrils, beard and skin defects.
+Several small trackers are arbitrarily placed within the face area, each of them large just enough so as to track a single feature of the face.
+Technically, it is possible to track any distinctive texture, so an automated feature detection such as the Harris detector \todo{@cite} performs well enough.
 
 Each of the markers is allowed to freely move around.
+(In contrast to the classical Deformable Parts Model \todo{@cite}, we do not impose any penalty to their relative configuration.)
 They are tracked from their previous known position relatively to the master tracker.
-If the tracking score drops below a certain limit or a marker escapes the face area, it is reset to its original position and tracking continues from there.
+If the tracking score of a marker drops below a certain limit or a marker escapes the face area, it is reset to its original position and tracking continues from there.
 
 \subsection{Grid}
 
-This method follows the approach of Active Appearance Models.
+This method follows the approach of Active Appearance Models \todo{@cite}.
 The master tracker is subdivided into a planar mesh, and each cell is responsible of tracking the corresponding part of the image.
 
 In order for the cells to form a contiguous mesh, certain parameters of neighboring cells are bound together and need to be optimized concurrently.
@@ -196,6 +210,28 @@ Since there are usually many distractive features around the eyes, such as the e
 Choosing several trackers that are sensitive to different deteriorations of the image, we can trade off some computational time for much robustness and precision.
 Each of the trackers chosen should obviously fail in different conditions so that a majority of them is correct on every image.
 Reasonable selection of trackers for a combined estimator is discussed in the next chapter.
+
+After letting each of the selected trackers cast a vote, it is possible to combine them in a more robust manner than the arithmetic average would be.
+It is very much possible that one or more of the trackers fail.
+We have very little prior information about the eye position, but we can exploit the distances among the votes.
+
+In the case of three trackers running in parallel, we can heuristically throw out the vote that is significantly far away from the remaining two.
+For a higher count of votes (assuming still that the number is reasonably small), this can be generalized as the subset with minimal expected variance.
+In order to find it, we explicitly loop over all the subsets.
+The average of this subset is the result of the combined estimator.
+
+\begin{lemma}
+Given a set $\{\vec x^i\}$ of samples from a normal distribution $X$, the expected value of the variance $\var X$ is
+$$\E\var (\vec x) = \frac 1 {n - 1} \sum_i (\vec x^i - \hatvec x),$$
+where $\hatvec x$ is the arithmetic mean.
+\end{lemma}
+\begin{proof}
+\todo{cite or derive}
+\end{proof}
+
+Another option is to run several algorithms in sequence.
+In this setting, the first algorithm provides a rough estimate that is subsequently refined by the remaining ones.
+Since most of our eye trackers use exhaustive pixel-by-pixel search, there are only a few meaningful configurations of this kind.
 
 \section{Gaze estimation}
 

@@ -26,7 +26,7 @@ This step requires the face to be localized properly in the image but since the 
 
 Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of each eye are fed into a gaze estimator that outputs coordinates in screen reference frame.
 
-\section{Face Tracking}
+\section{Face tracking}
 \label{s:impl-face}
 
 \textit{Input:} reference image $\textrm{R}$ and current image $\textrm{I}$.\\
@@ -58,8 +58,8 @@ For performance reasons, a motion model must be chosen at compilation time, and 
 
 We discretize the formula as a pixel-by-pixel sum and optimize it by gradient descent.
 The derivatives of the transformation are computed analytically.
-In case of the two motion models that are possible to align in grid (the triangle affinity and the homography), the derivatives are considered interesting enough and have been described in sections \ref{s:algo-daffine} and \ref{s:algo-dhomo}, respectively.
-The remaining two use only simplistic formulas that have been omitted.
+In case of the homography motion model, these derivatives are not quite obvious to formulate, and as such, they have been described in Section \ref{s:algo-dhomo}.
+The formulas for calculating a triangle affinity are given in Section \ref{s:algo-affine}.
 
 In order to allow large-scale movement, all of the trackers operate upon an \textit{image pyramid}.
 \todo{define the pyramid}
@@ -88,9 +88,9 @@ Our implementation of the corresponding tracker methods does this explicitly sin
 During optimization, the derivatives are summed up in each grid vertex (nevertheless the number of cells that share it) and all grid vertices are updated at once.
 
 This process is commonly done with a triangular mesh (i.e., barycentric cells), where the derivatives wrt. vertex coordinates are quite easy to derive.
-Our extension of this method to a quadrangular mesh (i.e., homographic cells) relies on the theory developed in Section \ref{s:algo-dhomo}.
+Our extension of this method to a quadrangular mesh (i.e., homographic cells) relies on the concepts developed in sections \ref{s:algo-homo} and \ref{s:algo-dhomo}.
 
-\section{Eye Tracking}
+\section{Eye tracking}
 
 \textit{Input:} iris radius $r \in \R$ and image $I$ centered at an expected eye location.\\
 \textit{Output:} iris center $\vec c \in \R^2$.\\

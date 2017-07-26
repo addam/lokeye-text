@@ -24,6 +24,8 @@ If the light conditions substantially start to differ from the ones during calib
 
 \section{Human head}
 
+We consider it important to introduce some basic terms and facts about human anatomy in order to better understand the problem at hand.
+
 \begin{figure}[ht]
 	\centering 
 	\begin{subfigure}[b]{0.55\textwidth}
@@ -38,18 +40,24 @@ If the light conditions substantially start to differ from the ones during calib
 
 \subsection{Face anatomy}
 The face is the frontal part of human head.
-Facial muscles are specific in that they are attached to the skin, and their sole purpose is communication.
-As seen in Figure \ref{i:analy-face}, the mimic muscles cover almost all of the face.
+Facial muscles are specific in that they are attached to the skin, and their almost sole purpose is communication.
+As seen in Figure \ref{i:analy-face}, there is hardly a spot on the face that would not have muscles underneath.
 Although they can be controlled by will, they often actuate subconsciously.
 There are kinds of subtle movements, usually induced by basic emotions such as fear, that can not be prevented by will.
-Generally, the facial skin is flexible with many degrees of freedom and the motion can affect almost all regions.
+In a summary, the facial skin is flexible with a virtually infinite number of degrees of freedom, and almost its whole area is controlled by muscles.
 
 Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
 These include the nose (especially its upper part), the chin and small outer regions around and slightly below the eyes.
-The chin is very prominent and easy to track, but may become completely misleading if the user opens their jaw.
-\todo{\dots}
+The chin is very prominent and easy to track, but may become completely misleading if the user opens their mouth.
+Given the flexibility discussed above, it is almost impossible to estimate head pose precisely, but we can get a good estimate by choosing some of these less expressive regions.
 
-\todo{describe stuff like eyebrows, eyelashes, eyelids}
+The face also contains many features that hinder gaze recognition.
+Typically, people keep their eyelids open just quite enough so as not to occlude the pupil.
+This poses a serious challenge to all techniques based on the iris: in many people, only about half of the iris area is visible.
+
+On the edges of eyelids there are eyelashes.
+Depending on the viewing angle, these can also significantly occlude the eye.
+As if this all was not enough, the user may wear strong makeup and a mascara to emphasize these undesirable factors.
 
 \subsection{Eye anatomy}
 \label{s.eyeanatomy}

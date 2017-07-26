@@ -61,7 +61,7 @@ For performance reasons, a motion model must be chosen at compilation time, and 
 We discretize the formula as a pixel-by-pixel sum and optimize it by gradient descent.
 The derivatives of the transformation are computed analytically.
 In case of the homography motion model, these derivatives are not quite obvious to formulate, and as such, they have been described in Section \ref{s:algo-dhomo}.
-The formulas for calculating a triangle affinity are given in Section \ref{s:algo-affine}.
+The formulas for calculating a triangle affinity are comparatively simple, but nevertheless, they have been summarized in Section \ref{s:algo-daff}.
 
 In order to allow large-scale movement, all of the trackers operate upon an \textit{image pyramid}.
 \todo{define the pyramid}

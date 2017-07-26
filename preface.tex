@@ -62,7 +62,9 @@ Head pose estimation and gaze tracking are typically handled as two separate tas
 Only few approaches are able to encompass both of these tasks within a single model.
 
 \subsection{Face tracking}
-\todo{explain what it is and why we need it}
+In this thesis, we believe that it is sufficient to examine the image of the face alone.
+Using the data obtained this way, we intend to cancel the effects of head movement, so that eyes can be tracked independently.
+However, the problem can also be viewed as a more general task of head pose estimation.
 
 Many substantially different approaches have been suggested for head pose estimation, and there seems to be no consensus so far.
 The tracker by Kanade, Lucas and Tomasi \cite{lucas81} is based on matching a template image using gradient descent optimization and can be considered the cornerstone of object tracking.
@@ -100,21 +102,18 @@ In this view, a face tracker simply extracts these parameters from the correspon
 For a thorough comparison of all the face tracking methods in terms of performance and requirements upon the input data, we can recommend the excellent (althought slightly outdated) survey \cite{murphy-chutorian09}.
 
 There have also been many software tools published aside from the scientific journals.
-Some of them are available including the source code such as \cite{eviacam}.
+Some of them are available including the source code such as \cite{eviacam,eyecam}.
 Others are shared only as a video recorded from the system running\footnote{
-As an example, several videos on the Youtube website:
+For example, there are many such videos on Youtube:
 \ahref{https://youtu.be/Etj\_aktbnwM},
-\ahref{https://youtu.be/dZXz3egT7MI},
-\ahref{https://youtu.be/1aNTsrEGM-8} also presented in \cite{valenti08},
-\ahref{https://youtu.be/wlrR33JC3zw}.
+\ahref{https://youtu.be/wlrR33JC3zw},
 }
 
 \subsection{Eye tracking}
 \label{s:related-gazetracking}
-\todo{explain what it is and why we need it}
 
-Eye tracking is rather a simple task once the head pose is known---it almost feels that the eyes are designed for easy tracking.
-However, there has not been a clear consensus on the appropriate method, so far.
+Eye tracking seems to be a simple task once the head pose is known---it almost feels that the eyes are designed for easy tracking.
+However, it is rather difficult to design a method that would generalize well, e.g., across users.
 It appears that many of the methods that have been proposed in the literature are only appropriate in conditions specific to each of them.
 
 Much research relies on the fact that both human iris and pupil are circles, so their camera projection is always an ellipse.

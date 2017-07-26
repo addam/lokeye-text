@@ -72,14 +72,16 @@ $$\mat Q = \begin{pmatrix}
  \vec q_3 & \vec q_5 & 2 \vec q_6
 \end{pmatrix}.$$
 Let us split this matrix into the following blocks:
-$$\mat A = \begin{pmatrix}
+\begin{equation}
+\mat A = \begin{pmatrix}
  2 \vec q_1 & \vec q_2 \\
  \vec q_2 & 2 \vec q_4 \\
 \end{pmatrix},
 \vec b = \begin{pmatrix}
  \vec q_3 \\
  \vec q_5 \\
-\end{pmatrix}.$$
+\end{pmatrix}.
+\end{equation}
 The global extremum $\vec x$ of this polynomial is obtained by solving $\mat A \vec x = -\vec b$.
 
 \begin{proof}
@@ -203,7 +205,7 @@ In our experiments, this method turned out as very unstable---possibly because i
 \section{Geometry}
 
 \subsection{Derivatives of a three-point affinity}
-
+\label{s:algo-daff}
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k, 1 \leq k \leq 3$ and vector $\vec v$, where $\vec x^k, \vec p^k, \vec v \in \R^2$.\\
 \textit{Output:} Jacobian matrices $\partial \mat A \vec v / \partial \vec p^k$, where $\mat A \cdot \mathrm{hom}(\vec x^k) = \vec p^k$.\\
 
@@ -226,7 +228,7 @@ The sought partial derivatives are given by
 This formula follows directly from the fact that $\mat C$ is constant wrt. all $\vec p^k$, and from the following lemma:
 
 \begin{lemma} \label{l:algo-aff}
-$\mat A$ is uniquely defined as
+The transformation matrix $\mat A$ is (uniquely) given by the formula
 $$\mat A = (\vec p^1, \vec p^2, \vec p^3)\T \cdot \mat C \inv.$$
 \end{lemma}
 
@@ -331,7 +333,7 @@ Let us define the sets of \textit{normalized points} $\{ \hatvec x^k \}$ and $\{
 \todo{We minimize the energy function by gradient descent.}
 
 \subsection{Four-point homography}
-
+\label{s:algo-homo}
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$.\\
 \textit{Output:} matrix $\mat H$ such that $\mat H \vec x^k \sim \vec p^k$.\\
 

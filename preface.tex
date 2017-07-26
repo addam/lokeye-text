@@ -56,7 +56,9 @@ The various methods suggested for eye tracking since the end of 19th century are
 \section{Related work}
 
 Rapid development of computers and digital video cameras has removed most of the hardware constraints mentioned so far.
-The demand for non-intrusive gaze tracking is high in many branches of science; for example, it is obvious that the results of a psychological experiment can greatly vary with emotional influence of the environment.
+The demand for non-intrusive gaze tracking is high in many branches of science.
+For example, it is obvious that the results of a psychological experiment can greatly vary with emotional influence of the environment, thus the influence should be kept minimal.
+
 Letting the subject move their head without constraints, invariance against head pose becomes a serious challenge.
 Head pose estimation and gaze tracking are typically handled as two separate tasks to be performed in series.
 Only few approaches are able to encompass both of these tasks within a single model.
@@ -67,8 +69,8 @@ Using the data obtained this way, we intend to cancel the effects of head moveme
 However, the problem can also be viewed as a more general task of head pose estimation.
 
 Many substantially different approaches have been suggested for head pose estimation, and there seems to be no consensus so far.
-The tracker by Kanade, Lucas and Tomasi \cite{lucas81} is based on matching a template image using gradient descent optimization and can be considered the cornerstone of object tracking.
-The original paper describes tracking a rectangular grayscale template by horizontal and vertical shift.
+The tracker by Kanade, Lucas and Tomasi \cite{lucas81} can be considered the cornerstone of object tracking.
+It is based on matching a template image using gradient descent optimization; more precisely, the original paper describes tracking a rectangular grayscale template by horizontal and vertical shift.
 Nowadays, such a simple problem can also be solved on a global scale, e.g., using normalized cross-correlation and the Fast Fourier Transform.
 However, there have been numerous generalizations of this concept to a broader class of motion models such as affine (e.g., \cite{bouguet01}) or perspective transformations, in which cases a global optimization is not feasible.
 These are often referred to as the \textit{deformable template models}.
@@ -78,49 +80,53 @@ An especially sophisticated generalization are the Active Appearance Models (AAM
 In this method, a planar mesh is overlaid on the object, subdividing the template image into polygon-shaped cells.
 Each of the cells is responsible of stretching its cut-out image part when its vertices are displaced.
 All vertices of the mesh can be displaced separately, and they are essentially the model parameters to be optimized.
-The degrees of freedom of this model can be customized to application needs, so that the method will handle either rigid or soft-body transformations gracefully.
-The original paper suggests to learn the constraints by a Principal Component Analysis of manually 
+The degrees of freedom of this model can be customized to application needs, so that the method will handle either rigid- or soft-body motion gracefully.
+The original paper suggests to learn the motion constraints by a Principal Component Analysis of manually annotated training data.
 
 Purely geometric image transformations exhibit poor invariance to changes in lighting, so they are well combined with element-wise image transformations.
 A simple option is to acquire multiple templates of the object in question, and either just select the best candidate for each input image, or allow their arbitrary linear combinations.
 If the amount of training data grows large, more efficient and robust schemes are necessary.
-The template images can be arranged in a search structure to speed up the lookup of the most similar template (i.e., nearest neighbor).
+The template images can be arranged in a search structure to speed up the lookup of the most similar template (i.e., the nearest neighbor).
 
-A template need not be limited to a single image, and may be given implicitly as in \cite{gourier06}.
+A template need not be limited to a single image, and may be given implicitly, such as in \cite{gourier06}.
 It is especially common to extend each template by a per-pixel linear function in a small neighborhood.
-The linear coefficients are typically estimated from several nearby templates using Principal Component Analysis, and this approach is widely known as Eigenfaces \cite{srinivasan02,morency03}.
+The linear coefficients are typically estimated from several nearby templates using the Principal Component Analysis, and this approach is widely known as Eigenfaces \cite{srinivasan02,morency03}.
 This approach leads to a mathematical concept of a high-dimensional manifold that covers all feasible face images.
 Each point in the high-dimensional space can be assigned a feature vector that correspond to the modeled degrees of freedom \cite{balasubramanian07}.
 In this view, a face tracker simply extracts these parameters from the corresponding point in space.
 
+Another direction of development is to track several small templates simultaneously, and to impose constraints upon their relative positions.
+These are called the \textit{Deformable Parts Models}.
+The image is analysed within each of the parts, and their positions are updated in an iterative manner.
+In order to exploit all the information available, their displacement in each iteration should be planned for all at once.
+Reasonable choices of such a decision engine include the Support Vector Machines \cite{uricar12} and Random Forests \cite{ren14}.
+Given the typically high complexity of this algorithm, each of the templates is usually limited to a simple displacement, i.e., they remain as axis-aligned rectangles.
+The facial landmarks tracked by such Deformable Parts Models can be used for geometric reasoning on the head pose.
 
-\todo{hlavac uricar \cite{uricar12} since they are in the thesis assignment}
-\todo{wang shi 16 \cite{wang16} etc. thoroughly}
+A noteworthy group of approaches uses some extra hardware, most commonly a depth camera.
+This data stream may be made optional alongside a video, as in \cite{morency03}.
+Thanks to the geometric nature of the depth data, it can significantly improve the overall precision.
 
-\todo{approaches using a depth map}
-
-For a thorough comparison of all the face tracking methods in terms of performance and requirements upon the input data, we can recommend the excellent (althought slightly outdated) survey \cite{murphy-chutorian09}.
+For a thorough comparison of all the face tracking methods in terms of performance and requirements upon the input data, we can recommend the excellent (although slightly outdated) survey \cite{murphy-chutorian09}.
 
 There have also been many software tools published aside from the scientific journals.
 Some of them are available including the source code such as \cite{eviacam,eyecam}.
-Others are shared only as a video recorded from the system running\footnote{
-For example, there are many such videos on Youtube:
-\ahref{https://youtu.be/Etj\_aktbnwM},
-\ahref{https://youtu.be/wlrR33JC3zw},
-}
 
 \subsection{Eye tracking}
 \label{s:related-gazetracking}
 
-Eye tracking seems to be a simple task once the head pose is known---it almost feels that the eyes are designed for easy tracking.
-However, it is rather difficult to design a method that would generalize well, e.g., across users.
+Eye tracking seems to be a simple task once the head pose is known---it almost feels that the eyes are made so as to be clearly visible.
+However, it is rather difficult to develop a method that would generalize well, e.g., across users.
 It appears that many of the methods that have been proposed in the literature are only appropriate in conditions specific to each of them.
 
 Much research relies on the fact that both human iris and pupil are circles, so their camera projection is always an ellipse.
 When the gaze direction is reasonably bounded, these projected shapes can safely be considered to remain circular.
-For example, the generalized Hough Transform provides a global method of searching for circles with one-pixel precision.
-Many alternative but quite similar models are tested in this thesis and available in the accompanying source code.
-\todo{mean shift algorithm}
+Under this assumption, the generalized Hough Transformation can be used to search for circles with one-pixel precision.
+
+Unfortunately, the Hough Transformation is only effective around the boundary of the circle.
+One possibility how to incorporate the whole mass inside the circle is the Mean Shift algorithm.
+Essentially, that is an application of the Expectation-Maximization scheme: a circle is iteratively repositioned to the mean of pixel weights within it.
+This concept has been used in many simple programs, and is also included in complex models such as \cite{wang16}.
 
 It is quite common to model some more specific aspects of the eye.
 A reasonable choice are the eye corners \cite{zhu12} and the eyelids \cite{yuille92}.
@@ -130,7 +136,7 @@ This approach usually requires the eye position to be precisely normalized to a 
 Obviously, there are many free parameters (such as iris color, skin tone, shape of the eyelids and amount of eyelashes) that ought to be ignored by the gaze tracker.
 To this end, it is necessary to provide enough training data that covers all these cases, to prevent overfitting.
 
-Contrary to these methods based solely on an image, many rely on some extra hardware, such as cameras or lights.
+In contrast to these methods based solely on an image, many rely on some extra hardware, such as cameras or lights.
 Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on its inner and its outer surfaces.
 The retina of the human eye is distincly reflective in red and near infrared light, which is the cause of the red-eye effect commonly observed in photography.
 If an infrared light source is placed next to the camera, the user's pupils will shine brightly, whereas the rest of the eye and the scene brightens only subtly.
@@ -155,8 +161,26 @@ For a thorough survey of eye trackers including the obscure historical ones, the
 Regarding the relation between eye rotation and on-screen gaze position, some sources suggest that only a linear function is necessary \cite{zhu12}.
 On the other hand, if the head and scene model is precise enough, it may be appropriate to calculate the gaze explicitly as a ray in space \cite{wang16}.
 
-\todo{talk about available data sets}
-\todo{what about dataset http://csr.bu.edu/headtracking/uniform-light/}
+\subsection{Testing data}
+
+There are many data sets for gaze tracking.\footnote{
+A very nice list of data sets for computer vision, including gaze estimation, is maintained at \ahref{http://homepages.inf.ed.ac.uk/rbf/CVonline/Imagedbase.htm\#face}.
+}
+We have examined many of them in the hope that they could be used for the training and testing of our own program.
+
+Perhaps the most profound benchmark is the BioID database \cite{bioid}.
+It consists of about 1500 grayscale images, each of them annotated with the position of each pupil, the eye corners and thirteen more prominent facial landmarks.
+The images are all limited to a common resolution of $384\times286$ pixels, which makes the iris about 10 pixels in diameter.
+This image resolution could be enough for our purposes.
+Unfortunately, the eye positions are given in whole pixel units only, and the actual precision is yet somewhat worse.
+Since we intend to locate the iris center with subpixel precision, this dataset is not sufficient.
+
+Another noteworthy piece is the MPIIGaze dataset \cite{mpiigaze}, which is accompanied by a neural network-based gaze tracker.
+It contains more than 200,000 photos in full color and quite a high resolution, acquired using a built-in camera of a laptop computer.
+Its annotations are another extreme case: the on-screen gaze position is known in each image, but nothing else.
+In theory, we could use it to evaluate the performance of our program.
+Unfortunately, even that is not appropriate because almost every photo in the MPIIGaze dataset has been taken in different light conditions than others.
+Furthermore, the lighting is often poor and the photos are blurry.
 
 \section{Organization}
 \todo{describe each chapter}

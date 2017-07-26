@@ -340,7 +340,7 @@ where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{dec}(\mat A) \cdot \
 \end{definition}
 
 The sought four-point homography is given by
-\begin{equation}
+\begin{equation} \label{e:algo-homo}
 \mat H = \mathrm{dec}(\vec p_1, \dots, \vec p_4) \cdot \mathrm{can}(\vec x_1, \dots, \vec x_4).
 \end{equation}
 
@@ -378,34 +378,20 @@ However surprising may this asymmetry seem, it is caused by the unknown scale fa
 \label{s:algo-dhomo}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$ and vector $\vec v \in \R^2$.\\
-\textit{Output:} Jacobian matrices $\partial \vec v / \partial \vec x^k$.\\
+\textit{Output:} Jacobian matrices $\partial \mat H \vec v / \partial \vec p^k$, where $\mat H \vec x^k \sim \vec p^k$.\\
 
-The Jacobian matrix wrt. the last point is given by
-\begin{equation}
-\partial \vec v / \partial \vec x^4 = 
+The partial derivative wrt. the $i$-th coordinate of the last point is given by
+\begin{equation} \label{e:algo-dhomo}
+\partial \mat H \vec v / \partial \vec p^4_1 = \mat H \cdot \mathrm{dec}(\vec p^1, \vec p^2, \vec p^3, \vec e^i) \cdot \vec v,
 \end{equation}
-% to druhé konverguje k prvnímu, jak se patří:
-projection\_derivative(get\_hom($[aa,bb,cc,dd], [a,b,c,d])$, p) * get\_hom([aa,bb,cc,dd], [a,b,c,dy]) * p\\
-$u=1e-7$; (projection(get\_hom($[aa,bb,cc,dd], [a,b,c,d+u*dy]), p$) - projection(get\_hom($[aa,bb,cc,dd], [a,b,c,d]), p)) / u$
-% get_hom(p1, p2) * p1 ~ p2
-function $H$ = get\_hom($p1,p2$)\\
- $H$ = decanonize($p2$) * canonize($p1$);\\
-end
-
-% projection_derivative(H, v) * H * v = dHv / dP(:,4) for HX ~ P
-function $dPi$ = projection\_derivative($H, v$)\\
- $w = H(3,:) * v$;\\
- proj = $H(1:2,:) * v / w$;\\
- dPi = $[1, 0, -proj(1); 0, 1, -proj(2)] / w$;\\
-end
-\todo{rewrite as a short solution and its proof}
+where $\vec e^i$ is the natural basis vector for the $i$-th coordinate and $\mat H$ is exactly as in \eqref{e:algo-homo}.
+The remaining three matrices are obtained by a permutation of the input points.
 
 \begin{proof}
-We wish to calculate the derivative of a four-point homography with respect to the coordinates of its four control points.
-The linearity of $\mathrm{dec}(\mat A)$ implies that the derivative $\frac{\partial} {\partial \vec d_i} \mathrm{dec} \left( \vec a, \vec b, \vec c, \vec d \right) = \mathrm{dec} \left( \vec a, \vec b, \vec c, \vec e_i \right)$, where $\vec e_i$ is the unit vector for the coordinate axis $i$.
+This follows from the linearity of $\mat H$ wrt. $\vec p^4$, by applying formulas for derivative of the matrix product.
+\end{proof}
 
-Furthermore, we need to calculate derivatives with respect to $\vec a$, $\vec b$ and $\vec c$.
-Theoretically, we could use the fact that any permutation of the canonical points can be expressed as a homography,\footnote{
+It seems that we could use the fact that any permutation of the canonical points can be expressed as a homography,\footnote{
 The homography $\mat R = \begin{pmatrix}
  0 & 0 & 1 \\
  -1 & 0 & 1 \\
@@ -415,9 +401,10 @@ The homography $\mat R = \begin{pmatrix}
  1 & 0 & 1 & 0 \\
  1 & 0 & 0 & 1
  \end{pmatrix}$.
-} and incorporate these homographies into the formulas above.
-Unfortunately, there are several unknown scale factors involved that make such an approach inefficient.
-The preferable method is to explicitly permute the points so that the point in question becomes the last one, and to repeat the original scheme.
-\end{proof}
+} and incorporate it into \eqref{e:algo-dhomo}.
+Unfortunately, the unknown scale factors make such an approach inefficient.
+The preferable method is therefore to explicitly permute the points so that the point in question becomes the last one, and to repeat the original scheme.
 
-\todo{what are the overall computational requirements, per pixel?}
+In our implementation, we need to evaluate the Jacobian matrices in each image pixel.
+Note that all the matrices can be precalculated as long as the homography $\mat H$ is constant.
+What remains then is one matrix multiplication per pixel---and some extra cost due to conversion to Cartesian coordinates.

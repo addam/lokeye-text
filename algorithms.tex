@@ -202,14 +202,43 @@ In our experiments, this method turned out as very unstable---possibly because i
 
 \section{Geometry}
 
-\subsection{Three-point affinity}
+\subsection{Derivatives of a three-point affinity}
 
-\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 3$, $x^k \in \R^2$, $p^k \in \R^2$.\\
-\textit{Output:} affinity matrix $\mat A$ such that $\mat A \vec x^k = \vec p^k$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k, 1 \leq k \leq 3$ and vector $\vec v$, where $\vec x^k, \vec p^k, \vec v \in \R^2$.\\
+\textit{Output:} Jacobian matrices $\partial \mat A \vec v / \partial \vec p^k$, where $\mat A \cdot \mathrm{hom}(\vec x^k) = \vec p^k$.\\
 
-\todo{explain this portion of the code}
+\begin{definition}
+The \textit{homogeneous conversion} function $\mathrm{hom}: \R^n \to \R^{n + 1}$ maps a Cartesian vector to its homogeneous counterpart:
+$$
+\mathrm{hom}(\vec x) = (\vec x_1, \dots, \vec x_n, 1)\T.
+$$
+\end{definition}
 
-The \textit{barycentric transformation} is an affine transformation defined by two planar triangles.
+Let us define the matrix $\mat C$ as 
+\begin{equation}
+\mat C = \left( \mathrm{hom}(\vec x^1), \mathrm{hom}(\vec x^2), \mathrm{hom}(\vec x^3) \right),
+\end{equation}
+
+The sought partial derivatives are given by
+\begin{equation} \label{e:algo-aff}
+\frac {\partial \mat A \vec v} {\partial (\vec p^k)_i} = \frac {\partial (\vec p^1, \vec p^2, \vec p^3)\T} {(\partial \vec p^k)_i} \cdot \mat C \inv \cdot \vec v.
+\end{equation}
+This formula follows directly from the fact that $\mat C$ is constant wrt. all $\vec p^k$, and from the following lemma:
+
+\begin{lemma} \label{l:algo-aff}
+$\mat A$ is uniquely defined as
+$$\mat A = (\vec p^1, \vec p^2, \vec p^3)\T \cdot \mat C \inv.$$
+\end{lemma}
+
+\begin{proof}
+Splitting $\mat A \cdot \mathrm{hom}(\vec v)$ into two matrix multiplications this way has an intuitive motivation.
+Firstly, the vector $\vec v$ is expressed as an affine combination of points $\vec p^k$.
+This is accomplished by the multiplication by $\mat C \inv$.
+We can verify that this combination $\sum_i \alpha_i \vec v_i$ is affine because the weights sum up to $\left(\mat C \cdot (\alpha_1, \alpha_2, \alpha_3) \right)_3 = \mathrm{hom}(\vec v)_3 = 1$.
+
+Then, the same weights can be used to express $\mat A \cdot \mathrm{hom}(\vec v)$ as an affine combination of $\vec x^k$.
+The weights $\alpha_1, \alpha_2, \alpha_3$ are called the \textit{barycentric coordinates}.
+\end{proof}
 
 \subsection{Direct Linear Transformation}
 
@@ -399,4 +428,4 @@ The preferable method is therefore to explicitly permute the points so that the 
 
 In our implementation, we need to evaluate the Jacobian matrices in each image pixel.
 Note that all the matrices can be precalculated as long as the homography $\mat H$ is constant.
-What remains then is one matrix multiplication per pixel---and some extra cost due to conversion to Cartesian coordinates.
+What remains then are four matrix multiplications per pixel---and some extra cost due to the conversion to Cartesian coordinates.

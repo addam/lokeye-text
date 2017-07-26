@@ -44,6 +44,8 @@ In order to gain some robustness against changes in lighting, the parent tracker
 A surface within the face is tracked pixel per pixel, minimizing the energy function
 $$\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2,$$
 where $T: \R^2 \to \R^2$ is a differentiable image transformation.
+\todo{note that the image functions return real 3-dimensional vectors. These correspond to RGB.}
+
 The reference image $R$ is a single frame that is used during the whole course of operation.
 Although this approach does not tolerate long term changes (such as when the user takes on their glasses), it is robust against slow drift.
 

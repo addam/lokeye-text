@@ -7,7 +7,7 @@ There are three aspects to consider when talking of performance: robustness, pre
 Let us introduce the transformations available in face tracking by an example of two still images:
 \todo{intuitively compare the face tracking methods on a real image}
 
-\todo{compare them an a computer-rendered face image, if possible}
+\todo{explain that a more thorough comparison is not possible because the planar transformation between two faces is not clearly defined.}
 
 \section{Iris Tracking}
 
@@ -61,12 +61,13 @@ On overly large-resolution images, its execution time can actually harm the over
 \label{s:results-eyecovar}
 
 Apparently, the results of eye tracking depend heavily on the qualitative aspects of each image.
-For this reason, we annotated each of our testing samples with in following regards:
+For this reason, we annotated each of our testing samples in the following regards:
 \begin{itemize}
 \item Iris brightness
 \item \todo{more}
 \end{itemize}
-Obviously, each eye sample has already been labeled with the iris radius.
+The quantities are expressed in a subjective scale from $1$ (effect not visible) to $3$ (severe impact) or $4$ (image is almost unrecognizable).
+Apart from this, each eye sample has already been labeled with the iris radius.
 
 As expected, there is a strong correlation between many of these quantities:
 \begin{table}[h]

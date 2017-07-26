@@ -27,6 +27,7 @@ This step requires the face to be localized properly in the image but since the 
 Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of each eye are fed into a gaze estimator that outputs coordinates in screen reference frame.
 
 \section{Face Tracking}
+\label{s:impl-face}
 
 \textit{Input:} reference image $\textrm{R}$ and current image $\textrm{I}$.\\
 \textit{Output:} geometric transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2$ is minimal.\footnote{
@@ -35,13 +36,13 @@ The full form would read: $\int_{\vec p \in \Omega} |\textrm{R}(\vec p) - \textr
 }\\
 
 The tracking is split into two parts: a \textit{parent tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
-All of the trackers are deformable templates along the lines of \todo{cite klt and generalization}.
+All of the trackers are deformable templates along the lines of \cite{bouguet01}.
 
 The parent tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
 In order to gain some robustness against changes in lighting, the parent tracker is color-normalized.
 
-A surface within the face is tracked pixel per pixel, minimizing the following energy function:
-$$\todo{formula},$$
+A surface within the face is tracked pixel per pixel, minimizing the energy function
+$$\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2,$$
 where $T: \R^2 \to \R^2$ is a differentiable image transformation.
 The reference image $R$ is a single frame that is used during the whole course of operation.
 Although this approach does not tolerate long term changes (such as when the user takes on their glasses), it is robust against slow drift.
@@ -57,7 +58,7 @@ For performance reasons, a motion model must be chosen at compilation time, and 
 
 We discretize the formula as a pixel-by-pixel sum and optimize it by gradient descent.
 The derivatives of the transformation are computed analytically.
-In case of the two motion models that are possible to align in grid (the triangle affinity and the homography), the derivatives are considered interesting enough and have been described in Section \todo{@ref}.
+In case of the two motion models that are possible to align in grid (the triangle affinity and the homography), the derivatives are considered interesting enough and have been described in sections \ref{s:algo-daffine} and \ref{s:algo-dhomo}, respectively.
 The remaining two use only simplistic formulas that have been omitted.
 
 In order to allow large-scale movement, all of the trackers operate upon an \textit{image pyramid}.
@@ -87,7 +88,7 @@ Our implementation of the corresponding tracker methods does this explicitly sin
 During optimization, the derivatives are summed up in each grid vertex (nevertheless the number of cells that share it) and all grid vertices are updated at once.
 
 This process is commonly done with a triangular mesh (i.e., barycentric cells), where the derivatives wrt. vertex coordinates are quite easy to derive.
-Our extension of this method to a quadrangular mesh (i.e., homographic cells) relies on the theory developed in Section \ref{s.homderivatives}.
+Our extension of this method to a quadrangular mesh (i.e., homographic cells) relies on the theory developed in Section \ref{s:algo-dhomo}.
 
 \section{Eye Tracking}
 
@@ -141,21 +142,12 @@ In our case, the function to be optimized appears to be smooth enough, and the a
 This method is designed for refining an estimated eye position on the subpixel level, so it performs well when coupled with another eye tracking method.
 If executed alone, it often fails to locate the global optimum.
 
-% deleted for now \todo
-%The eye region of the face is actually not uniform as it contains many wrinkles and directional light may cause strong shadow.
-%These facts cause a low-magnitude gradient that might modify the global optimum of the method described above.
-%In order to gain some robustness, we can apply a heuristic filter to the gradient values.
-%If designed with care, the method can still operate at nearly the same speed.
-%This extension is available as a separate method, using a polynomial function upon the gradient.
-
 \subsection{Hough Transformation}
-We can use a voting scheme to find the limbus center, as described in Section \todo{@ref}.
-\cite{leo14,zhang13}
+We can use a voting scheme to find the limbus center, as described in Section \ref{s:algo-hough}.
+\todo{used in \cite{leo14,zhang13}}
 
 A free parameter is yet to define: the resolution of the voting grid.
 Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
-
-\todo{explain the advantage when radius is known}
 
 \subsection{Dark iris correlation}
 
@@ -182,12 +174,13 @@ For tracking a colored object, it is again reasonable to use the normalized corr
 It may be considerably difficult to obtain a reliable iris image, and generally speaking it is a calibration step that we wish to avoid.
 Instead, we can use the sole fact that the iris is a radially symmetric object on a white background.
 An example of a filter based on radial symmetry can be found in \cite{leo14}.
-In contrast to that paper, we exploit the color information.
+Hereby we design a novel robust algorithm that exploit color information.
 
 The iris colors are recalculated for each frame and each eye position, so only few free parameters remain.
 
 This algorithm has built-in skin masking, so that whole segments of the iris are ignored where the limbus is not visible.
 
+\todo{Add some intro -- let us define the following functions}
 \begin{itemize}
 \item
 Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{I}(\vec p)|$ where $\arctan(\vec p) = \alpha$ and $|\vec p| = r$.
@@ -200,7 +193,6 @@ Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of th
 The weight is $\textrm{w}(\vec p) = t \cdot (c - |\textrm{image}(\vec p) - \textrm{mean}(t)|)$, clamped to zero, with $t = |\vec p|$ and $c$ being a value appropriately chosen.
 
 \end{itemize}
-
 The total score is defined as $\int_\alpha \textrm{limbus}(\alpha) \cdot \textrm{iris}(\alpha)$.
 
 Note that the formula for $\textrm{mean}(t)$ has not been specified yet.
@@ -211,7 +203,7 @@ There are essentialy two ways how to generaze the median to color pixels.
 Firstly, we can pick the median value as sorted by a scalar value (e.g., brightness).
 This approach becomes unpredictable if many different colors have the same brightness, and specifically in the case of skin tones and iris color, this may be an issue.
 
-The second option is to define the median of set $S$ as the value $m \in S$ such that the sum of distances $\sum_{x \in S} |m - x|$ is minimized.
+The second option is to define the median of set $S$ as the value $\vec m \in S$ such that the sum of distances $\sum_{\vec x \in S} |\vec m - \vec x|$ is minimized.
 This formula is consistent with the one-dimensional case and is valid in any metric space.
 Unfortunately, efficient algorithms to compute this value are too sophisticated, so we loop over $S$ explicitly.
 
@@ -274,6 +266,7 @@ In this setting, the first algorithm provides a rough estimate that is subsequen
 Since most of our eye trackers use exhaustive pixel-by-pixel search, there are only few meaningful configurations of this kind.
 
 \section{Gaze estimation}
+\label{s:impl-gaze}
 
 \textit{Input:} vectors $\vec e \in \R^n$ and $\vec f \in \R^m$ and \textit{gaze parameters} as defined below.\\
 \textit{Output:} vector $\vec p \in \R^2$.\\

@@ -159,18 +159,17 @@ In our implementation, we take care of this explicitly either by expressing all 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d$.\\
 \textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)| < d$.\\
 
+\todo{explain}
+\cite[p.117]{hartley03}
+
 \section{Image processing}
 
-%\begin{definition}
-%The number $\omega_n \in \C$ is the $n$-th fundamental root of unity:
-%$$\omega_n = \exp(2 \pi i / n),$$
-%where $i$ is the imaginary unit.
-%\end{definition}
-
-\subsection{Convolution}
-
-\textit{Input:} matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$.\\
-\textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
+\begin{definition}
+The \textit{convolution} of matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$ is the matrix $\mat R \in \R^{|n-k| \times |m - l|}$ defined as:
+$$\todo{formula}
+$$
+We write the convolution as $\mat R = \mat M \ast \mat T$.
+\end{definition}
 
 \subsection{Normalized Cross-Correlation}
 
@@ -178,8 +177,10 @@ In our implementation, we take care of this explicitly either by expressing all 
 \textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
 
 \todo {there are more use cases beyond the obvious one.}
+\todo{explain that the values can be precalculated using convolution.}
 
 \subsection{Circle Hough Transformation}
+\label{s:algo-hough}
 
 \textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle and radius of the circle $r \in \R$.\\
 \textit{Output:} center of the circle.\\
@@ -192,13 +193,12 @@ and casts a weighted vote into a 2-dimensional accumulator.
 % why was this here? This allows us to apply a sophisticated heuristic filter at almost no cost.
 Each sample from the image gradient casts a weighted vote into a 2-dimensional accumulator that represents the limbus center.
 
-The vote is applied 
+The vote is applied \todo{\dots}.
 
-This is essentially a simplified version of the Circle Hough Transformation\footnote{
-If the radius is not known, we can estimate it from the \textit{isophote curvature}, using the 2nd image derivative
-\todo{\dots}
-}
-\todo{\dots}
+This is essentially a simplified version of the general Circle Hough Transformation.
+The general case does not require the radius to be known a priori.
+Instead, the radius is estimated for each vote from the \textit{isophote curvature} as in \cite{valenti08}.
+In our experiments, this method turned out as very unstable---possibly because it depends on the 2nd-order image derivatives.
 
 \section{Geometry}
 
@@ -212,20 +212,22 @@ If the radius is not known, we can estimate it from the \textit{isophote curvatu
 The \textit{barycentric transformation} is an affine transformation defined by two planar triangles.
 
 \subsection{Derivatives of an affinity}
+\label{s:daffine}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 3$.\\
-\textit{Output:} \todo{what}.\\
+\textit{Output:} partial derivative matrices $\partial \mat A / \vec x^k_i$ for all $k, i$, and for $\mat A$ as defined above.\\
 
 \todo{explain this portion of the code}
 
 \subsection{Direct Linear Transformation}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by an unknown homography.\\
-\textit{Output:} matrix $\mat H$ minimizing \todo{what}.\\
+\textit{Output:} estimated homography matrix $\mat H$ .\\
 
 \begin{definition}
 The \textit{vectorization} operator $\mathrm{vec} : \R^{m \times n} \to \R^{mn}$ is defined as
 $$\mathrm{vec}(\mat M)_{m i + j} = \mat M_{i,j} \textrm{ for all } i, j.$$
+This essentially means reading out all the matrix elements in row-major order.
 \end{definition}
 
 We are presented with a set projective correspondences of the form
@@ -234,25 +236,23 @@ We are presented with a set projective correspondences of the form
 \end{equation}
 where $\alpha_k$ are unknown scalars and $\mat H$ is an unknown matrix that we want to calculate.
 
-Let us define the sets of \textit{normalized points} $\{ \hatvec x^k \}$ and $\{ \hatvec p^k \}$ using affine transformations $\hatvec x^k = \mat A \vec x^k$ and $\hatvec p^k = \mat B \vec p^k$, where $\mat A, \mat B$ are chosen so that the respective point set has zero mean and unity variance.
 \todo{$\vec x$ and $\vec p$ need not have the same dimension}
-Let us also define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
+Let us define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
 \begin{equation} \label{e:homography-antisymm}
 \mat M^{i, j}_{i, j} = 1,
 \mat M^{i, j}_{j, i} = -1.
 \end{equation}
 Finally, let us formulate a homogeneous linear system:
 \begin{equation} \label{e:homography-system}
-\mathrm{vec} \left(({\hatvec p}^k)\T \mat M^{i, j} {\hatvec x}^k \right)\T \cdot \mathrm{vec}(\hatmat H) = 0,
+\mathrm{vec} \left(({\vec p}^k)\T \mat M^{i, j} {\vec x}^k \right)\T \cdot \mathrm{vec}(\mat H) = 0,
 \end{equation}
-for all $i, j, k$ such that $i < j$ and either $\hatvec p^k_i$ or $\hatvec p^k_j$ is the maximal element of $\hatvec p^k$.
-The result is $\mat H = \mat B \inv \hatmat H \mat A$.
+for all $i, j, k$ such that $i < j$ and either $\vec p^k_i$ or $\vec p^k_j$ is the maximal element of $\vec p^k$.
+The result is $\mat H = \mat B \inv \mat H \mat A$.
 
 There are, loosely speaking, two difficulties in homography fitting as compared to affine transformations.
-Firstly, it has a nonlinear component so an algebraic least-squares solution is generally different from a geometric least-squares solution.
-The Direct Linear Transformation computes only former of these two, since it can be obtained in a much more stable way than the latter.
-For better precision, it is recommended to use the result for initialization of a nonlinear optimization method.\todo{separate the linear and nonlinear method clearly}
-One such method is detailed in the next section.
+Firstly, it has a nonlinear component so an algebraic least-squares solution (as defined in \cite[p.93]{hartley03}) is generally different from a geometric least-squares solution (i.e., the sum of distances).
+The Direct Linear Transformation computes only former of these two.
+The relation between these two approaches is addressed in the next section.
 
 Secondly, it is not possible to formulate a linear system straight away.
 The equations \eqref{e:homography-input} do not form a linear system with respect to the unknown matrix $\mat H$ because the measured data points are defined only up to scale---there is an unknown scale factor $\alpha_k$ involved in each equation.
@@ -280,22 +280,20 @@ Its unknowns will be precisely the elements of the matrix $\mat H$.
 Each equation of the system represents a constraint of the form $\vec p\T \mat M \mat H \vec x = 0$, which is the orthogonality constraint as proposed above (from now on, the row-dependent indices $i, j, k$ are omitted for readability).
 This constraint can be reformulated in terms of the Frobenius inner product $\langle \mat A, \mat B \rangle_F = \sum_{i, j} \mat A_{i, j} \cdot \mat B_{i, j}$ and the vector outer product as follows:
 $$\vec p\T \mat M \mat H \vec x = \sum_{i, j} (\vec p\T \mat M)_i \mat H_{i, j} \vec x_j = \langle \vec p\T \mat M \vec x\T, \mat H \rangle_F = 0.$$
-Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form \eqref{e:homography-system},
-where $\mathrm{vec} : \R^{m \times n} \to \R^{mn}$ stacks all matrix elements to a vector, in row-major order.
+Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form \eqref{e:homography-system}.
 Each correspondence pair and each selected antisymmetric matrix $\mat M$ for that pair provide one such equation, and the row vectors $\mathrm{vec} ({\vec p}\T \mat M \vec x)\T$ can be stacked to form the system matrix.
 
 In real scenarios, the input point sets are disrupted by noise.
-Solving this system in least squares sense provides the algebraic least-squares solution as suggested above.
+As already noted, solving this overdetermined system in least squares sense provides the algebraic least-squares solution.
 However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\mat H \vec x^k = \alpha_k \vec p^k$.
 In particular, it is possible that a solution will produce points at infinity, meaning that $\vec p_n \approx 0$ and that the Cartesian counterpart of $\vec p$ is undefined.
-Instead of avoiding such degeneracies explicitly, we loop through the resultant singular vectors and choose the one with the minimal reprojection error.
+Instead of avoiding such degeneracies explicitly, we step into the algorithm for homogeneous solving.
+We loop through the possible choices of $\vec s_i$ and choose the one that produces the minimal geometric error, as defined below.
 
-\todo{normalization: subtract mean, enforce unity variance}
+\subsection{Homography refitting} 
 
-\subsection{Fitting homography locally} 
-
-\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by roughly estimated homography $\mat H$.\\
-\textit{Output:} homography matrix $\mat G$ that minimizes $\sum_k |\mathrm{cart}(\mat G \vec x^k) - \mathrm{cart}(\vec p^k)|^2$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by roughly estimated homography $\mat H^0$.\\
+\textit{Output:} homography matrix $\mat H$ that minimizes $\sum_k |\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)|^2$.\\
 
 \begin{definition}
 The \textit{Cartesian conversion} function $\mathrm{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
@@ -304,7 +302,12 @@ $$
 $$
 \end{definition}
 
-We minimize the energy function by gradient descent.
+\todo{move normalization here: it is necessary for the algebraic and geometric errors to be similar.}
+...For better precision, it is recommended to use the result for initialization of a nonlinear optimization method.
+
+Let us define the sets of \textit{normalized points} $\{ \hatvec x^k \}$ and $\{ \hatvec p^k \}$ using affine transformations $\hatvec x^k = \mat A \vec x^k$ and $\hatvec p^k = \mat B \vec p^k$, where $\mat A, \mat B$ are chosen so that the respective point set has zero mean and unity variance.
+
+\todo{We minimize the energy function by gradient descent.}
 
 \subsection{Four-point homography}
 
@@ -313,28 +316,14 @@ We minimize the energy function by gradient descent.
 
 \begin{definition}
 The similarity operator $\sim$ denotes the equality of homogeneous vectors up to scale.
-When applied to matrices $\mat A, \mat B \in \R^{n \times m}$, the equality is posed between their corresponding columns:
+When applied to matrices $\mat A, \mat B \in \R^{n \times k}$, the equality is posed between their corresponding columns:
 $$
-\mat A \sim \mat B \Leftrightarrow \exists \vec c \in \R^n : \mat A \cdot \diag(\vec c) = \mat B.
+\mat A \sim \mat B \Leftrightarrow \exists \vec c \in \R^k : \mat A \cdot \diag(\vec c) = \mat B.
 $$
 \end{definition}
 
-A minimal case of a two-dimensional homography estimation is a correspondence of four point pairs.
-If the input points are in a general configuration (none three are collinear), then there is an exact solution---least squares fitting is not necessary here.
-The general formula as generated by Direct Linear Transformation would be needlessly bloated for this setting.
-
-\todo{rewrite this as lemmas, definitions and proofs.}
-
-Let us write the point sets as columns of a $3 \times 4$ matrix, and let us denote the equivalence of two point sets up to scale by the $\sim$ (tilde) character \todo{ref to definition}.
-Also, let us declare the following set as the \textit{canonical configuration}:
-$$\mat C = \begin{pmatrix}
- 1 & 0 & 0 & 1 \\
- 0 & 1 & 0 & 1 \\
- 0 & 0 & 1 & 1
- \end{pmatrix}.$$
-We will now present the formulas to convert an arbitrary 4-point set to and from the canonical configuration.
-
-For a given point set $\mat A = \left( \vec a, \vec b, \vec c, \vec d \right)$, the homography $\mathrm{can}(\mat A)$ is defined as:
+\begin{definition}
+The \textit{canonizer} function $\mathrm{can}: \R^{3\times 4} \to \R^{3\times 3}$ is defined as
 $$\mathrm{can}(\mat A) = \begin{pmatrix}
  \alpha_1 (\vec b \times \vec c) \T \\
  \alpha_2 (\vec c \times \vec a) \T \\
@@ -342,26 +331,51 @@ $$\mathrm{can}(\mat A) = \begin{pmatrix}
  \end{pmatrix},
 $$
 where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{can}(\mat A) \cdot \vec d = \left( 1, 1, 1 \right)\T$.
-Note that this requires no linear solving, just an element-wise division.
-If the points $\mat A$ are affine independent, it clearly follows that $\mathrm{can}(\mat A) \cdot \mat A \sim \mat C$.
+\end{definition}
 
-The homography $\mathrm{dec}(\mat A)$ is, in turn, defined as:
+\begin{definition}
+The \textit{decanonizer} function $\mathrm{dec}: \R^{3\times 4} \to \R^{3\times 3}$ is defined as
 $$\mathrm{dec}(\mat A) = \left( \alpha_1 \vec a, \alpha_2 \vec b, \alpha_3 \vec c \right),$$
 where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{dec}(\mat A) \cdot \left( 1, 1, 1 \right)\T = \vec d$.
-This requires us to solve the $3 \times 3$ linear system $\left(\vec a, \vec b, \vec c \right) \cdot \left(\alpha_1, \alpha_2, \alpha_3 \right) \T = \vec d$.
-As a result it follows that $\mathrm{dec}(\mat A) \cdot \mat C \sim \mat A$.
+\end{definition}
+
+The sought four-point homography is given by
+\begin{equation}
+\mat H = \mathrm{dec}(\vec p_1, \dots, \vec p_4) \cdot \mathrm{can}(\vec x_1, \dots, \vec x_4).
+\end{equation}
+
+A minimal case of a two-dimensional homography estimation is a correspondence of four point pairs.
+If the input points are in a general configuration (i.e., none three are collinear), then there is an exact solution---no least squares fitting necessary.
+The general formula as generated by Direct Linear Transformation would be needlessly bloated for this setting.
+
+Let us declare the following set as the \textit{canonical configuration} $\mat C$:
+$$\mat C = \begin{pmatrix}
+ 1 & 0 & 0 & 1 \\
+ 0 & 1 & 0 & 1 \\
+ 0 & 0 & 1 & 1
+ \end{pmatrix}.$$
+The formulas given above can be used to convert an arbitrary four-point set to and from the canonical configuration.
+
+\begin{lemma}
+For an affine independent four-point set $\mat A$,
+$$\mathrm{can}(\mat A) \cdot \mat A \sim \mat C \textrm{ and } \mathrm{dec}(\mat A) \cdot \mat C \sim \mat A$$
+\end{lemma}
+\begin{proof}
+The proof follows directly from the definition of $\mathrm{can}(\mat A)$ and $\mathrm{dec}(\mat A)$.
+\end{proof}
+This already proves that $\mat H \vec x^k \sim \vec p^k$ as required.
+
+Note that evaluating the function $\mathrm{can}(\mat A)$ requires no linear solving, just an element-wise division.
+In order to evaluate $\mathrm{dec}(\mat A)$, we have to solve the $3 \times 3$ linear system $\left(\vec a, \vec b, \vec c \right) \cdot \left(\alpha_1, \alpha_2, \alpha_3 \right) \T = \vec d$.
 Note that the vector $\vec d$ is exactly the right-hand side of this system.
 A neat side-effect is that the inverse matrix $\mathrm{dec}(\mat A) \inv = \mathrm{can}(\mat A)$ has correct scale. 
-More importantly, it means that the mapping $\mathrm{dec}$ is linear with respect to all elements of $\vec d$.
-
-These two mappings can be composed to provide any four-point homography as necessary:
-$$\mathrm{dec}(\mat B) \cdot \mathrm{can}(\mat A) \cdot \mat A \sim \mat B.$$
-The resulting mapping is linear with respect to the last column of $\mat B$.
-
-\todo{what are the overall computational requirements?}
+More importantly, it means that the mapping $\mathrm{dec}$ is linear with respect to all elements of $\vec d$.\footnote{
+The mapping is not linear with respect to $\vec a, \vec b$ nor $\vec c$.
+However surprising may this asymmetry seem, it is caused by the unknown scale factors.
+}
 
 \subsection{Derivatives of a homography}
-\label{s.homderivatives}
+\label{s:algo-dhomo}
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$, where $1 \leq k \leq 4$ and vector $\vec v \in \R^2$.\\
 \textit{Output:} Jacobian matrices $\partial \vec v / \partial \vec x^k$.\\

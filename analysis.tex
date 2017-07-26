@@ -46,7 +46,7 @@ Generally, the facial skin is flexible with many degrees of freedom and the moti
 
 Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
 These include the nose (especially its upper part), the chin and small outer regions around and slightly below the eyes.
-The chin is especially prominent and easy to track, but may become completely misleading if the user opens their jaw.
+The chin is very prominent and easy to track, but may become completely misleading if the user opens their jaw.
 \todo{\dots}
 
 \todo{describe stuff like eyebrows, eyelashes, eyelids}
@@ -92,8 +92,8 @@ Both the sympathicus and parasympathicus are parts of the \textit{autonomous ner
 
 \subsection{Eye Movement}
 
-Human eyes have developed not only as an organ of sight, but also as a means of communication.
-When attending to an object or another person, people will usually turn their eyes directly towards it.
+When attending to an object or another person, people will automatically turn their eyes directly towards it.
+This process is usually subconscious and not all aspects of it can be controlled by will.
 
 The main reason of this is that the overall acuity of our visual system increases towards an area near the optical axis.
 The corresponding spot on the retina is called the \textit{fovea}, and it is located about $5\degree$ horizontally towards the nose \cite{villanueva08}.
@@ -101,7 +101,7 @@ It covers only about $1.5\degree$ of the visual field.
 The density of photopic (daylight-sensitive) cells in the fovea is up to 20 times more than in the peripheral areas of the retina.
 
 Although gaze can be precisely controlled by will, there are many peculiarities about eye motion that depend on old brain circuitry and are common to all humans.
-Assuming that each muscle can apply force only by stretching, and not extending itself, the six muscles provide three degrees of freedom to the eye motion---but only two DoF are necessary to control the gaze direction.
+Assuming that each muscle can apply force only by stretching, and not extending itself, the six muscles provide three degrees of freedom (DoF) to the eye motion---but only two DoF are necessary to control the gaze direction.
 
 A third DoF, namely rotation around the optical axis (the \textit{roll}) is actively used by the brain.
 The effect is slight, but because fovea is offset from the optical axis, this could make the gaze direction unpredictable given the optical axis only.
@@ -127,7 +127,7 @@ In fact, prolonged static pose of the head can cause pain in the spine.
 Under the assumption of small angle divergence, we can model movement of the pupil as a simple translation.
 It is important to note that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
 
-We avoid explicit modeling of the viewed scene by assuming that the gaze is given by a homography, as it will be detailed in Section \todo{@ref}.
+We avoid explicit modeling of the viewed scene by assuming that the gaze is given by a homography, as it will be detailed in Section \ref{s:impl-gaze}.
 The non-linear factor is quite huge, unfortunately.
 
 \section{Camera}
@@ -212,5 +212,5 @@ The partial derivatives of an image are estimated as
 $$\todo{formula}.$$
 
 Note that each derivative is sampled at a slightly shifted position.
-While this may seem needlessly picky, precise coordinates become very important when working with downscaled images (e.g., in Section \todo{@ref pyramid}).
+While this may seem needlessly picky, precise coordinates become very important when working with downscaled images (e.g., in Section \ref{s:impl-face}).
 A half-pixel shift in a downscaled image can represent a very large distance in the original pixel grid, and ignoring this displacement would actually make our algorithms fail.

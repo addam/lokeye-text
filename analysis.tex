@@ -186,7 +186,7 @@ We can put a black and white grid nearby the user's head and tune the camera foc
 The image acquired from the camera is a rectangular grid of colored points, expressed as a matrix $\mat M \in \R^{n\times m}$.
 However, certain parts of the computation require a continuous and smooth image model in order to obtain a sub-pixel precision.
 In such cases, the image function is defined as
-$$I(\vec p) = \todo{formula}.$$
+$$\f{I}(\vec p) = \todo{formula}.$$
 
 We need to geometrically transform (i.e., stretch) the image, and evaluate it at random positions.
 In general, this problem has three possible solutions.
@@ -198,12 +198,12 @@ This solution is implicitly used by many software libraries.
 
 Finally, it is possible to interpolate using a sophisticated function.
 We need to calculate image derivatives up to 2nd order, so , such as
-\todo{mention Lanczos function $\mathrm{sinc}(x) \cdot \mathrm{sinc}(x/2)$}
+\todo{mention Lanczos function $\f{sinc}(x) \cdot \f{sinc}(x/2)$}
 \todo{mention $\frac 1 2 (\cos(x) + 1)$ is symmetric, just somewhat too sharp}
 
 However, many commonly used interpolation functions are not suitable for a precise model.
 An interpolator should obviously not be biased towards zero, i.e., interpolation of a constant image should be a constant.
-Because of this, functions such as $\mathrm{sinc}$ can only serve as weights in a weighted average.
+Because of this, functions such as $\f{sinc}$ can only serve as weights in a weighted average.
 The vector formula  often makes image derivatives prohibitively hard to calculate.
 In the end, this may lead us to only estimating the image derivatives by a simple formula---but by making such a step we effectively classify to the first category above.
 

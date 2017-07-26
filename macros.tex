@@ -68,12 +68,13 @@
 \renewcommand{\C}{\mathbb{C}}
 
 %%% Useful operators
+\newcommand\f[1]{\mathrm{#1}}
 \DeclareMathOperator{\pr}{\textsf{P}}
 \DeclareMathOperator{\E}{\textsf{E}\,}
-\DeclareMathOperator{\var}{\textrm{var}}
-\DeclareMathOperator{\cov}{\textrm{cov}}
-\DeclareMathOperator{\sd}{\textrm{sd}}
-\newcommand{\diag}[0]{\mathrm{diag}}
+\DeclareMathOperator{\var}{\f{var}}
+\DeclareMathOperator{\cov}{\f{cov}}
+\DeclareMathOperator{\sd}{\f{sd}}
+\newcommand{\diag}[0]{\f{diag}}
 
 %%% Transposition of a vector/matrix
 \def\T{^{\!\mathsf{T}}}

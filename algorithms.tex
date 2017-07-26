@@ -59,13 +59,13 @@ If $\vec s_i^2 = \vec s_j^2$ for some $j$, the global minimum is not unique but 
 
 \subsection{Quadratic polynomial fitting}
 \textit{Input:} set of samples $P = \{\vec p^i \in \R^2 \}$ of function $\textrm{score}: \R^2 \to \R$.\\
-\textit{Output:} quadratic polynomial $Q \in \R^2 \to \R$ minimizing $\sum_i |\textrm{score}(\vec p^i) - Q(\vec p^i)|^2$ and vector $\vec x$ maximizing $Q(\vec x)$.\\
+\textit{Output:} quadratic polynomial $\f{Q} \in \R^2 \to \R$ minimizing $\sum_i |\f{score}(\vec p^i) - \f{Q}(\vec p^i)|^2$ and vector $\vec x$ maximizing $\f{Q}(\vec x)$.\\
 
 Given several samples of a real function nearby its maximum, we would like to get a precise estimate of the maximum location.
 
 Let us express the least-squares fit as a linear system:
-$$(x^2, xy, x, y^2, y, 1)\T \vec q = \textrm{score}(\vec p^i) \text{ for each } i, \text{ where } \vec p^i = (x, y)\T.$$
-The polynomial $Q$ can be expressed in terms of the solution $\vec q$ as the symmetrical matrix
+$$(x^2, xy, x, y^2, y, 1)\T \vec q = \f{score}(\vec p^i) \text{ for each } i, \text{ where } \vec p^i = (x, y)\T.$$
+The polynomial $\f{Q}$ can be expressed in terms of the solution $\vec q$ as the symmetrical matrix
 $$\mat Q = \begin{pmatrix}
  2 \vec q_1 & \vec q_2 & \vec q_3 \\
  \vec q_2 & 2 \vec q_4 & \vec q_5 \\
@@ -117,25 +117,25 @@ Using the fact that covariance is a linear quantity, we derive:
 Setting $\mat A = \mat U\T$, we obtain $\mat A \mat C \mat A \T = \mat U\T \mat U \cdot \diag(\vec s) \cdot \mat U\T \mat U = \diag(\vec s)$.
 This means that if the data are expressed in the orthonormal basis  $\mat U$, their vector components are no longer correlated.
 
-Picking the first basis vector $\vec q^1$ (such that the variance of the orthogonal projection of $\mat P$ onto $\vec q^1$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
+Picking the first basis vector $\vec q^1$ (such that the variance of the orthogonal projection of $P$ onto $\vec q^1$ is maximal) then amounts to selecting the basis vector of $\mat U$ with the largest variance (i.e., the first column of $\mat U \T$) and so forth.
 
 \end{proof}
 
 \subsection{Gradient descent}
-\textit{Input:} function $F \in \R^n \to \R$, its gradient $\nabla F$ and initial location $\vec p_0 \in \R^n$.\\
-\textit{Output:} local minimum of $F$.\\
+\textit{Input:} function $\f{F} \in \R^n \to \R$, its gradient $\nabla \f{F}$ and initial location $\vec p_0 \in \R^n$.\\
+\textit{Output:} local minimum of $\f{F}$.\\
 
 This algorithm is an iterative scheme.
 The next step is given by the formula
-$$\vec p^{i+1} = \vec p^i - s \cdot \nabla F(\vec p^i),$$
+$$\vec p^{i+1} = \vec p^i - s \cdot \nabla \f{F}(\vec p^i),$$
 where $s$ defines the step length.
 In our implementation, even the step length is calculated by an iteration:
-$$s_{j+1} = s_j - \frac 1 2 \frac {G_j'(0)} {G_j(1) - G_j(0) - G_j'(0)},$$
-where $G_j(t) = F \big( \vec p^i - s_j \cdot t \cdot \nabla F(\vec p^i) \big)$.
+$$s_{j+1} = s_j - \frac 1 2 \frac {\f{G}_j'(0)} {\f{G}_j(1) - \f{G}_j(0) - \f{G}_j'(0)},$$
+where $\f{G}_j(t) = \f{F} \big( \vec p^i - s_j \cdot t \cdot \nabla \f{F}(\vec p^i) \big)$.
 The initial step length $s_0$, and the number of iterations both in the inner and the outer loops, are heuristically chosen constant values.
 
-The iterative scheme for $s_j$ is inspired by the fact that we would evaluate $F(\vec p^{i+1})$ anyway, to ensure that it is an improvement over $F(\vec p^i)$.
-Having computed these values, we can already approximate the function $G$ as a quadratic polynomial, and find its minimum.
+The iterative scheme for $s_j$ is inspired by the fact that we would evaluate $\f{F}(\vec p^{i+1})$ anyway, to ensure that it is an improvement over $\f{F}(\vec p^i)$.
+Having computed these values, we can already approximate the function $\f{G}$ as a quadratic polynomial, and find its minimum.
 If the improvement is small enough, we accept the so-obtained step length and proceed with the outer iteration.
 
 It is possible to calculate the optimal step length $s$ using second derivatives.
@@ -145,21 +145,21 @@ Functions based on image pixel data may change strongly from a pixel to its neig
 In order for this algorithm not to skip such important details, the initial step length $s_0$ is set to one pixel.
 
 \begin{claim}
-When supplied with a function of the form $F(\vec x) = a|\vec x - \vec x_0|^2 + b$ for $\vec x_0 \in \R^n$ and $a, b \in \R$, this algorithm finds the global optimum $\vec x_0$ on the first iteration.
+When supplied with a function of the form $\f{F}(\vec x) = a|\vec x - \vec x_0|^2 + b$ for $\vec x_0 \in \R^n$ and $a, b \in \R$, this algorithm finds the global optimum $\vec x_0$ on the first iteration.
 \end{claim}
 This algorithm is provided without a proof of convergence.
 We intend to use it on functions that are very noisy and a radially symmetric quadratic polynomial can hardly even serve as an approximation.
-Ensuring that some necessary conditions are satisfied by the function $F$ can be much more difficult than the proof itself.
+Ensuring that some necessary conditions are satisfied by the function $\f{F}$ can be much more difficult than the proof itself.
 We consider this minimization scheme an intuitive heuristic, and we admit that it may fail to converge in some circumstances.
 
 This algorithm is perhaps the simplest optimization scheme applicable on our problems, and its performance can be hindered by many issues that are quite common.
-For example, it is important that all the parameters of $F$ are expressed in units of a similar scale.
+For example, it is important that all the parameters of $\f{F}$ are expressed in units of a similar scale.
 In our implementation, we take care of this explicitly either by expressing all the parameters in the same unit (e.g., pixels) or by scaling them by a heuristic factor.
 
 \subsection{Random Sample Consensus}
 
-\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d$.\\
-\textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)| < d$.\\
+\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d \in \R$.\\
+\textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\f{cart}(\mat H \vec x^k) - \f{cart}(\vec p^k)| < d$.\\
 
 \todo{explain}
 \cite[p.117]{hartley03}
@@ -189,7 +189,7 @@ We write the convolution as $\mat R = \mat M \ast \mat T$.
 
 Each sample of the image gradient assumes for a moment that the limbus is passing through it, and makes a guess where the center of the circle would be.
 The gradient value provides just enough information: given a gradient sample at 
-$$\vec c = -r \frac {\nabla I(\vec p)} {|\nabla I(\vec p)|}.$$
+$$\vec c = -r \frac {\nabla \f I(\vec p)} {|\nabla \f I(\vec p)|}.$$
 
 and casts a weighted vote into a 2-dimensional accumulator.
 % why was this here? This allows us to apply a sophisticated heuristic filter at almost no cost.
@@ -207,18 +207,18 @@ In our experiments, this method turned out as very unstable---possibly because i
 \subsection{Derivatives of a three-point affinity}
 \label{s:algo-daff}
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k, 1 \leq k \leq 3$ and vector $\vec v$, where $\vec x^k, \vec p^k, \vec v \in \R^2$.\\
-\textit{Output:} Jacobian matrices $\partial \mat A \vec v / \partial \vec p^k$, where $\mat A \cdot \mathrm{hom}(\vec x^k) = \vec p^k$.\\
+\textit{Output:} Jacobian matrices $\partial \mat A \vec v / \partial \vec p^k$, where $\mat A \cdot \f{hom}(\vec x^k) = \vec p^k$.\\
 
 \begin{definition}
-The \textit{homogeneous conversion} function $\mathrm{hom}: \R^n \to \R^{n + 1}$ maps a Cartesian vector to its homogeneous counterpart:
+The \textit{homogeneous conversion} function $\f{hom}: \R^n \to \R^{n + 1}$ maps a Cartesian vector to its homogeneous counterpart:
 $$
-\mathrm{hom}(\vec x) = (\vec x_1, \dots, \vec x_n, 1)\T.
+\f{hom}(\vec x) = (\vec x_1, \dots, \vec x_n, 1)\T.
 $$
 \end{definition}
 
 Let us define the matrix $\mat C$ as 
 \begin{equation}
-\mat C = \left( \mathrm{hom}(\vec x^1), \mathrm{hom}(\vec x^2), \mathrm{hom}(\vec x^3) \right),
+\mat C = \left( \f{hom}(\vec x^1), \f{hom}(\vec x^2), \f{hom}(\vec x^3) \right),
 \end{equation}
 
 The sought partial derivatives are given by
@@ -233,12 +233,12 @@ $$\mat A = (\vec p^1, \vec p^2, \vec p^3)\T \cdot \mat C \inv.$$
 \end{lemma}
 
 \begin{proof}
-Splitting $\mat A \cdot \mathrm{hom}(\vec v)$ into two matrix multiplications this way has an intuitive motivation.
+Splitting $\mat A \cdot \f{hom}(\vec v)$ into two matrix multiplications this way has an intuitive motivation.
 Firstly, the vector $\vec v$ is expressed as an affine combination of points $\vec p^k$.
 This is accomplished by the multiplication by $\mat C \inv$.
-We can verify that this combination $\sum_i \alpha_i \vec v_i$ is affine because the weights sum up to $\left(\mat C \cdot (\alpha_1, \alpha_2, \alpha_3) \right)_3 = \mathrm{hom}(\vec v)_3 = 1$.
+We can verify that this combination $\sum_i \alpha_i \vec v_i$ is affine because the weights sum up to $\left(\mat C \cdot (\alpha_1, \alpha_2, \alpha_3) \right)_3 = \f{hom}(\vec v)_3 = 1$.
 
-Then, the same weights can be used to express $\mat A \cdot \mathrm{hom}(\vec v)$ as an affine combination of $\vec x^k$.
+Then, the same weights can be used to express $\mat A \cdot \f{hom}(\vec v)$ as an affine combination of $\vec x^k$.
 The weights $\alpha_1, \alpha_2, \alpha_3$ are called the \textit{barycentric coordinates}.
 \end{proof}
 
@@ -248,8 +248,8 @@ The weights $\alpha_1, \alpha_2, \alpha_3$ are called the \textit{barycentric co
 \textit{Output:} estimated homography matrix $\mat H$ .\\
 
 \begin{definition}
-The \textit{vectorization} operator $\mathrm{vec} : \R^{m \times n} \to \R^{mn}$ is defined as
-$$\mathrm{vec}(\mat M)_{m i + j} = \mat M_{i,j} \textrm{ for all } i, j.$$
+The \textit{vectorization} operator $\f{vec} : \R^{m \times n} \to \R^{mn}$ is defined as
+$$\f{vec}(\mat M)_{m i + j} = \mat M_{i,j} \textrm{ for all } i, j.$$
 This essentially means reading out all the matrix elements in row-major order.
 \end{definition}
 
@@ -267,7 +267,7 @@ Let us define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times 
 \end{equation}
 Finally, let us formulate a homogeneous linear system:
 \begin{equation} \label{e:homography-system}
-\mathrm{vec} \left(({\vec p}^k)\T \mat M^{i, j} {\vec x}^k \right)\T \cdot \mathrm{vec}(\mat H) = 0,
+\f{vec} \left(({\vec p}^k)\T \mat M^{i, j} {\vec x}^k \right)\T \cdot \f{vec}(\mat H) = 0,
 \end{equation}
 for all $i, j, k$ such that $i < j$ and either $\vec p^k_i$ or $\vec p^k_j$ is the maximal element of $\vec p^k$.
 The result is $\mat H = \mat B \inv \mat H \mat A$.
@@ -304,7 +304,7 @@ Each equation of the system represents a constraint of the form $\vec p\T \mat M
 This constraint can be reformulated in terms of the Frobenius inner product $\langle \mat A, \mat B \rangle_F = \sum_{i, j} \mat A_{i, j} \cdot \mat B_{i, j}$ and the vector outer product as follows:
 $$\vec p\T \mat M \mat H \vec x = \sum_{i, j} (\vec p\T \mat M)_i \mat H_{i, j} \vec x_j = \langle \vec p\T \mat M \vec x\T, \mat H \rangle_F = 0.$$
 Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form \eqref{e:homography-system}.
-Each correspondence pair and each selected antisymmetric matrix $\mat M$ for that pair provide one such equation, and the row vectors $\mathrm{vec} ({\vec p}\T \mat M \vec x)\T$ can be stacked to form the system matrix.
+Each correspondence pair and each selected antisymmetric matrix $\mat M$ for that pair provide one such equation, and the row vectors $\f{vec} ({\vec p}\T \mat M \vec x)\T$ can be stacked to form the system matrix.
 
 In real scenarios, the input point sets are disrupted by noise.
 As already noted, solving this overdetermined system in least squares sense provides the algebraic least-squares solution.
@@ -316,12 +316,12 @@ We loop through the possible choices of $\vec s_i$ and choose the one that produ
 \subsection{Homography refitting} 
 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by roughly estimated homography $\mat H^0$.\\
-\textit{Output:} homography matrix $\mat H$ that minimizes $\sum_k |\mathrm{cart}(\mat H \vec x^k) - \mathrm{cart}(\vec p^k)|^2$.\\
+\textit{Output:} homography matrix $\mat H$ that minimizes $\sum_k |\f{cart}(\mat H \vec x^k) - \f{cart}(\vec p^k)|^2$.\\
 
 \begin{definition}
-The \textit{Cartesian conversion} function $\mathrm{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
+The \textit{Cartesian conversion} function $\f{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
 $$
-\mathrm{cart}(\vec x) = (\vec x_1 / \vec x_n, \dots, \vec x_{n - 1} / \vec x_n)\T.
+\f{cart}(\vec x) = (\vec x_1 / \vec x_n, \dots, \vec x_{n - 1} / \vec x_n)\T.
 $$
 \end{definition}
 
@@ -346,25 +346,25 @@ $$
 \end{definition}
 
 \begin{definition}
-The \textit{canonizer} function $\mathrm{can}: \R^{3\times 4} \to \R^{3\times 3}$ is defined as
-$$\mathrm{can}(\mat A) = \begin{pmatrix}
+The \textit{canonizer} function $\f{can}: \R^{3\times 4} \to \R^{3\times 3}$ is defined as
+$$\f{can}(\mat A) = \begin{pmatrix}
  \alpha_1 (\vec b \times \vec c) \T \\
  \alpha_2 (\vec c \times \vec a) \T \\
  \alpha_3 (\vec a \times \vec b) \T \\
  \end{pmatrix},
 $$
-where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{can}(\mat A) \cdot \vec d = \left( 1, 1, 1 \right)\T$.
+where $\alpha_1 \dots \alpha_3$ are chosen so that $\f{can}(\mat A) \cdot \vec d = \left( 1, 1, 1 \right)\T$.
 \end{definition}
 
 \begin{definition}
-The \textit{decanonizer} function $\mathrm{dec}: \R^{3\times 4} \to \R^{3\times 3}$ is defined as
-$$\mathrm{dec}(\mat A) = \left( \alpha_1 \vec a, \alpha_2 \vec b, \alpha_3 \vec c \right),$$
-where $\alpha_1 \dots \alpha_3$ are chosen so that $\mathrm{dec}(\mat A) \cdot \left( 1, 1, 1 \right)\T = \vec d$.
+The \textit{decanonizer} function $\f{dec}: \R^{3\times 4} \to \R^{3\times 3}$ is defined as
+$$\f{dec}(\mat A) = \left( \alpha_1 \vec a, \alpha_2 \vec b, \alpha_3 \vec c \right),$$
+where $\alpha_1 \dots \alpha_3$ are chosen so that $\f{dec}(\mat A) \cdot \left( 1, 1, 1 \right)\T = \vec d$.
 \end{definition}
 
 The sought four-point homography is given by
 \begin{equation} \label{e:algo-homo}
-\mat H = \mathrm{dec}(\vec p_1, \dots, \vec p_4) \cdot \mathrm{can}(\vec x_1, \dots, \vec x_4).
+\mat H = \f{dec}(\vec p_1, \dots, \vec p_4) \cdot \f{can}(\vec x_1, \dots, \vec x_4).
 \end{equation}
 
 A minimal case of a 2-dimensional homography estimation is a correspondence of four point pairs.
@@ -381,18 +381,18 @@ The formulas given above can be used to convert an arbitrary four-point set to a
 
 \begin{lemma}
 For an affine independent four-point set $\mat A$,
-$$\mathrm{can}(\mat A) \cdot \mat A \sim \mat C \textrm{ and } \mathrm{dec}(\mat A) \cdot \mat C \sim \mat A$$
+$$\f{can}(\mat A) \cdot \mat A \sim \mat C \textrm{ and } \f{dec}(\mat A) \cdot \mat C \sim \mat A$$
 \end{lemma}
 \begin{proof}
-The proof follows directly from the definition of $\mathrm{can}(\mat A)$ and $\mathrm{dec}(\mat A)$.
+The proof follows directly from the definition of $\f{can}(\mat A)$ and $\f{dec}(\mat A)$.
 \end{proof}
 This already proves that $\mat H \vec x^k \sim \vec p^k$ as required.
 
-Note that evaluating the function $\mathrm{can}(\mat A)$ requires no linear solving, just an element-wise division.
-In order to evaluate $\mathrm{dec}(\mat A)$, we have to solve the $3 \times 3$ linear system $\left(\vec a, \vec b, \vec c \right) \cdot \left(\alpha_1, \alpha_2, \alpha_3 \right) \T = \vec d$.
+Note that evaluating the function $\f{can}(\mat A)$ requires no linear solving, just an element-wise division.
+In order to evaluate $\f{dec}(\mat A)$, we have to solve the $3 \times 3$ linear system $\left(\vec a, \vec b, \vec c \right) \cdot \left(\alpha_1, \alpha_2, \alpha_3 \right) \T = \vec d$.
 Note that the vector $\vec d$ is exactly the right-hand side of this system.
-A neat side-effect is that the inverse matrix $\mathrm{dec}(\mat A) \inv = \mathrm{can}(\mat A)$ has correct scale. 
-More importantly, it means that the mapping $\mathrm{dec}$ is linear with respect to all elements of $\vec d$.\footnote{
+A neat side-effect is that the inverse matrix $\f{dec}(\mat A) \inv = \f{can}(\mat A)$ has correct scale. 
+More importantly, it means that the mapping $\f{dec}$ is linear with respect to all elements of $\vec d$.\footnote{
 The mapping is not linear with respect to $\vec a, \vec b$ nor $\vec c$.
 However surprising may this asymmetry seem, it is caused by the unknown scale factors.
 }
@@ -405,7 +405,7 @@ However surprising may this asymmetry seem, it is caused by the unknown scale fa
 
 The partial derivative wrt. the $i$-th coordinate of the last point is given by
 \begin{equation} \label{e:algo-dhomo}
-\partial \mat H \vec v / \partial \vec p^4_1 = \mat H \cdot \mathrm{dec}(\vec p^1, \vec p^2, \vec p^3, \vec e^i) \cdot \vec v,
+\partial \mat H \vec v / \partial \vec p^4_1 = \mat H \cdot \f{dec}(\vec p^1, \vec p^2, \vec p^3, \vec e^i) \cdot \vec v,
 \end{equation}
 where $\vec e^i$ is the natural basis vector for the $i$-th coordinate and $\mat H$ is exactly as in \eqref{e:algo-homo}.
 The remaining three matrices are obtained by a permutation of the input points.

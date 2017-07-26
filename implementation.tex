@@ -29,10 +29,10 @@ Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of ea
 \section{Face tracking}
 \label{s:impl-face}
 
-\textit{Input:} reference image $\textrm{R}$ and current image $\textrm{I}$.\\
-\textit{Output:} geometric transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2$ is minimal.\footnote{
+\textit{Input:} reference image $\f{R}$ and current image $\f{I}$.\\
+\textit{Output:} geometric transformation $\f T: \R^2 \to \R^2$ such that $\int_{\vec p} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2$ is minimal.\footnote{
 Because we do not actually intend to use integral calculus, the integral is only written in an informal way.
-The full form would read: $\int_{\vec p \in \Omega} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2 \mathrm{d}\vec p$, where $\Omega$ is the image domain.
+The full form would read: $\int_{\vec p \in \Omega} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2 \f{d}\vec p$, where $\Omega$ is the image domain.
 }\\
 
 The tracking is split into two parts: a \textit{parent tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
@@ -42,7 +42,7 @@ The parent tracker provides a reference frame for all other features (e.g., eye 
 In order to gain some robustness against changes in lighting, the parent tracker is color-normalized.
 
 A surface within the face is tracked pixel per pixel, minimizing the energy function
-$$\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2,$$
+$$\int_{\vec p} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2,$$
 where $T: \R^2 \to \R^2$ is a differentiable image transformation.
 \todo{note that the image functions return real 3-dimensional vectors. These correspond to RGB.}
 
@@ -94,7 +94,7 @@ Our extension of this method to a quadrangular mesh (i.e., homographic cells) re
 
 \section{Eye tracking}
 
-\textit{Input:} iris radius $r \in \R$ and image $I$ centered at an expected eye location.\\
+\textit{Input:} iris radius $r \in \R$ and image $\f I$ centered at an expected eye location.\\
 \textit{Output:} iris center $\vec c \in \R^2$.\\
 
 \todo{further assumptions on the image necessary for good recognition}
@@ -185,19 +185,19 @@ This algorithm has built-in skin masking, so that whole segments of the iris are
 \todo{Add some intro -- let us define the following functions}
 \begin{itemize}
 \item
-Angular limbus score $\textrm{limbus}(\alpha)$ is the gradient magnitude $|\nabla \textrm{I}(\vec p)|$ where $\arctan(\vec p) = \alpha$ and $|\vec p| = r$.
+Angular limbus score $\f{limbus}(\alpha)$ is the gradient magnitude $|\nabla \f{I}(\vec p)|$ where $\arctan(\vec p) = \alpha$ and $|\vec p| = r$.
 
 \item
-Radial color $\textrm{mean}(t)$ is a mean value of the set $\{\textrm{I}(\vec p) \text{ for all } |\vec p| = t \}$.
+Radial color $\f{mean}(t)$ is a mean value of the set $\{\f{I}(\vec p) \text{ for all } |\vec p| = t \}$.
 
 \item
-Angular iris score $\textrm{iris}(\alpha)$ is the weighted arithmetic mean of the set $\{\textrm{I}(\vec p)$ for all $\arctan(\vec p) = \alpha \}$.
-The weight is $\textrm{w}(\vec p) = t \cdot (c - |\textrm{image}(\vec p) - \textrm{mean}(t)|)$, clamped to zero, with $t = |\vec p|$ and $c$ being a value appropriately chosen.
+Angular iris score $\f{iris}(\alpha)$ is the weighted arithmetic mean of the set $\{\f{I}(\vec p)$ for all $\arctan(\vec p) = \alpha \}$.
+The weight is $\f{w}(\vec p) = t \cdot (c - |\f{image}(\vec p) - \f{mean}(t)|)$, clamped to zero, with $t = |\vec p|$ and $c$ being a value appropriately chosen.
 
 \end{itemize}
-The total score is defined as $\int_\alpha \textrm{limbus}(\alpha) \cdot \textrm{iris}(\alpha)$.
+The total score is defined as $\int_\alpha \f{limbus}(\alpha) \cdot \f{iris}(\alpha)$.
 
-Note that the formula for $\textrm{mean}(t)$ has not been specified yet.
+Note that the formula for $\f{mean}(t)$ has not been specified yet.
 Using the arithmetic mean may have a bad impact on the overall success rate.
 It is appropriate here to use a more robust formula such as the median.
 
@@ -255,9 +255,9 @@ Note that in the case of two votes, their arithmetic mean is the only option.
 In the three-vote case, either a mean of two or the mean of all three can be selected depending on their relative distances.
 
 \begin{lemma}
-Given a set $\{\vec x^i\}$ of samples from a normal distribution $X$, the expected value of the variance $\var X$ is
+Given a set $X = \{\vec x^i\}$ of samples from a normal distribution, the expected value of the variance $\var X$ is
 $$\E\var (\vec x) = \frac 1 {n - 1} \sum_i (\vec x^i - \hatvec x),$$
-where $\hatvec x$ is the arithmetic mean.
+where $\hatvec x$ is the arithmetic mean of $X$.
 \end{lemma}
 \begin{proof}
 \todo{cite or derive}

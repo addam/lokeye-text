@@ -59,6 +59,11 @@ On the edges of eyelids there are eyelashes.
 Depending on the viewing angle, these can also significantly occlude the eye.
 As if this all was not enough, the user may wear strong makeup and a mascara to emphasize these undesirable factors.
 
+Assistive tools like glasses and contact lenses also have to be considered when designing a gaze tracker, although they are technically not a part of the face.
+Glasses and lenses (including the natural ones) will cause an unpredictable displacement of the iris and pupil image.
+A flexible enough gaze estimator may be capable of handling this distortion implicitly.
+In fact, glasses with solid rims can help head pose estimation as their position relatively to the skull remains reliably constant.
+
 \subsection{Eye anatomy}
 \label{s.eyeanatomy}
 
@@ -79,45 +84,63 @@ There are six separately controlled muscles stretching between to the eyeball an
 Throughout the literature, eye is modeled either as a sphere \cite{zhang13}, or with an extra spherical section for the cornea \cite{villanueva08}.
 Some sources, such as \cite{wang16}, also explicitly model the eyelids.
 
-The sclera of human eye is made of white colagen.
-The color of the iris can vary between bright blue and dark brown, including less common shades of green and amber.
+The sclera of human eye is made of white collagen.
+The color of the iris, in turn, can vary anywhere between bright blue and dark brown, including some less common shades like green and amber.
 It feels quite intuitive that these distinctive colors have evolved for the purposes of nonverbal communication.
 This claim is known as the \textit{cooperative eye hypothesis} and has been, in part, proven by experiment \cite{tomasello07}.
 
 In addition, the aperture inside the iris, known as the \textit{pupil}, displays the retina through the lens.
-The retina needs to absorb light in order to sense as much information as possible, and therefore it is mostly black.
+The retina absorbs light in order to acquire as much information as possible, and therefore it is mostly black.
 A notable exception is the red-eye effect that may appear in directional light.
 Its usefulness to eye tracking has been discussed in Section \ref{s:related-gazetracking}, but since we assume diffuse lighting, this effect should not be present.
 
 The inner and outer boundary of the human iris (the pupil and the limbus, respectively) are concentric circles.
-Generally, the inner shape of the iris is less reliable of these two.
+Generally, the inner shape of the iris is the less reliable of these two.
 An extreme case is when the pupil is permanently distorted and non-circular due to a damage \cite[p.5]{bowyer16} or a disease \cite[p.146]{bowyer16}.
 
 In healthy people, the radius of the pupil changes depending on the amount of incoming light and on their emotional state.
-The constriction is controlled by the \textit{parasympathicus}, a nervous system generally related to comfortable actions such as eating and sleeping.
-The dilation is controlled by the \textit{sympathicus}, which in turn is the main actuator of the ``fight or flight" stress response.
-Both the sympathicus and parasympathicus are parts of the \textit{autonomous nervous system} and as suggested by the name, they cannot be directly controlled by will.
+The constriction is controlled by the parasympathicus, a nervous system generally related to comfortable actions such as eating and sleeping.
+The dilation is controlled by the sympathicus, which in turn is the main actuator of the ``fight or flight" stress response.
+Both the sympathicus and parasympathicus are parts of the autonomous nervous system and as suggested by the name, they cannot be directly controlled by will.
 
 \subsection{Eye movement}
 
-When attending to an object or another person, people will automatically turn their eyes directly towards it.
-This process is usually subconscious and not all aspects of it can be controlled by will.
+When attending to an object (or another person), people will automatically turn their eyes directly towards it.
+This process is usually subconscious and some of its aspects are involuntary.
 
-The main reason of this is that the overall acuity of our visual system increases towards an area near the optical axis.
-The corresponding spot on the retina is called the \textit{fovea}, and it is located about $5\degree$ horizontally towards the nose \cite{villanueva08}.
+The main reason for eye movement is that the overall acuity of our visual system increases towards a small area near the optical axis.
+The corresponding spot on the retina is called the \textit{fovea}, and it is located about $5\degree$ off-axis horizontally towards the nose \cite{villanueva08}.
 It covers only about $1.5\degree$ of the visual field.
 The density of photopic (daylight-sensitive) cells in the fovea is up to 20 times more than in the peripheral areas of the retina.
 
 Although gaze can be precisely controlled by will, there are many peculiarities about eye motion that depend on old brain circuitry and are common to all humans.
-Assuming that each muscle can apply force only by stretching, and not extending itself, the six muscles provide three degrees of freedom (DoF) to the eye motion---but only two DoF are necessary to control the gaze direction.
 
+Assuming that each muscle can apply force only by stretching, and not extending itself, the six muscles provide three degrees of freedom (DoF) to the eye motion---but only two DoF are necessary to control the gaze direction.
 A third DoF, namely rotation around the optical axis (the \textit{roll}) is actively used by the brain.
 The effect is slight, but because fovea is offset from the optical axis, this could make the gaze direction unpredictable given the optical axis only.
 Fortunately, the roll is deterministic with respect to the remaining two rotation angles.
-This fact is known as the \textit{Donder's Law} \cite{hansen10}.
-Thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
+This fact is known as the \textit{Donder's Law} \cite{hansen10}, and thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
 
-\todo{saccades, fixation, smooth pursuit}
+The gaze is usually controlled by high-level brain regions automatically so as to observe all necessary details about the environment.
+This process is mainly based on visual feedback.
+There are three basic actions that our visual system is capable of: a \textit{saccade}, a \textit{fixation}, and a \textit{smooth pursuit}.
+
+The purpose of saccades is to point the gaze in another direction.
+During eye movement, the visual input is distorted by motion blur, so it is desirable that it be as quick as possible.
+Indeed, the angular acceleration in the beginning and in the end of a saccade reaches the order of $\num{10000}\degree/\mathrm{s}^2$
+The periods when the eye is static are called fixations.
+
+It is important to note that what we feel like a constant gaze direction is actually a sequence of saccades and fixations.
+Although a single fixation may suffice to identify an object, the whole visual system relies on its ability to perform saccades constantly.
+The scale of these saccades varies greatly, a microsaccade measured in an experiment can be considered small within the fixation threshold in another one.
+For a rough estimate, we can say that the eye moves less than $1\degree$ during a fixation.
+
+Finally, there is a special kind of eye movement for following objects that actually move around.
+This is referred to as the smooth pursuit, and it is characterized by a smooth, saccade-less eye movement.
+
+People are usually unable to perform smooth pursuit without a moving object in sight.
+On the other hand, if a moving target is drawn on the screen with a low frame rate, our perception of it will be blurry because the eye will traverse a smooth path during each frame.
+Being so predictable and precise, smooth pursuit is perfect for the calibration of a gaze tracker.
 
 \section{Gaze}
 \label{s:gaze-model}

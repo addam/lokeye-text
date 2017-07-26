@@ -140,7 +140,7 @@ In contrast to these methods based solely on an image, many rely on some extra h
 Methods with partially controlled lighting are especially efficient for eye tracking because the mammalian eye is reflective both on its inner and its outer surfaces.
 The retina of the human eye is distincly reflective in red and near infrared light, which is the cause of the red-eye effect commonly observed in photography.
 If an infrared light source is placed next to the camera, the user's pupils will shine brightly, whereas the rest of the eye and the scene brightens only subtly.
-The pupil shape can be obtained by contrasting this image to the one when the infrared light is turned off.
+The pupil shape can be obtained simply by contrasting this image to the one when the infrared light is turned off.
 
 Having a point light source in a known position relatively to the camera also creates predictable reflections on the outer eye surface, called the \textit{Purkinje images} \cite{hansen10}.
 The shape of the eye is just quite enough complex (as detailed in Section \ref{s.eyeanatomy}) and almost the same across individuals, so the eye pose can be deduced from such glares by geometric calculations.
@@ -176,7 +176,7 @@ Unfortunately, the eye positions are given in whole pixel units only, and the ac
 Since we intend to locate the iris center with subpixel precision, this data set is not sufficient.
 
 Another noteworthy piece is the MPIIGaze data set \cite{mpiigaze}, which is accompanied by a neural network-based gaze tracker.
-It contains more than 200,000 photos in full color and quite a high resolution, acquired using a built-in camera of a laptop computer.
+It contains more than \num{200000} photos in full color and quite a high resolution, acquired using a built-in camera of a laptop computer.
 Its annotations are another extreme case: the on-screen gaze position is known in each image, but nothing else.
 In theory, we could use it to evaluate the performance of our program.
 Unfortunately, even that is not appropriate because almost every photo in the MPIIGaze data set has been taken in different light conditions than others.

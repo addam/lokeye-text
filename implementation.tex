@@ -10,10 +10,16 @@ They are presented here, and will be evaluated in the next section under varying
 On a first run, the program needs a calibration procedure to learn specific parameters related to the user.
 Some calibration is also necessary on each run and during longer periods of execution because of changing light conditions.
 
-The pipeline of computation is presented in Drawing \todo{@ref}.
-Firstly, the face is locally tracked from the previous frame.
-Only if this step fails, the program starts a global face localization procedure.
-This first step results in a 3-dimensional translation and rotation mapping from the initial pose.
+\begin{figure}[!ht]
+	\centering 
+	\centering \includegraphics{img/impl-overview.pdf}
+	\caption{Scheme of operation of the whole program.}\label{i:impl-overview}
+\end{figure}
+
+The pipeline of computation is presented in Drawing \ref{i:impl-overview}.
+Firstly, the face is locally tracked from the previous frame by the so-called parent tracker.
+Only if this step fails, the program executes a global face localization procedure.
+This first step results in a geometric image transformation.
 
 Next, the precise position of both eyes is established within a reasonable region in the face.
 This step requires the face to be localized properly in the image but since the eyes can move very quickly, no information from previous frames is taken into account.
@@ -23,16 +29,16 @@ Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of ea
 \section{Face Tracking}
 
 \textit{Input:} reference image $\textrm{R}$ and current image $\textrm{I}$.\\
-\textit{Output:} geometrical transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2$ is minimal.\footnote{
+\textit{Output:} geometric transformation $T: \R^2 \to \R^2$ such that $\int_{\vec p} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2$ is minimal.\footnote{
 Because we do not actually intend to use integral calculus, the integral is only written in an informal way.
 The full form would read: $\int_{\vec p \in \Omega} |\textrm{R}(\vec p) - \textrm{I}(\textrm{T}(\vec p))|^2 \mathrm{d}\vec p$, where $\Omega$ is the image domain.
 }\\
 
-The tracking is split into two parts: a \textit{master tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
+The tracking is split into two parts: a \textit{parent tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
 All of the trackers are deformable templates along the lines of \todo{cite klt and generalization}.
 
-The master tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
-In order to gain some robustness against changes in lighting, the master trackers is color-normalized.
+The parent tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
+In order to gain some robustness against changes in lighting, the parent tracker is color-normalized.
 
 A surface within the face is tracked pixel per pixel, minimizing the following energy function:
 $$\todo{formula},$$
@@ -64,17 +70,17 @@ These represent two major groups of tracking techniques in general: the feature-
 
 This method relies on small-scale features that are usually present in the face and on skin---such as the eyebrows, nostrils, beard and skin defects.
 Several small trackers are arbitrarily placed within the face area, each of them large just enough so as to track a single feature of the face.
-Technically, it is possible to track any distinctive texture, so an automated feature detection such as the Harris detector \todo{@cite} performs well enough.
+Technically, it is possible to track any distinctive texture, so an automated feature detection such as the Harris corner detector (provided by a third-party library) performs well enough.
 
 Each of the markers is allowed to freely move around.
 (In contrast to the classical Deformable Parts Model such as in \cite{uricar12}, we do not calculate any penalty from their relative configuration.)
-They are tracked from their previous known position relatively to the master tracker.
+They are tracked from their previous known position relatively to the parent tracker.
 If the tracking score of a marker drops below a certain limit or a marker escapes the face area, it is reset to its original position and tracking continues from there.
 
 \subsection{Grid}
 
 This method follows the approach of Active Appearance Models \cite{cootes01}.
-The master tracker is subdivided into a planar mesh, and each cell is responsible of tracking the corresponding part of the image.
+The parent tracker is subdivided into a planar mesh, and each cell is responsible of tracking the corresponding part of the image.
 
 In order for the cells to form a contiguous mesh, certain parameters of neighboring cells are bound together and need to be optimized concurrently.
 Our implementation of the corresponding tracker methods does this explicitly since their parameters are the planar coordinates of their corner vertices.
@@ -206,7 +212,7 @@ Firstly, we can pick the median value as sorted by a scalar value (e.g., brightn
 This approach becomes unpredictable if many different colors have the same brightness, and specifically in the case of skin tones and iris color, this may be an issue.
 
 The second option is to define the median of set $S$ as the value $m \in S$ such that the sum of distances $\sum_{x \in S} |m - x|$ is minimized.
-This formula is consistent with the one-dimensional case(@cite) and is valid in any metric space.
+This formula is consistent with the one-dimensional case and is valid in any metric space.
 Unfortunately, efficient algorithms to compute this value are too sophisticated, so we loop over $S$ explicitly.
 
 This function is computationally expensive and, depending on the method for mean color calculation, difficult to optimize locally.
@@ -251,6 +257,9 @@ For a higher count of votes (assuming still that the number is reasonably small)
 In order to find it, we explicitly loop over all the subsets.
 The average of this subset is the result of the combined estimator.
 
+Note that in the case of two votes, their arithmetic mean is the only option.
+In the three-vote case, either a mean of two or the mean of all three can be selected depending on their relative distances.
+
 \begin{lemma}
 Given a set $\{\vec x^i\}$ of samples from a normal distribution $X$, the expected value of the variance $\var X$ is
 $$\E\var (\vec x) = \frac 1 {n - 1} \sum_i (\vec x^i - \hatvec x),$$
@@ -274,7 +283,7 @@ The \textit{gaze parameters} consist of an orthonormal basis $\mat P \in \R^{2\t
 \end{definition}
 
 Given the vector $\vec f$ obtained from face tracking and vector $\vec e$ obtained from eye tracking, and using the scene model described in Section \ref{s:gaze-model}, we wish to estimate the on-screen position $\vec p$ (in pixel units).
-Commonly used approximation methods for this purpose vary greatly from simple approximations \cite{zhu12} more flexible ones \cite{kassner14,yucel09} and thorough geometrical models \cite{villanueva08,wang16}.
+Commonly used approximation methods for this purpose vary greatly from simple approximations \cite{zhu12} more flexible ones \cite{kassner14,yucel09} and thorough geometric models \cite{villanueva08,wang16}.
 
 Computer screen is a plane in space, with pixels aligned in a regular square grid.
 If the face and the eyes were also planar objects, then the gaze in screen coordinates would be related to the face and eyes position by a projectivity.

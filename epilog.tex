@@ -2,5 +2,25 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 
 We have designed and implemented a gaze tracker that can serve many real-world purposes.
-The software is presented as a proof of concept and as a benchmark rig, so it is highly adjustable and modular.
-Evaluation on real-world data shows that the algorithm used here works well when supplied with flawless input data, and that the results deteriorate steadily as the conditions become more challenging.
+
+On average, we failed to attain a sub-pixel precision in eye tracking, as was the original goal.
+Evaluation on real-world data shows that  the program is indeed capable of such a precision when supplied with flawless data, and it quite often succeeds even in more challenging cases.
+It is mainly the outliers that spoil the average performance of eye tracking.
+
+In order to deal with these outliers, we have designed a robust calibration method.
+
+In terms of computational speed, the tracker provides an interactive performance of several frames per second on a typical computer.
+The software is modular and highly adjustable, i.e., it can be configured for high precision or for decreased computational requirements at the expense of tracking quality.
+
+The performance deteriorates steadily as the conditions become more challenging.
+We have evaluated many test cases in detail and based on these, we provide an analysis of the actual necessary conditions for a smooth operation.
+
+\section{Future work}
+
+It would be nice to integrate some existing libraries \cite{deepgaze}.
+
+We should provide calibration data to enable quick testing.
+
+The performance of each face tracker should be evaluated and if it considerably deteriorates, it should be reset.
+
+Out of the two eye trackers, we should choose the one with the greater fitting score.

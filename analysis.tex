@@ -90,7 +90,6 @@ Fortunately, the roll is deterministic with respect to the remaining two rotatio
 This fact is known as the \textit{Donder's Law} \cite{hansen10}.
 Thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
 
-\todo{citations: čihák and student's guide to cognitive science}
 \todo{saccades, fixation, smooth pursuit}
 
 \section{Gaze}
@@ -101,7 +100,7 @@ We assume that it is pointed to somewhere on the computer screen.
 
 Gaze is affected by both the head pose and eye rotation.
 Although it may seem more efficient to only move our eyes when using a computer, people usually move their heads.
-In fact, prolonged static pose of the head can induce painful angle wear \todo{@cite čihák}.
+In fact, prolonged static pose of the head can cause pain in the spine.
 
 \todo{geometric description of the scene}
 \todo{accompanied by a figure}
@@ -132,16 +131,14 @@ Refractive lens are usually inserted into the optical path so that light need no
 This approach results in that only light rays originating from a certain surface in the scene, known as the focal plane, are properly projected onto the image plane.
 Points from a plane parallel with the focal plane will be displayed as if convolved with a disc kernel; the radius increases with the parallel distance from the focal plane, and the shape is mostly a projection of the camera iris.
 
-The lens may be dirty or otherwise bad, which casues a slight and uniform foggy blur.
-
-In very small cameras with relatively high resolution, the wave nature of light may cause additional blur @cite.
-The most notable of these issues is diffraction at edges of the camera iris.
+The lens may be dirty or scratched, which casues a slight and uniform foggy blur.
+In very small cameras with relatively high resolution, the wave nature of light may cause additional blur by diffraction at edges of the camera iris.
 
 \item
 Lens aberration.
 The lens itself is a thick solid object and therefore can never fulfill its physical model perfectly.
 The nonlinear effect usually manifests itself by stretching sensed points in or out relatively to the image origin point.
-If carefully measured, this geometrical transformation within the image plane can be very well cancelled.
+If carefully measured, this geometric transformation within the image plane can be very well cancelled.
 
 Because the refractive index of materials varies with wavelength (this fact is known as dispersion), the nonlinearities are also wavelength dependent.
 There are software tools to reduce percieved color aberration, but this problem is under-determined and can never be solved exactly.

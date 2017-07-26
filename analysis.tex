@@ -122,18 +122,30 @@ Fortunately, the roll is deterministic with respect to the remaining two rotatio
 This fact is known as the \textit{Donder's Law} \cite{hansen10}, and thanks to it, the effect of eye roll can be implicitly precalculated during calibration.
 
 The gaze is usually controlled by high-level brain regions automatically so as to observe all necessary details about the environment.
-This process is mainly based on visual feedback.
+This process is mainly based on visual feedback, and can be predicted to an extent by simple image processing, such as in \cite{yucel09}.
 There are three basic actions that our visual system is capable of: a \textit{saccade}, a \textit{fixation}, and a \textit{smooth pursuit}.
 
-The purpose of saccades is to point the gaze in another direction.
+The purpose of saccades is to point the gaze in a new direction.
 During eye movement, the visual input is distorted by motion blur, so it is desirable that it be as quick as possible.
 Indeed, the angular acceleration in the beginning and in the end of a saccade reaches the order of $\num{10000}\degree/\mathrm{s}^2$
 The periods when the eye is static are called fixations.
+
+\begin{figure}[h]
+	\centering 
+	\centering \includegraphics[width=0.7\linewidth]{img/analy-saccade.png}
+	\caption{Gaze recording. (Image by L. Yarbus \cite{yarbus67})}\label{i:analy-saccade}
+\end{figure}
 
 It is important to note that what we feel like a constant gaze direction is actually a sequence of saccades and fixations.
 Although a single fixation may suffice to identify an object, the whole visual system relies on its ability to perform saccades constantly.
 The scale of these saccades varies greatly, a microsaccade measured in an experiment can be considered small within the fixation threshold in another one.
 For a rough estimate, we can say that the eye moves less than $1\degree$ during a fixation.
+This corresponds to the $1.5\degree$ diameter of the fovea: when attending to an object, it is enough to project it quite anywhere on the fovea, in order to get a good image.
+Figure \ref{i:analy-saccade} shows a sequence of saccades and fixations as recorded when viewing a static image.
+
+Our tracker will ignore these details about eye motion since they are much below the expected resolution of our program.
+It is important to remember, though, that the speed of saccades makes the gaze very unpredictable.
+For example, it would not be wise to impose a maximum gaze offset relatively to the previous known position.
 
 Finally, there is a special kind of eye movement for following objects that actually move around.
 This is referred to as the smooth pursuit, and it is characterized by a smooth, saccade-less eye movement.
@@ -146,17 +158,25 @@ Being so predictable and precise, smooth pursuit is perfect for the calibration 
 \label{s:gaze-model}
 
 The gaze is the direction of focus of the user.
-We assume that it is pointed to somewhere on the computer screen.
+We assume that it is a ray originating in the eye, and that its direction is unambiguously given by the eye rotation.
+Furthermore, we expect the ray be pointed to somewhere on the computer screen.
+The typical setting is drawn out in Figure \ref{i:analy-gaze}.
+
+\begin{figure}[h]
+	\centering 
+	\centering \includegraphics{img/analy-gaze.pdf}
+	\caption{Sketch of the scene.}\label{i:analy-gaze}
+\end{figure}
 
 Gaze is affected by both the head pose and eye rotation.
-Although it may seem more efficient to only move our eyes when using a computer, people usually move their heads.
+Although it may seem more efficient to only move our eyes when using a computer, people usually move their heads quite a lot.
 In fact, prolonged static pose of the head can cause pain in the spine.
 
 \todo{geometric description of the scene}
 \todo{accompanied by a figure}
 
-Under the assumption of small angle divergence, we can model movement of the pupil as a simple translation.
-It is important to note that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
+Under the assumption of small angle divergence, we model movement of the pupil as a simple translation.
+We should stress that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
 
 We avoid explicit modeling of the viewed scene by assuming that the gaze is given by a homography, as it will be detailed in Section \ref{s:impl-gaze}.
 The non-linear factor is quite huge, unfortunately.

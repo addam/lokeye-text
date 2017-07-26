@@ -8,6 +8,12 @@ We discuss the anatomy of human face and eyes in particular, and all relevant te
 We expect that the user is working with their personal computer or a similar device such as a tablet.
 The user and the device can freely move around; the only constraint there is that the camera must be fixed to the computer screen.
 
+\begin{figure}[h]
+	\centering 
+	\centering \includegraphics[width=0.7\linewidth]{img/analy-shot.jpg}
+	\caption{Example input frame (see Attachment \ref{s:testingdata}).}\label{i:analy-shot}
+\end{figure}
+
 Throughout the computation, we rely on that the user's face and both eyes are visible, and that the angle difference of the gaze and the camera direction is small.
 We do not impose any further constraints on the face pose relatively to the camera.
 For example, it is not necessary that the camera be upright, since some users might find it more comfortable to attach a camera to the bottom of their screen upside down.
@@ -21,6 +27,9 @@ Ambient lighting must be good enough for the camera to deliver a high-contrast a
 The image brightness, white balance etc. are allowed to change abruptly and always.
 There is, however, a strong requirement on the light being rather diffuse than directional, and making no sharp shadows on the user's face.
 If the light conditions substantially start to differ from the ones during calibration, it may be necessary to re-calibrate.
+
+Cluttered environment is not an issue as long as the extraneous objects do not occlude the view and do not oversaturate (dazzle) the camera.
+An example of what the input image could look like is given in Figure ref{i:analy-shot}.
 
 \section{Human head}
 
@@ -133,7 +142,7 @@ The periods when the eye is static are called fixations.
 \begin{figure}[h]
 	\centering 
 	\centering \includegraphics[width=0.7\linewidth]{img/analy-saccade.png}
-	\caption{Gaze recording. (Image by L. Yarbus \cite{yarbus67})}\label{i:analy-saccade}
+	\caption{Gaze recording. (L. Yarbus \cite{yarbus67})}\label{i:analy-saccade}
 \end{figure}
 
 It is important to note that what we feel like a constant gaze direction is actually a sequence of saccades and fixations.
@@ -141,7 +150,7 @@ Although a single fixation may suffice to identify an object, the whole visual s
 The scale of these saccades varies greatly, a microsaccade measured in an experiment can be considered small within the fixation threshold in another one.
 For a rough estimate, we can say that the eye moves less than $1\degree$ during a fixation.
 This corresponds to the $1.5\degree$ diameter of the fovea: when attending to an object, it is enough to project it quite anywhere on the fovea, in order to get a good image.
-Figure \ref{i:analy-saccade} shows a sequence of saccades and fixations as recorded when viewing a static image.
+Figure \ref{i:analy-saccade} shows a sequence of saccades and fixations as recorded when viewing a static image for three minutes.
 
 Our tracker will ignore these details about eye motion since they are much below the expected resolution of our program.
 It is important to remember, though, that the speed of saccades makes the gaze very unpredictable.
@@ -172,10 +181,14 @@ Gaze is affected by both the head pose and eye rotation.
 Although it may seem more efficient to only move our eyes when using a computer, people usually move their heads quite a lot.
 In fact, prolonged static pose of the head can cause pain in the spine.
 
-\todo{geometric description of the scene}
-\todo{accompanied by a figure}
+There are no strict constraints regarding the scene configuration.
+Perhaps the only requirement is our assumption of small angle divergence.
+The gaze angle when the user looks directly into the camera and when they look to the farthest point on the screen should not differ by more than about $30\degree$.
+This means that the iris can be anisotropically stretched by a factor of about $0.9$, which can still be approximated as a circle.\footnote{
+Assuming that the camera lies in the screen plane, this factor equals $\mathrm{cos}(30\degree) \approx 0.87$.
+}
 
-Under the assumption of small angle divergence, we model movement of the pupil as a simple translation.
+We model movement of the pupil as a simple translation.
 We should stress that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
 
 We avoid explicit modeling of the viewed scene by assuming that the gaze is given by a homography, as it will be detailed in Section \ref{s:impl-gaze}.

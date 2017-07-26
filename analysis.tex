@@ -7,13 +7,15 @@ We discuss the anatomy of human face and eyes in particular, and all relevant te
 
 We expect that the user is working with their personal computer or a similar device such as a tablet.
 The user and the device can freely move around; the only constraint there is that the camera must be fixed to the computer screen.
-Throughout the calculation, we rely on that the user's face and both eyes are visible, and that the angle difference of the gaze and the camera direction is small.
+
+Throughout the computation, we rely on that the user's face and both eyes are visible, and that the angle difference of the gaze and the camera direction is small.
 We do not impose any further constraints on the face pose relatively to the camera.
-For example, it is not necessary that the camera be upright, since such a constraint might be difficult for users working with a vertically rotated screen.
+For example, it is not necessary that the camera be upright, since some users might find it more comfortable to attach a camera to the bottom of their screen upside down.
+Such a constraint could also pose a difficulty for users working with a vertically rotated screen.
 
 For a good calibration, we require active cooperation from the user: they are asked to watch a dot moving around the screen.
 If necessary, this requirement can be somewhat lifted by using a calibration file defined earlier or by some completely different means of calibration.
-We allow the user to move their head but we cannot \textit{rely} on this because many users (e.g. disabled ones) may have difficulties to move.
+We allow the user to move their head but we cannot actually rely on this because many users (e.g. disabled ones) may have difficulties to move.
 
 Ambient lighting must be good enough for the camera to deliver a high-contrast and sharp image.
 The image brightness, white balance etc. are allowed to change abruptly and always.
@@ -22,16 +24,28 @@ If the light conditions substantially start to differ from the ones during calib
 
 \section{Human head}
 
+\begin{figure}[ht]
+	\centering 
+	\begin{subfigure}[b]{0.55\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/analy-face.png} \caption{Human face. (J. Sobota, public pomain)} \label{i:analy-face}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.44\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/analy-eye.pdf}
+		\caption{Human eye. (Adopted from \href{https://commons.wikimedia.org/wiki/File:Schematic_diagram_of_the_human_eye_en.svg}{\tt commons.wikimedia.org}, CC0)}\label{i:analy-eye}
+	\end{subfigure}
+	\caption{Illustration of an undesired result of the Poisson reconstruction.}\label{i:analy-anatomy}
+\end{figure}
+
 \subsection{Face Anatomy}
 The face is the frontal part of human head.
 Facial muscles are specific in that they are attached to the skin, and their sole purpose is communication.
-As seen in Figure \todo{@ref}, the mimic muscles cover almost all of the face.
+As seen in Figure \ref{i:analy-face}, the mimic muscles cover almost all of the face.
 Although they can be controlled by will, they often actuate subconsciously.
 There are kinds of subtle movements, usually induced by basic emotions such as fear, that can not be prevented by will.
 Generally, the facial skin is flexible with many degrees of freedom and the motion can affect almost all regions.
 
 Of special interest for us are regions that remain mostly fixed to the skull in normal conditions.
-These include most notably the chin, base of the nose and small outer regions around and slightly below the eyes.
+These include the nose (especially its upper part), the chin and small outer regions around and slightly below the eyes.
 The chin is especially prominent and easy to track, but may become completely misleading if the user opens their jaw.
 \todo{\dots}
 
@@ -40,13 +54,14 @@ The chin is especially prominent and easy to track, but may become completely mi
 \subsection{Eye Anatomy}
 \label{s.eyeanatomy}
 
-The eyeball consists of several parts, most notably:
+The eyeball consists of several functional parts.
+The most notable ones are depicted in Figure \ref{i:analy-eye}:
 \begin{itemize}
-\item Transparent \textit{cornea}, which makes a fixed lens and provides some mechanical protection
+\item Transparent \textit{cornea}, a fixed lens also providing some mechanical protection
 \item Flexible and reflective \textit{iris}, which serves as a diaphragm
 \item Flexible \textit{lens} stretched by several muscles to control its optical magnitude
 \item Purely white \textit{sclera}, which serves as a hard shell of the eyeball
-\item \textit{Vitreous body} consisting mostly of a transparent gel to maintain the inner pressure
+\item \textit{Vitreous body}, a transparent gel to maintain the inner pressure
 \item Light-sensitive \textit{retina}
 \end{itemize}
 
@@ -54,22 +69,26 @@ Furthermore, each eyeball is embedded in a hole called the \textit{orbit} that p
 There are six separately controlled muscles stretching between to the eyeball and the orbit.
 
 Throughout the literature, eye is modeled either as a sphere \cite{zhang13}, or with an extra spherical section for the cornea \cite{villanueva08}.
-Some sources also explicitly model the eyelids.
+Some sources, such as \cite{wang16}, also explicitly model the eyelids.
 
-\todo{rewrite this in a more educated manner}
-Sclera is white and pupil is black.
-Iris is something in between.
-The iris diameter remains constant but the pupil diameter can change dramatically.
+The sclera of human eye is made of white colagen.
+The color of the iris can vary between bright blue and dark brown, including less common shades of green and amber.
+It feels quite intuitive that these distinctive colors have evolved for the purposes of nonverbal communication.
+This claim is known as the \textit{cooperative eye hypothesis} and has been, in part, proven by experiment \cite{tomasello07}.
+
+In addition, the aperture inside the iris, known as the \textit{pupil}, displays the retina through the lens.
+The retina needs to absorb light in order to sense as much information as possible, and therefore it is mostly black.
+A notable exception is the red-eye effect that may appear in directional light.
+Its usefulness to eye tracking has been discussed in Section \ref{s:related-gazetracking}, but since we assume diffuse lighting, this effect should not be present.
 
 The inner and outer boundary of the human iris (the pupil and the limbus, respectively) are concentric circles.
 Generally, the inner shape of the iris is less reliable of these two.
-The pupil shape can also be permanently distorted or non-circular due to a damage or a disease \cite{bowyer16}.
-In a healthy case, its radius changes depending on the amount of incoming light and the emotional state of the user.
-The constriction is controlled by the \textit{parasympathicus}, a nervous system generally related to comfortable actions such as eating and sleeping.
-The dilation is controlled by the \textit{sympathicus}, which in turn is the main actuator of the so-called \textit{fight or flight} stress response.
-Both sympathicus and parasympathicus are parts of the \textit{autonomous nervous system} and therefore cannot be directly controlled by will.
+An extreme case is when the pupil is permanently distorted and non-circular due to a damage \cite[p.5]{bowyer16} or a disease \cite[p.146]{bowyer16}.
 
-In case of a disease or an injury, it is also possible that some of the muscles stop working properly and the inner iris shape is no longer a circle.\todo{image}
+In healthy people, the radius of the pupil changes depending on the amount of incoming light and on their emotional state.
+The constriction is controlled by the \textit{parasympathicus}, a nervous system generally related to comfortable actions such as eating and sleeping.
+The dilation is controlled by the \textit{sympathicus}, which in turn is the main actuator of the ``fight or flight" stress response.
+Both the sympathicus and parasympathicus are parts of the \textit{autonomous nervous system} and as suggested by the name, they cannot be directly controlled by will.
 
 \subsection{Eye Movement}
 

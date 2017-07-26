@@ -161,9 +161,9 @@ For a thorough survey of eye trackers including the obscure historical ones, the
 Regarding the relation between eye rotation and on-screen gaze position, some sources suggest that only a linear function is necessary \cite{zhu12}.
 On the other hand, if the head and scene model is precise enough, it may be appropriate to calculate the gaze explicitly as a ray in space \cite{wang16}.
 
-\subsection{Testing data}
+\subsection{Testing databases}
 
-There are many data sets for gaze tracking.\footnote{
+Many data sets for gaze tracking are publicly available for download.\footnote{
 A very nice list of data sets for computer vision, including gaze estimation, is maintained at \ahref{http://homepages.inf.ed.ac.uk/rbf/CVonline/Imagedbase.htm\#face}.
 }
 We have examined many of them in the hope that they could be used for the training and testing of our own program.
@@ -173,14 +173,25 @@ It consists of about 1500 grayscale images, each of them annotated with the posi
 The images are all limited to a common resolution of $384\times286$ pixels, which makes the iris about 10 pixels in diameter.
 This image resolution could be enough for our purposes.
 Unfortunately, the eye positions are given in whole pixel units only, and the actual precision is yet somewhat worse.
-Since we intend to locate the iris center with subpixel precision, this dataset is not sufficient.
+Since we intend to locate the iris center with subpixel precision, this data set is not sufficient.
 
-Another noteworthy piece is the MPIIGaze dataset \cite{mpiigaze}, which is accompanied by a neural network-based gaze tracker.
+Another noteworthy piece is the MPIIGaze data set \cite{mpiigaze}, which is accompanied by a neural network-based gaze tracker.
 It contains more than 200,000 photos in full color and quite a high resolution, acquired using a built-in camera of a laptop computer.
 Its annotations are another extreme case: the on-screen gaze position is known in each image, but nothing else.
 In theory, we could use it to evaluate the performance of our program.
-Unfortunately, even that is not appropriate because almost every photo in the MPIIGaze dataset has been taken in different light conditions than others.
+Unfortunately, even that is not appropriate because almost every photo in the MPIIGaze data set has been taken in different light conditions than others.
 Furthermore, the lighting is often poor and the photos are blurry.
+
+Very appealing is the approach taken by the authors of the SynthesEyes data set \cite{syntheseyes}.
+They used real people only for creation of the 3-dimensional models of their heads.
+These models are then used to create a virtually infinite number of training images.
+The resulting computer generated images show a small region centered around an eye.
+All of the randomly generated parameters, such as viewing direction and gaze direction, are recorded in a data file.
+We should note that the variation of parameters is taken to an extreme---for example, several of the images are entirely black due to contrast variation.
+Also, because of the wide range of viewing angles, this data set does not fit our needs well.
+
+In the end we decided to collect own testing data.
+These are described in detail in Attachment \ref{s:testingdata}.
 
 \section{Organization}
 \todo{describe each chapter}

@@ -232,9 +232,10 @@ On the other hand, they also decrease with the lens size, and cameras with a nar
 
 \item
 Moiré.
-In most consumer cameras, image colors are obtained by attaching different color filters to each cell of the light sensor.
-\todo{explain some more}
-Contrast on subpixel level makes each color channel sum up to a different amount, even if there are no colored objects in the scene.
+In most consumer cameras, image colors are obtained by attaching a color filter in front of the sensor, so that each light-sensitive element receives either red, green or blue light only.
+These colors are interleaved in a fine pattern.
+Color pixel can be obtained from each element by looking at two neighbors neighbors that have different filters, in the hope these neighbors are lit by roughly the same color.
+Alas, contrast on subpixel level makes each of these color sensors receive a different amount of light, even if there are no actual colored objects in the scene.
 When imaging fine black-and-white colored structures, spurious and highly saturated colors may appear.
 
 This effect can hardly occur when displaying human faces.

@@ -18,12 +18,16 @@ We have evaluated many test cases in detail and based on these, we provide an an
 \section*{Future work}
 \addcontentsline{toc}{section}{Future work}
 
-\todo{rewrite this like an adult.}
+A great challenge awaits our algorithm in that they should be compared to Artificial Neural Networks in terms of performance.
+To this end, an existing software library such as \cite{deepgaze} shall be used.
 
-It would be nice to integrate some existing libraries \cite{deepgaze}.
+So far, we did not manage to implement the resetting scheme for face trackers, as described in Section \ref{s:impl-markers}.
+This method is important for practical use of the program.
 
-We should provide calibration data to enable quick testing.
+Following quite a similar thought, we should combine both of the eye trackers in a robust manner based on their tracking score.
+The extreme case is to ignore one of the eyes completely if the tracking fails there.
 
-The performance of each face tracker should be evaluated and if it considerably deteriorates, it should be reset.
+Finally, the user comfort will be greatly improved by distributing some basic calibration data alongside the code, so that the program can be immediately tested upon download.
 
-Out of the two eye trackers, we should choose the one with the greater fitting score.
+The interested reader is advised to download the most recent version of this program, instead of relying on the accompanying medium.
+The source code, including some extra tools, is published at \ahref{https://github.com/addam/lokeye}.

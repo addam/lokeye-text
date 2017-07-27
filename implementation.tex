@@ -91,6 +91,7 @@ Our program supports two methods how the child trackers are managed.
 These represent two major groups of tracking techniques in general: the feature-based and the appearance-based method.
 
 \subsection{Markers}
+\label{s:impl-markers}
 
 This method relies on small-scale features that are usually present in the face and on skin---such as the eyebrows, nostrils, beard and skin defects.
 Several small trackers are arbitrarily placed within the face area, each of them large just enough so as to track a single feature of the face.
@@ -271,18 +272,35 @@ This tracker uses exhaustive search to find the global minimum within a crop-out
 Skin, including the eyelids, can be detected quite easily by an analysis of its color.
 This approach is perhaps too naive to be advocated in the literature, but it can be found in software libraries such as \cite{deepgaze}.
 
-We allow each of the eye trackers presented so far to be coupled with a color detector tuned for skin tones.
-Each pixel is converted to the \todo{\dots}Pixels whose HSL vector lies within a user-defined cube are excluded from eye fitting.
+We allow several of the eye trackers presented so far to be coupled with a color detector tuned for skin tones.
+In each pixel, the hue, saturation and value (HSV) is estimated.
+Pixels whose HSV vector lies within a user-defined cube are excluded from eye fitting.
 
-The method is based on the following heuristic mapping that is supposed to extract the information about hue, saturation and lightness (HSL) from a color vector:
-\begin{equation}
-\todo{formula}
-\end{equation}
+The method is based on the following heuristic mapping.
+Given a color vector $\vec c = (r, g, b)$ consisting of the red, green and blue channel, we define $\f{hsv}(\vec c) = (h, s, v), h \in \lbrack 0, 6)$.
+In order to present simple formulas for $s$ and $h$, we begin by stating two symmetries in this mapping:
+\begin{align}
+\f{hsv}(b, r, g) &= (h + 2, s, v), \textrm{ and } \\
+\f{hsv}(b, g, r) &= (6 - h, s, v). \notag
+\end{align}
+
+Then, assuming without loss of generality that $r \geq g \geq b$,
+\begin{align}
+v &= \frac 1 3 (r + g + b), \notag \\
+s &= \frac 1 v (r - b ), \textrm{ and } \\
+h &= \frac {g - b} {r - b}. \notag
+\end{align}
+
 
 It is important to note the heuristic aspects of this approach.
-\todo{HSV, sRGB, the cube -- lighting, skin color etc.}
+In fact, many color spaces have been proposed that calculate the hue, saturation and value in a similar manner.
+There are also several color spaces based on human color perception that can be used for the purpose of color filtering.
 
-Since there are usually many distractive features around the eyes, such as the eyelashes and makeup, the mask is processed by a morphology filter so as to have a smooth boundary and to cover nearby black splotches.
+We do not pay much attention to the choice of the $\f{hsv}$ mapping because the whole idea of skin masking does not stand on a solid ground.
+Due to possible changes of lighting and variation of skin tone among users, it is impossible to classify skin based on its color alone.
+This method is provided only as a small helper.
+
+Since there are usually many distractive features around the eyes, such as the eyelashes and makeup, the mask obtained by this HSV thresholding is processed by a morphology filter so as to have a smooth boundary and to cover nearby black splotches.
 
 \subsection{Combined estimator}
 

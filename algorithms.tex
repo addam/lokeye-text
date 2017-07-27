@@ -7,29 +7,32 @@ This chapter provides mathematical tools and computational methods for the probl
 Firstly, we shall describe a several classical algorithms that we use to solve generic mathematical problems.
 
 \begin{definition}
-The \textit{diagonal matrix constructor} $\diag \in \R^n \to \R^{n\times n}$ creates a matrix with a given vector along the main diagonal, with all remaining entries set to zero:
+The \textit{diagonal matrix constructor} $\diag^{n, m}: \R^k \to \R^{n\times m}$, creates a matrix with a given vector along the main diagonal, with all remaining entries set to zero:
 $$\diag(\vec d)_{i, i} = \vec d_i, \diag(\vec d)_{i,j} = 0 \textrm{ for all } i \neq j.$$
+The input dimension $k$ must equal to the lesser value of $n, m$.
 \end{definition}
 
 \begin{definition}
-The \textit{Singular Value Decomposition} (SVD) of a given matrix $\mat A$ are orthonormal matrices $\mat U, \mat V$ and a vector $\vec s$ such that $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$, $\vec s_i \geq 0$ and $\vec s_i \geq \vec s_j$ for all $i \leq j$.
-The dimension of $\vec s$ is the greater of the dimensions of $\mat A$.
+The \textit{Singular Value Decomposition} (SVD) of a given matrix $\mat A \in \R^{n \times m}$ are orthonormal matrices $\mat U \in \R^{n \times n}, \mat V \in \R^{m \times m}$ and a vector $\vec s$ such that $\mat A = \mat U \cdot \diag^{n, m}(\vec s) \cdot \mat V\T$, $\vec s_i \geq 0$ and $\vec s_i \geq \vec s_j$ for all $i \leq j$.
+The dimension of $\vec s$ equals to the lesser value of $n, m$.
 \end{definition}
 
 \begin{claim}
-The Singular Value Decomposition (SVD) always exists and is unique.
+The Singular Value Decomposition exists for any real $\mat A$.
 In the specific case where $\mat A$ is symmetric, then $\mat U = \mat V$.
 \end{claim}
 
 \subsection{Linear solving}
-\textit{Input:} matrix $\mat A \in \R^{n \times m}$ of rank $n$, vector $\vec b \in \R^n$.\\
+\textit{Input:} matrix $\mat A \in \R^{n \times m}$ of rank $m$, vector $\vec b \in \R^n$.\\
 \textit{Output:} vector $\vec x$ such that $|\mat A \vec x - \vec b|$ is minimal.\\
 
 Let us consider the SVD of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
-The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \cdot \vec b$, where $\vec t$ is given by $\vec t_i = \vec s_i ^{-1}$.
+The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \vec b$, where $\vec t$ is given by $\vec t_i = \vec s_i ^{-1}$.
 
-\begin{proof}
-\todo{\dots}
+\begin{proof}[Proof for the case $m = n$]
+In the case of a square matrix $\mat A$, clearly
+$\mat A \vec x = \mat U \cdot \diag(\vec s) \cdot \mat V\T \mat V \cdot \diag(\vec t) \cdot \mat U\T \vec b = \vec b$,
+because $\diag(\vec s) = \diag(\vec t)\inv$.
 \end{proof}
 
 \subsection{Homogeneous linear solving}
@@ -37,10 +40,10 @@ The result is $\vec x = \mat V \cdot \diag(\vec t) \cdot \mat U\T \cdot \vec b$,
 \textit{Output:} vector $\vec x$ such that $|\vec x| = 1$ and $|\mat A \vec x|$ is minimal.\\
 
 Let us consider the SVD of $\mat A = \mat U \cdot \diag(\vec s) \cdot \mat V\T$.
-The result $\vec x$ is the last column of $\mat V \T$.
+The result $\vec x$ is the last column of $\mat V$.
 
 \begin{proof}
-Let us define a vector $\vec v = \mat V \vec x$.
+Let us define a vector $\vec v = \mat V\T \vec x$.
 This is effectively a change of basis, and because $\mat V$ is an orthonormal matrix, the norm $|\vec v| = |\vec x|$ is preserved.
 Because also $\mat U$ is an orthonormal matrix, it can be safely crossed out of the norm $|\mat A \vec x| = |\diag(\vec s) \cdot \vec v|$.
 This in turn can be expressed as the square root of $\sum_i (\vec s_i \vec v_i)^2 = \sum_i \vec s_i^2 \vec v_i^2$, and the root can be omitted in optimization.\footnote{
@@ -52,10 +55,11 @@ Equating $\nabla(\sum_i \vec s_i^2 \vec v_i^2) = \lambda \nabla (\sum_i \vec v_i
 These necessary constraints are satisfied only by choosing $\lambda = \vec s_i^2$ for some $i$.
 Deliberately assuming that all $\vec s_j^2 \neq \vec s_i^2$ for all $j \neq i$, we must also set the remaining elements $\vec v_j = 0$, and therefore $\vec v_i = 1$.
 In order to find a global minimum, we pick $i$ such that $\vec s_i^2 \vec v_i^2 = \vec s_i^2$ is minimal.
-The result is $\vec x = \mat V \inv \vec v = \mat V \T \vec v$.
+The result is $\vec x = \mat V \invt \vec v = \mat V \vec v$.
 \end{proof}
 
-If $\vec s_i^2 = \vec s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway, as can be proven by adding a small perturbation to $\vec s_j$.
+If $\vec s_i^2 = \vec s_j^2$ for some $j$, the global minimum is not unique but this method finds a correct solution anyway.
+This claim is left without a proof.
 
 \subsection{Quadratic polynomial fitting}
 \textit{Input:} set of samples $P = \{\vec p^i \in \R^2 \}$ of function $\textrm{score}: \R^2 \to \R$.\\
@@ -85,7 +89,10 @@ Let us split this matrix into the following blocks:
 The global extremum $\vec x$ of this polynomial is obtained by solving $\mat A \vec x = -\vec b$.
 
 \begin{proof}
-\todo{\dots}
+Firstly, the polynomial can be evaluated using the matrix $\mat Q$ as $\f Q(\vec x) = \vec h\T \mat Q \vec h$, where $\vec h = (\vec x_1, \vec x_2, 1)\T$.
+(See Definition \ref{d:hom}.)
+The vector $\vec q$ finds a least squares fit of this equation.
+Then, we set the gradient $\nabla \f Q(\vec x) = 2\mat Q \vec h$ to zero.
 \end{proof}
 
 \subsection{Principal Component Analysis}
@@ -209,10 +216,17 @@ In our experiments, this method turned out as very unstable---possibly because i
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k, 1 \leq k \leq 3$ and vector $\vec v$, where $\vec x^k, \vec p^k, \vec v \in \R^2$.\\
 \textit{Output:} Jacobian matrices $\partial \mat A \vec v / \partial \vec p^k$, where $\mat A \cdot \f{hom}(\vec x^k) = \vec p^k$.\\
 
-\begin{definition}
+\begin{definition} \label{d:hom}
 The \textit{homogeneous conversion} function $\f{hom}: \R^n \to \R^{n + 1}$ maps a Cartesian vector to its homogeneous counterpart:
 $$
 \f{hom}(\vec x) = (\vec x_1, \dots, \vec x_n, 1)\T.
+$$
+\end{definition}
+
+\begin{definition} \label{d:cart}
+The \textit{Cartesian conversion} function $\f{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
+$$
+\f{cart}(\vec x) = (\vec x_1 / \vec x_n, \dots, \vec x_{n - 1} / \vec x_n)\T.
 $$
 \end{definition}
 
@@ -259,21 +273,19 @@ We are presented with a set projective correspondences of the form
 \end{equation}
 where $\alpha_k$ are unknown scalars and $\mat H$ is an unknown matrix that we want to calculate.
 
-\todo{$\vec x$ and $\vec p$ need not have the same dimension}
 Let us define a set of antisymmetric matrices $\{\mat M^{i, j} \in \R^{n \times n}\}$, $1 \leq i < j \leq n$, each having only two nonzero elements:
 \begin{equation} \label{e:homography-antisymm}
 \mat M^{i, j}_{i, j} = 1,
 \mat M^{i, j}_{j, i} = -1.
 \end{equation}
-Finally, let us formulate a homogeneous linear system:
+Then, $\mat H$ is obtained by solving the homogeneous linear system
 \begin{equation} \label{e:homography-system}
-\f{vec} \left(({\vec p}^k)\T \mat M^{i, j} {\vec x}^k \right)\T \cdot \f{vec}(\mat H) = 0,
+\f{vec} \left(({\vec p}^k)\T \mat M^{i, j} ({\vec x}^k)\T \right)\T \cdot \f{vec}(\mat H) = 0,
 \end{equation}
-for all $i, j, k$ such that $i < j$ and either $\vec p^k_i$ or $\vec p^k_j$ is the maximal element of $\vec p^k$.
-The result is $\mat H = \mat B \inv \mat H \mat A$.
+where all $i, j, k$ generate the system rows, under the constraints that $i < j$ and either $\vec p^k_i$ or $\vec p^k_j$ is the maximal element of $\vec p^k$.
 
 There are, loosely speaking, two difficulties in homography fitting as compared to affine transformations.
-Firstly, it has a nonlinear component so an algebraic least-squares solution (as defined in \cite[p.93]{hartley03}) is generally different from a geometric least-squares solution (i.e., the sum of distances).
+Firstly, it has a nonlinear component so an algebraic least-squares solution (as defined in \cite[p.93]{hartley03}) is generally different from a geometric least-squares solution (i.e., the sum of errors).
 The Direct Linear Transformation computes only former of these two.
 The relation between these two approaches is addressed in the next section.
 
@@ -306,31 +318,24 @@ $$\vec p\T \mat M \mat H \vec x = \sum_{i, j} (\vec p\T \mat M)_i \mat H_{i, j} 
 Viewing the matrices as vectors of their elements, this finally leads to an equation in the suitable form \eqref{e:homography-system}.
 Each correspondence pair and each selected antisymmetric matrix $\mat M$ for that pair provide one such equation, and the row vectors $\f{vec} ({\vec p}\T \mat M \vec x)\T$ can be stacked to form the system matrix.
 
+\begin{definition}
+Given point pairs $\vec x^k \leftrightarrow \vec p^k$ and a homography matrix $\mat H$, the \textit{geometric error} is defined as
+$$\sum_k |\f{cart}(\mat H \vec x^k) - \f{cart}(\vec p^k)|^2.$$
+The function $\f{cart}$ has been formulated Definition \ref{d:cart}.
+\end{definition}
+
 In real scenarios, the input point sets are disrupted by noise.
 As already noted, solving this overdetermined system in least squares sense provides the algebraic least-squares solution.
 However, if the input vectors are degenerate and only span a subspace of $\R^m$, there are multiple solutions and not all of them are proper solutions of the original equation $\mat H \vec x^k = \alpha_k \vec p^k$.
 In particular, it is possible that a solution will produce points at infinity, meaning that $\vec p_n \approx 0$ and that the Cartesian counterpart of $\vec p$ is undefined.
 Instead of avoiding such degeneracies explicitly, we step into the algorithm for homogeneous solving.
-We loop through the possible choices of $\vec s_i$ and choose the one that produces the minimal geometric error, as defined below.
+We loop through the possible choices of $\vec s_i$ and choose the one that minimizes the geometric error.
 
-\subsection{Homography refitting} 
-
-\textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ related by roughly estimated homography $\mat H^0$.\\
-\textit{Output:} homography matrix $\mat H$ that minimizes $\sum_k |\f{cart}(\mat H \vec x^k) - \f{cart}(\vec p^k)|^2$.\\
-
-\begin{definition}
-The \textit{Cartesian conversion} function $\f{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
-$$
-\f{cart}(\vec x) = (\vec x_1 / \vec x_n, \dots, \vec x_{n - 1} / \vec x_n)\T.
-$$
-\end{definition}
-
-\todo{move normalization here: it is necessary for the algebraic and geometric errors to be similar.}
-...For better precision, it is recommended to use the result for initialization of a nonlinear optimization method.
-
+As suggested in \cite[p.107]{hartley03}, it is important to normalize the input points if this estimated matrix $\mat H$ should resemble the optimal solution.
 Let us define the sets of \textit{normalized points} $\{ \hatvec x^k \}$ and $\{ \hatvec p^k \}$ using affine transformations $\hatvec x^k = \mat A \vec x^k$ and $\hatvec p^k = \mat B \vec p^k$, where $\mat A, \mat B$ are chosen so that the respective point set has zero mean and unity variance.
+If the DLT algorithm applied to $\hatvec x \leftrightarrow \hatvec p$ returns the homography $\hatmat H$, then the overall solution is $\mat B \inv \hatmat H \mat A$.
 
-\todo{We minimize the energy function by gradient descent.}
+And finally, since even the normalized estimation need not be perfect, we locally minimize the geometric error of $\mat H$ by gradient descent.
 
 \subsection{Four-point homography}
 \label{s:algo-homo}

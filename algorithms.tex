@@ -18,7 +18,7 @@ The dimension of $\vec s$ equals to the lesser value of $n, m$.
 \end{definition}
 
 \begin{claim}
-The Singular Value Decomposition exists for any real $\mat A$.
+The Singular Value Decomposition exists for any real matrix $\mat A$.
 In the specific case where $\mat A$ is symmetric, then $\mat U = \mat V$.
 \end{claim}
 
@@ -68,7 +68,9 @@ This claim is left without a proof.
 Given several samples of a real function nearby its maximum, we would like to get a precise estimate of the maximum location.
 
 Let us express the least-squares fit as a linear system:
-$$(x^2, xy, x, y^2, y, 1)\T \vec q = \f{score}(\vec p^i) \text{ for each } i, \text{ where } \vec p^i = (x, y)\T.$$
+\begin{equation}
+(x^2, xy, x, y^2, y, 1)\T \vec q = \f{score}(\vec p^i) \text{ for each } i, \text{ where } \vec p^i = (x, y)\T.
+\end{equation}
 The polynomial $\f{Q}$ can be expressed in terms of the solution $\vec q$ as the symmetrical matrix
 $$\mat Q = \begin{pmatrix}
  2 \vec q_1 & \vec q_2 & \vec q_3 \\
@@ -132,10 +134,14 @@ Picking the first basis vector $\vec q^1$ (such that the variance of the orthogo
 
 This algorithm is an iterative scheme.
 The next step is given by the formula
-$$\vec p^{i+1} = \vec p^i - s \cdot \nabla \f{F}(\vec p^i),$$
+\begin{equation}
+\vec p^{i+1} = \vec p^i - s \cdot \nabla \f{F}(\vec p^i),
+\end{equation}
 where $s$ defines the step length.
 In our implementation, even the step length is calculated by an iteration:
-$$s_{j+1} = s_j - \frac 1 2 \frac {\f{G}_j'(0)} {\f{G}_j(1) - \f{G}_j(0) - \f{G}_j'(0)},$$
+\begin{equation}
+s_{j+1} = s_j - \frac 1 2 \frac {\f{G}_j'(0)} {\f{G}_j(1) - \f{G}_j(0) - \f{G}_j'(0)},
+\end{equation}
 where $\f{G}_j(t) = \f{F} \big( \vec p^i - s_j \cdot t \cdot \nabla \f{F}(\vec p^i) \big)$.
 The initial step length $s_0$, and the number of iterations both in the inner and the outer loops, are heuristically chosen constant values.
 
@@ -202,12 +208,26 @@ Both of the images are considired zero outside of their bounds.
 \subsection{Normalized cross-correlation}
 
 \textit{Input:} images $\f I, \f J \in \R^2 \to \R^n$.\\
-\textit{Output:} function $\f C$ as defined below.\\
+\textit{Output:} function $\f C \in \R^2 \to \R$ that is invariant to local changes in brightness and contrast of $\f I, \f J$ but otherwise proportional to $\f I \star \f J$.\\
 
+The sought function $\f C$ is obtained from $\f I \star \f J$ by an explicit normalization against the changes to brightness and then to contrast.
+Consider the intersection $R$ of image bounds of $\f I$ and $\f J$.
+Let us define the box filter $\f B(\vec x)$ to be $1/|R|$ when $\vec x \in R$, and zero otherwise.
+Here, $|R|$ is used to denote the area of $R$ (assuming that it is a rectangle).
 
-\todo{explain that the values can be precalculated by convolution.}
-In the discrete case, the normalized cross-correlation is calculated using the Fast Fourier Transform and a tiling scheme.
-The overall computation time is $O(mn \cdot \log(pq))$, where $m, n$ are dimensions of the larger image and $p, q$ are dimensions of the smaller one, respectively.
+For an image $\f I$, let us define the \textit{brightness-normalized image} $\f I_b$ as:
+$$
+\f I_b =  \f I - (\f I \star \f B).
+$$
+Then, let us define the contrast-normalized image $\f I_c$ as:
+\begin{equation}
+\f I_c(\vec x) = \frac {\f I(\vec x)} {\sqrt{(\f I^2 \star \f B)(\vec x)}},
+\end{equation}
+where $\f I^2(\vec x) = (\f I(\vec x))^2$ is calculated element-wise.
+
+In practice, all the cross-correlations involved are calculated using the Convolution Theorem, by applying the Fast Fourier Transform and a tiling scheme alongside with element-wise operations.
+Much of them can also be precalculated in advance.
+the overall computation time is $O(mn \cdot \log(pq))$, where $m\times n$ is the resolution of the larger image and $p\times q$ is the resolution of the smaller one.
 
 \subsection{Circle Hough Transformation}
 \label{s:algo-hough}

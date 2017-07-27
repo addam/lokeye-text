@@ -258,9 +258,9 @@ In such cases, the image function is defined by bilinear interpolation:
 where $\vec p = (i + t, s + j)\T$, $s, t \in \lbrack0, 1)$ and $i, j$ are whole numbers.
 
 The partial derivatives of an image are approximated as
-$$
+\begin{equation}
 \f I_x(\vec p, \mat M) = \f I\left((\vec p_1 - \frac 1 2, \vec p_2)\T, \mat D\right),
-$$
+\end{equation}
 where $\mat D_{i, j} = \mat M_{i,j+1} - \mat M_{i, j}$.
 
 Note that each derivative is sampled at a slightly shifted position.

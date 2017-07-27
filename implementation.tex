@@ -307,14 +307,11 @@ The average of this subset is the result of the combined estimator.
 Note that in the case of two votes, their arithmetic mean is the only option.
 In the three-vote case, either a mean of two or the mean of all three can be selected depending on their relative distances.
 
-\begin{lemma}
-Given a set $X = \{\vec x^i\}$ of samples from a normal distribution, the expected value of the variance $\var X$ is
-$$\E\var (\vec x) = \frac 1 {n - 1} \sum_i (\vec x^i - \hatvec x),$$
+\begin{claim}
+Given a set $X = \{\vec x^i\}$ of samples from a random distribution, the expected value of the variance $\var X$ is
+$$\E\var (\vec x) = \frac 1 {|X| - 1} \sum_i (\vec x^i - \hatvec x)(\vec x^i - \hatvec x)\T,$$
 where $\hatvec x$ is the arithmetic mean of $X$.
-\end{lemma}
-\begin{proof}
-\todo{cite or derive}
-\end{proof}
+\end{claim}
 
 Another option is to run several algorithms in sequence.
 In this setting, the first algorithm provides a rough estimate that is subsequently refined by the remaining ones.

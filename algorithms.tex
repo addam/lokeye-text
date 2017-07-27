@@ -107,16 +107,14 @@ The basis vectors are supposed to capture (and extract) all covariance, so that 
 Before we explain the formulas presented above, let us start with a lemma:
 
 \begin{lemma}
-If each point $\vec x$ of data with covariance matrix $\mat C$ is transformed to $\mat A \vec x$, the resulting points have covariance matrix $\mat A \mat C \mat A \T$.
+If a normally-distributed random vector $\vec x$ with covariance matrix $\mat C$ is transformed to $\mat A \vec x$, the resulting random vector has covariance matrix $\mat A \mat C \mat A \T$.
 \end{lemma}
 
 \begin{proof}
-We can view the data as a single random vector following a normal distribution with covariance matrix $\mat C$.
-\todo{or maybe not?}
 Using the fact that covariance is a linear quantity, we derive:
 \begin{multline}
 \cov\big( (\mat A \vec x)_i, (\mat A \vec x)_j \big) = \cov\Big( \sum_k(\mat A_{ik} \vec x_k), \sum_l(\mat A_{jl} \vec x_l) \Big) = \sum_k \Big( \mat A_{ik} \sum_l \cov( \vec x_k, \vec x_l ) \mat A_{jl} \Big) \\
-= \sum_k \Big( \mat A_{ik} \sum_l \mat C_{kl} \mat A_{lj}\T \Big) = \sum_k \mat A_{ik} (\mat C \mat A \T)_{kj} = (\mat A \mat C \mat A\T)_{ij},
+= \sum_k \Big( \mat A_{ik} \sum_l \mat C_{kl} \mat A_{lj}\T \Big) = \sum_k \mat A_{ik} (\mat C \mat A \T)_{kj} = (\mat A \mat C \mat A\T)_{ij}.
 \end{multline}
 \end{proof}
 
@@ -194,42 +192,48 @@ For more details, see \cite[p.117]{hartley03}.
 \section{Image processing}
 
 \begin{definition}
-The \textit{convolution} of matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{p \times q}$ is the matrix $\mat R \in \R^{|n-p| \times |m - q|}$ defined as:
-$$\mat R_{i, j} = \sum_{k, l} \mat M_{k, l} \mat T_{i - k, j - l}.
+The \textit{cross-correlation} of matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{p \times q}$ is the matrix $\mat R \in \R^{|n-p| \times |m - q|}$ defined as:
+$$\mat R_{i, j} = \sum_{k, l} \mat M_{i+k, j+l} \mat T_{k, l}.
 $$
-We write the convolution as $\mat R = \mat M \ast \mat T$.
+All undefined matrix elements are excluded from the sum.
+We write the cross-correlation as $\mat R = \mat M \star \mat T$.
 \end{definition}
-
-Combining the Fast Fourier Transform with a tiling scheme can calculate the convolution in $O(mn \log{pq})$ time.
 
 \subsection{Normalized cross-correlation}
 
 \textit{Input:} matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$.\\
-\textit{Output:} matrix $\mat R \in \R^{|n-k| \times |m - l|}$ as defined below.\\
+\textit{Output:} matrix $\mat R = \mat M \star \mat T / \sqrt{ \mat M \star \mat M \cdot \mat T \star \mat T}$.\\
 
-\todo {there are more use cases beyond the obvious one.}
-\todo{explain that the values can be precalculated using convolution.}
+
+\todo{explain that the values can be precalculated by convolution.}
+Combining the Fast Fourier Transform with a tiling scheme allows us to calculate each convolution in $O(mn \log(pq))$ time.
 
 \subsection{Circle Hough Transformation}
 \label{s:algo-hough}
 
-\textit{Input:} discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle and radius of the circle $r \in \R$.\\
-\textit{Output:} center of the circle.\\
+\textit{Input:} radius $r > 0$ and discretized greyscale image $\mat M \in \R^{n \times m}$ containing a dark circle of radius $r$.\\
+\textit{Output:} center $\vec c$ of the circle.\\
+
+Let us have a vote accumulator $\mat A \in \R^{n \times m}$, initially set to zero.
+Each image pixel $\vec p$ casts a vote to the estimated position
+\begin{equation}
+(i, j)\T = -r \frac {\nabla \f I(\vec p)} {|\nabla \f I(\vec p)|}
+\end{equation}
+with the increment:
+\begin{equation}
+\mat A_{j, i} \leftarrow \mat A_{j, i} + |\nabla \f I(\vec p)|.
+\end{equation}
+
+The result $\vec c$ is obtained by fitting a quadratic polynomial around the maximum element of $\mat A$.
 
 Each sample of the image gradient assumes for a moment that the limbus is passing through it, and makes a guess where the center of the circle would be.
-The gradient value provides just enough information: given a gradient sample at 
-$$\vec c = -r \frac {\nabla \f I(\vec p)} {|\nabla \f I(\vec p)|}.$$
-
-and casts a weighted vote into a 2-dimensional accumulator.
-% why was this here? This allows us to apply a sophisticated heuristic filter at almost no cost.
-Each sample from the image gradient casts a weighted vote into a 2-dimensional accumulator that represents the limbus center.
-
-The vote is applied \todo{\dots}.
+Thanks to the fact that the radius $r$ is known a priori, we only need to determine the direction.
 
 This is essentially a simplified version of the general Circle Hough Transformation.
 The general case does not require the radius to be known a priori.
 Instead, the radius is estimated for each vote from the \textit{isophote curvature} as in \cite{valenti08,leo14}.
-In our experiments, this method turned out as very unstable---possibly because it depends on the 2nd-order image derivatives.
+In our experiments, that method turned out to be very unreliable.
+The isophote curvature depends upon the second-order derivatives, and these tend to be noisy.
 
 \section{Geometry}
 

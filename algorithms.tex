@@ -192,21 +192,22 @@ For more details, see \cite[p.117]{hartley03}.
 \section{Image processing}
 
 \begin{definition}
-The \textit{cross-correlation} of matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{p \times q}$ is the matrix $\mat R \in \R^{|n-p| \times |m - q|}$ defined as:
-$$\mat R_{i, j} = \sum_{k, l} \mat M_{i+k, j+l} \mat T_{k, l}.
+The \textit{cross-correlation} of images $\f I, \f J \in \R^2 \to \R^3$ is the function $\f I \star \f J \in \R^2 \to \R$ defined as:
 $$
-All undefined matrix elements are excluded from the sum.
-We write the cross-correlation as $\mat R = \mat M \star \mat T$.
+(\f I \star \f J)(\vec p) = \int_{\vec x \in \R^2} \f I(\vec p + \vec x)\T \f J(\vec x) \mathrm{d} \vec x.
+$$
+Both of the images are considired zero outside of their bounds.
 \end{definition}
 
 \subsection{Normalized cross-correlation}
 
-\textit{Input:} matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$.\\
-\textit{Output:} matrix $\mat R = \mat M \star \mat T / \sqrt{ \mat M \star \mat M \cdot \mat T \star \mat T}$.\\
+\textit{Input:} images $\f I, \f J \in \R^2 \to \R^3$.\\
+\textit{Output:} function $\f C$ as defined below.\\
 
 
 \todo{explain that the values can be precalculated by convolution.}
-Combining the Fast Fourier Transform with a tiling scheme allows us to calculate each convolution in $O(mn \log(pq))$ time.
+In the discrete case, the normalized cross-correlation is calculated using the Fast Fourier Transform and a tiling scheme.
+The overall computation time is $O(mn \cdot \log(pq))$, where $m, n$ are dimensions of the larger image and $p, q$ are dimensions of the smaller one, respectively.
 
 \subsection{Circle Hough Transformation}
 \label{s:algo-hough}

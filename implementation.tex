@@ -30,31 +30,42 @@ Finally, the 6 degrees of freedom of the head and the 2 degrees of freedom of ea
 \label{s:impl-face}
 
 \textit{Input:} reference image $\f{R}$ and current image $\f{I}$.\\
-\textit{Output:} geometric transformation $\f T: \R^2 \to \R^2$ such that $\int_{\vec p} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2$ is minimal.\footnote{
-Because we do not actually intend to use integral calculus, the integral is only written in an informal way.
-The full form would read: $\int_{\vec p \in \Omega} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2 \f{d}\vec p$, where $\Omega$ is the image domain.
+\textit{Output:} geometric transformation $\f T: \R^2 \to \R^2$ such that $\int_{\vec p \in \R^2} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2$ is minimal.\footnote{
+Both of the images are considered zero outside their bounds.
 }\\
 
 The tracking is split into two parts: a \textit{parent tracker} that covers the whole face, and several \textit{child trackers} that capture more subtle degrees of freedom.
 All of the trackers are deformable templates along the lines of \cite{bouguet01}.
 
-The parent tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
-In order to gain some robustness against changes in lighting, the parent tracker is color-normalized.
+The reference image $R$ is a single frame that is used during the whole course of operation.
+Although this approach does not tolerate long term changes (such as when the user takes on their glasses), it makes our method robust against slow drift of the trackers.
 
-A surface within the face is tracked pixel per pixel, minimizing the energy function
+Each of the trackers minimizes the energy function
 $$\int_{\vec p} |\f{R}(\vec p) - \f{I}(\f{T}(\vec p))|^2,$$
 where $T: \R^2 \to \R^2$ is a differentiable image transformation.
-\todo{note that the image functions return real 3-dimensional vectors. These correspond to RGB.}
+Note that we do use the color information---this seems to be quite rare in the literature.
 
-The reference image $R$ is a single frame that is used during the whole course of operation.
-Although this approach does not tolerate long term changes (such as when the user takes on their glasses), it is robust against slow drift.
-
-Depending on the motion model expressed by the transformation, we get different kinds of trackers:
+Depending on the motion model expressed by the transformation $\f T$, we get different kinds of trackers that also differ by their degrees of freedom (DoF):
 \begin{itemize}
-\item Similarity transformation. 4 DoF. Aligning in grid makes no sense at all.
-\item Affinity over a triangle. 6 DoF. Possible to align in grid.
-\item Affinity over a quadrangle. 6 DoF. Aligning in grid makes no sense.
-\item Homography. 8 DoF. Possible to align in grid. Appropriate from a theoretical standpoint.
+\item
+Similarity transformation: 4 DoF.
+The transformation is parametrized by a displacement vector, scale and rotation angle.
+
+\item
+Affinity over a quadrangle: 6 DoF.
+The transformation is parametrized by its $2 \times 3$ affinity matrix.
+
+\item
+Affinity over a triangle: 6 DoF.
+This motion is advantageous over the previous one because its parameters exactly correspond to the DoF number of the transformation.
+The parameters are exactly the vertices of a triangle that defines the tracker area.
+This is important, as explained below.
+
+\item
+Homography. 8 DoF.
+Again, the parameters of this motion model are exactly the four vertices that define the tracker area.
+Homography encompasses all possible views of a planar object.
+
 \end{itemize}
 For performance reasons, a motion model must be chosen at compilation time, and it is shared by all the trackers.
 
@@ -64,7 +75,17 @@ In case of the homography motion model, these derivatives are not quite obvious 
 The formulas for calculating a triangle affinity are comparatively simple, but nevertheless, they have been summarized in Section \ref{s:algo-daff}.
 
 In order to allow large-scale movement, all of the trackers operate upon an \textit{image pyramid}.
-\todo{define the pyramid}
+The pyramid is defined by downsampling the input image to half its resolution in a recursive manner.
+The top level of the pyramid is an image too small to be downsampled.
+The tracking starts by a quick estimate on the top level, and this information is successively refined until the bottom level with the original input resolution.
+
+Assuming that the top level of the pyramid is correct, it is enough to refine the trackers up to the current pixel scale.
+Any greater displacement should have been handled in the levels above.
+Thanks to this assumption, only few steps of gradient descent (possibly just one) are necessary on each level of the pyramid.
+That in turn allows us to track large displacements in real time.
+
+The parent tracker provides a reference frame for all other features (e.g., eye trackers) and it supplies the most important parameters to gaze estimation.
+In order to gain some robustness against changes in lighting, the parent tracker is color-normalized.
 
 Our program supports two methods how the child trackers are managed.
 These represent two major groups of tracking techniques in general: the feature-based and the appearance-based method.

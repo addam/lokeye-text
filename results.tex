@@ -135,12 +135,13 @@ For completeness, we repeated this test with each of our data sets.
 These detailed results are provided in tables \ref{t:algo-covar-instagram}, \ref{t:algo-covar-models} and \ref{t:algo-covar-eyes}.
 The overall eye tracking performance on each of the data sets is listed in Table \ref{t:algo-mean-data}.
 
+The Eyes data set is apparently much more challenging than the remaining two.
+The relative advantage of the Correlation tracker on the Instagram data set can be explained by the fact that most of the eyes in that data set are dark, whereas the Models data set contains a prevalence of blue eyes.
+
 Clearly, the performance of the Correlation tracker is harmed by bright iris color.
 This is confirmed consistently in all of the data sets.
 The serioparallel tracker has been designed with this fact in mind, so that if correlation tracking fails, the remaining two votes should still provide a good estimate.
 It seems that the combination technique is inefficient because it improves only few of the results.
-
-The limbus gradient maximizer shows
 
 \begin{table}[h]
 \centering

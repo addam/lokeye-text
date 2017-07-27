@@ -32,4 +32,24 @@ Instead of building this library from source, the user is recommended to downloa
 \section{Testing Data}
 \label{s:testingdata}
 
-\todo{\dots}
+There are three data sets provided in the testing data directory.
+All of them have been manually annotated with the position of iris center, and with a few extra values that describe the qualitative aspects of each image.
+
+\begin{itemize}
+\item {\tt instagram/} are pairs of eyes acquired from random photos tagged as ``selfie" on the website \ahref{https://www.instagram.com/}.
+The users who took the original photos come from all around the globe.
+By the nature of this data source, there are much more female subjects than males, and subjectively it seems that the ethnicities are not distributed accordingly to their global distribution.
+However, the images have been indeed selected by a random search in a fair manner.
+
+\item {\tt models/} pairs of eyes cropped out from photos of photo models, taken by professionals.
+The visual quality of most of the images is excellent, being perfectly in focus and providing enough contrast.
+All of the subjects are females, and most of them wear makeup.
+These images have been obtained from many different, publicly available sources.
+
+\item {\tt eyes/} are single eyes cropped out from the personal archive of the author.
+The single exception is the image {\tt eyes/lena.jpg}, which is cropped out from the profound Lena image.
+The situations in which each of the photos were acquired vary greatly, and so does their visual quality and resolution.
+\end{itemize}
+
+The annotations are supplied in the JSON file format, and have been evaluated subjectively by the author of this thesis.
+For precise localization of the iris center, a specific tool was developed that is also provided in the source code.

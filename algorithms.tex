@@ -168,17 +168,39 @@ In our implementation, we take care of this explicitly either by expressing all 
 \textit{Input:} set of point pairs $\vec x^k \leftrightarrow \vec p^k$ and distance limit $d \in \R$.\\
 \textit{Output:} matrix $\mat H$ maximizing the count of $k$ such that $|\f{cart}(\mat H \vec x^k) - \f{cart}(\vec p^k)| < d$.\\
 
-\todo{explain}
-\cite[p.117]{hartley03}
+The Random Sample Consensus (Ransac) is a probabilistic and iterative scheme.
+
+Each trial begins by randomly selecting several point correspondencies, called the minimal support set $S_0$.
+The number of pairs is chosen so that the homography $\mat H^0$ that relates them exactly, that is $(mn - 1) / (n -1)$ for a $\mat H \in \R^{n \times m}$.
+The support set $S_{i + 1}$ is defined as all point pairs $\vec x^k \leftrightarrow \vec p^k$ that satisfy $|\f{cart}(\mat H^{i} \vec x^k) - \f{cart}(\vec p^k)| < d$.
+
+The homography $H^{i + 1}$ is initialized by applying the DLT algorithm on $S_{i}$.
+This result is further refined by gradient descent minimization of the geometric error on the subset $S_{i}$.
+The iteration stops as soon as $|S_{i + 1}| \leq |S_{i}|$.
+
+In real scenarios we assume that some of the input point pairs can be related by a homography within the distance limit, while others are useless outliers.
+In order for the iteration to converge to the correct solution, it is necessary that no outlier is selected in the minimal support set.
+
+We repeat the whole iteration schema many times in the hope that at least one of the minimal support sets will be free of outliers.
+
+The probability that after we pick a minimal support set containing no outlier at least once in $n$ iterations is
+\begin{equation}
+p = 1 - \left( {t \choose s} {t \choose u}^{\!\!-1} \right)^n,
+\end{equation}
+given that $t$ is the total number of input pairs, $u$ is the number of outliers and $s$ is the size of the support set.
+This equation can be solved for $n$ and thanks to the fact that binomial coefficients are well approximated by the normal distribution, it can be incorporated into a program.
+For more details, see \cite[p.117]{hartley03}.
 
 \section{Image processing}
 
 \begin{definition}
-The \textit{convolution} of matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{k \times l}$ is the matrix $\mat R \in \R^{|n-k| \times |m - l|}$ defined as:
-$$\todo{formula}
+The \textit{convolution} of matrices $\mat M \in \R^{n \times m}$ and $\mat T \in \R^{p \times q}$ is the matrix $\mat R \in \R^{|n-p| \times |m - q|}$ defined as:
+$$\mat R_{i, j} = \sum_{k, l} \mat M_{k, l} \mat T_{i - k, j - l}.
 $$
 We write the convolution as $\mat R = \mat M \ast \mat T$.
 \end{definition}
+
+Combining the Fast Fourier Transform with a tiling scheme can calculate the convolution in $O(mn \log{pq})$ time.
 
 \subsection{Normalized cross-correlation}
 
@@ -224,7 +246,7 @@ $$
 \end{definition}
 
 \begin{definition} \label{d:cart}
-The \textit{Cartesian conversion} function $\f{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
+The \textit{Cartesian convertor} $\f{cart}: \R^n \to \R^{n - 1}$ maps a homogeneous vector to its Cartesian counterpart:
 $$
 \f{cart}(\vec x) = (\vec x_1 / \vec x_n, \dots, \vec x_{n - 1} / \vec x_n)\T.
 $$
@@ -321,7 +343,7 @@ Each correspondence pair and each selected antisymmetric matrix $\mat M$ for tha
 \begin{definition}
 Given point pairs $\vec x^k \leftrightarrow \vec p^k$ and a homography matrix $\mat H$, the \textit{geometric error} is defined as
 $$\sum_k |\f{cart}(\mat H \vec x^k) - \f{cart}(\vec p^k)|^2.$$
-The function $\f{cart}$ has been formulated Definition \ref{d:cart}.
+The cartesian convetor $\f{cart}$ has been formulated Definition \ref{d:cart}.
 \end{definition}
 
 In real scenarios, the input point sets are disrupted by noise.
@@ -334,8 +356,6 @@ We loop through the possible choices of $\vec s_i$ and choose the one that minim
 As suggested in \cite[p.107]{hartley03}, it is important to normalize the input points if this estimated matrix $\mat H$ should resemble the optimal solution.
 Let us define the sets of \textit{normalized points} $\{ \hatvec x^k \}$ and $\{ \hatvec p^k \}$ using affine transformations $\hatvec x^k = \mat A \vec x^k$ and $\hatvec p^k = \mat B \vec p^k$, where $\mat A, \mat B$ are chosen so that the respective point set has zero mean and unity variance.
 If the DLT algorithm applied to $\hatvec x \leftrightarrow \hatvec p$ returns the homography $\hatmat H$, then the overall solution is $\mat B \inv \hatmat H \mat A$.
-
-And finally, since even the normalized estimation need not be perfect, we locally minimize the geometric error of $\mat H$ by gradient descent.
 
 \subsection{Four-point homography}
 \label{s:algo-homo}

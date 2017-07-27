@@ -118,14 +118,14 @@ Our extension of this method to a quadrangular mesh (i.e., homographic cells) re
 \textit{Input:} iris radius $r \in \R$ and image $\f I$ centered at an expected eye location.\\
 \textit{Output:} iris center $\vec c \in \R^2$.\\
 
-\todo{further assumptions on the image necessary for good recognition}
-\todo{list out the difficult factors and reference the table in Results}
-
 Once the face itself has been tracked, the eyes can be easily located using their reference position.
-The iris radius can also be extracted by multiplying the reference radius with a scale factor given by the face tracker.
+The iris radius can also be queried from the parent tracker, given that a radius has been marked in the reference image.
 Most of the face trackers induce non-uniform scaling, so it might seem appropriate that the eye shape will be an ellipse.
 However, we assume that eyes are always directed towards the camera, so the limbus should retain a circular shape even if the face is stretched.
+Tracking an ellipse provides an undesirable flexibility, making the calculation prone to failure.
 
+\todo{further assumptions on the image necessary for good recognition}
+\todo{list out the difficult factors and reference the table in Results}
 \todo{explain that we do not impose many constraints on the pupil occlusion, so the problem is actually very hard.}
 
 There are a plenty of eye trackers available in our program.
@@ -138,39 +138,55 @@ From a broader perspective, we took four different approaches:
 \end{itemize}
 
 Acknowledging that the scale (e.g., the radius $r$) can be only a few pixels, we aim for a subpixel precision.
-That is a meaningful pursuit thanks to the continuous image model defined in Section \ref{s.imagemodel}.
+That is a meaningful pursuit thanks to the continuous image model developed in Section \ref{s.imagemodel}.
 
 However, many of the algorithms to be presented are based on pixel by pixel evaluation of a scoring function.
-In such cases, it is not very appropriate to evaluate at fractional coordinates.
-Instead, we fit a quadratic polynomial to several score values around the maximal pixel, and output the maximum of this polynomial as the global maximum.
+In such cases, it is not efficient to evaluate at fractional coordinates.
+Instead, we find the pixel with the maximum score by an exhaustive search.
+Then we fit a quadratic polynomial to several score values around the maximal pixel, and output the maximum of this polynomial as the global maximum.
 
 The following methods are available to the host application:
 
 \subsection{Limbus gradient}
-This method relies on the edge between the iris and the sclera.
-Assuming that the iris is much darker than the sclera, their shared boundary (the limbus) should be sensed as a circle of high contrast.
+Limbus is the edge between the iris and the sclera.
+Assuming that the iris is much darker than the sclera, the limbus should be sensed as a circle of high contrast.
 Curve fitting to detected edge pixels can provide very precise results \cite{kassner14}.
-Given the image resolution we work with, the usual approach based on a Canny filter and ellipse fitting is not viable.
+Given that we expect to work with images of low quality, the usual approach based on a Canny filter and ellipse fitting is not viable.
+The Canny filter requires careful tuning of parameters with respect to the amount of blur present in the image.
+
 Instead, we propose an iterative optimization scheme that will directly fit a circle to the image gradient.
+The energy function is given as
+\begin{equation}
+\f E(\vec c, r) = \int_{\vec x: |\vec x - \vec c| = r} (\vec x - \vec c)\T \nabla \f I (\vec x) \mathrm{d}\vec x.
+\end{equation}
+This energy is minimized by gradient descent.
 
-We assume the eyelids be of uniform color, so they have zero value in the gradient domain and can be neglected.
+As simple as it seems, the formula is motivated by the fact that the gradient on circle boundary is oriented precisely outwards from the iris center.
+The dot product with the radial vector $\vec x - \vec c$ is maximal if our estimate of $\vec c$ is correct.
 
-\todo{formulate the energy function}
-This function is minimized by gradient descent.
-It is important to note that optimization of a function based on image gradient requires image derivatives of second order to be calculated.
-\todo{if there is a citation for this:}
-These are often considered unstable and avoided in the literature.
-In our case, the function to be optimized appears to be smooth enough, and the algorithm converges well if initialized a few pixels from the correct solution.
+We have experimented with applying a transition function on the dot product, to obtain a more robust tracker.
+For example, it is reasonable to completely ignore pixels where the dot product is negative.
+Our program can be easily modified to incorporate such a generalization but our experimets show that the improvement is questionable.
 
-This method is designed for refining an estimated eye position on the subpixel level, so it performs well when coupled with another eye tracking method.
-If executed alone, it often fails to locate the global optimum.
+It is important to note that we optimization of a function based on image gradient requires image derivatives of second order to be calculated.
+We have previously stated that these are better avoided, so this new decision deserves an explanation.
+
+This method is mainly designed for refining an estimated eye position on the subpixel level.
+We assume that the center is already initialized only a few pixel from the optimal solution, so that the strong gradient around the limbus will overrule the noise present in the derivatives.
+If this algorithm is executed alone, it usually fails to locate the global optimum.
 
 \subsection{Hough Transformation}
 We can use a voting scheme to find the limbus center, as described in Section \ref{s:algo-hough}.
 \todo{used in \cite{leo14,zhang13}}
 
-A free parameter is yet to define: the resolution of the voting grid.
-Using each pixel as a voting bin is usually the best choice, but it may fail on blurry images of high resolution because the votes will be distributed quite randomly over a wide region around the true center.
+A free parameter remains to be defined: the resolution of the voting grid.
+Setting the resolution too high can result in the votes being distributed quite randomly over a wide region around the true center.
+Especially in the case of blurry or noisy images, it may be reasonable to choose a coarser grid than the actual image resolution.
+
+In fact, we can even extend this method to the image pyramid, as defined in Section \ref{s:impl-face}.
+Results from downsampled versions of the input image are added up to the detailed ones in order to agglomerate nearby votes.
+However, it is necessary to express how the votes are upsampled and summed up to the final accumulator.
+That means even more free parameters.
 
 \subsection{Dark iris correlation}
 

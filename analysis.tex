@@ -188,11 +188,11 @@ This means that the iris can be anisotropically stretched by a factor of about $
 Assuming that the camera lies in the screen plane, this factor equals $\mathrm{cos}(30\degree) \approx 0.87$.
 }
 
-We model movement of the pupil as a simple translation.
-We should stress that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
+We model movement of the iris as a simple translation.
+It should be clear that because the head and the eyes differ by an order of magnitude in scale, gaze estimation is numerically unstable.
+A small variation in the eye rotation induces an even smaller variation in the iris position, but may correspond to a large change of gaze.
 
 We avoid explicit modeling of the viewed scene by assuming that the gaze is given by a homography, as it will be detailed in Section \ref{s:impl-gaze}.
-The non-linear factor is quite huge, unfortunately.
 
 \section{Camera}
 

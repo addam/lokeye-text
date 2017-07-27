@@ -192,7 +192,7 @@ For more details, see \cite[p.117]{hartley03}.
 \section{Image processing}
 
 \begin{definition}
-The \textit{cross-correlation} of images $\f I, \f J \in \R^2 \to \R^3$ is the function $\f I \star \f J \in \R^2 \to \R$ defined as:
+The \textit{cross-correlation} of images $\f I, \f J \in \R^2 \to \R^n$ is the function $\f I \star \f J \in \R^2 \to \R$ defined as:
 $$
 (\f I \star \f J)(\vec p) = \int_{\vec x \in \R^2} \f I(\vec p + \vec x)\T \f J(\vec x) \mathrm{d} \vec x.
 $$
@@ -201,7 +201,7 @@ Both of the images are considired zero outside of their bounds.
 
 \subsection{Normalized cross-correlation}
 
-\textit{Input:} images $\f I, \f J \in \R^2 \to \R^3$.\\
+\textit{Input:} images $\f I, \f J \in \R^2 \to \R^n$.\\
 \textit{Output:} function $\f C$ as defined below.\\
 
 

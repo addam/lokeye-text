@@ -118,17 +118,20 @@ Our extension of this method to a quadrangular mesh (i.e., homographic cells) re
 \textit{Input:} iris radius $r \in \R$ and image $\f I$ centered at an expected eye location.\\
 \textit{Output:} iris center $\vec c \in \R^2$.\\
 
-Once the face itself has been tracked, the eyes can be easily located using their reference position.
+Once the parent tracker for the face has been precisely localized, the eyes can be easily located using their reference position.
 The iris radius can also be queried from the parent tracker, given that a radius has been marked in the reference image.
-Most of the face trackers induce non-uniform scaling, so it might seem appropriate that the eye shape will be an ellipse.
-However, we assume that eyes are always directed towards the camera, so the limbus should retain a circular shape even if the face is stretched.
-Tracking an ellipse provides an undesirable flexibility, making the calculation prone to failure.
 
-\todo{further assumptions on the image necessary for good recognition}
-\todo{list out the difficult factors and reference the table in Results}
-\todo{explain that we do not impose many constraints on the pupil occlusion, so the problem is actually very hard.}
+In order for the eye tracking to succeed, it is necessary that these estimates obtained by the face tracker are close to their actual value.
+Furthermore, it is necessary that a large enough portion of the iris is visible.
+This condition depends on the particular algorithm being used but in general, we require something like a half of the iris to be visible.
+There is no hard limit but the recognition performance clearly decreases with a strong occlusion of the iris.
 
-There are a plenty of eye trackers available in our program.
+There are many more important factors that can hinder the performance of eye tracking.
+Some of these are mentioned in the specific algorithms that follow, and a global overview of the challenges is given in Section \ref{s:results-eyecovar}.
+By experience, we believe that these degradations are actually quite common in the real world, so we should not strictly forbid them.
+However, the problem of eye tracking becomes a difficult one in these adverse conditions.
+
+A plenty of eye trackers have been implemented and tested in our program.
 From a broader perspective, we took four different approaches:
 \begin{itemize}
 \item Tracking the limbus. There should be a circle with a strong gradient directed outwards.
@@ -136,6 +139,10 @@ From a broader perspective, we took four different approaches:
 \item Segmentation. Skin, sclera, iris and pupil should each be uniform, but mutually different in color.
 \item Machine learning. Instead of modeling, we can feed the image into a regression engine.
 \end{itemize}
+
+Most of the face trackers induce non-uniform scaling, so it might seem appropriate that the eye shape will be an ellipse.
+However, we assume that eyes are always directed towards the camera, so the limbus should retain a circular shape even if the face is stretched.
+Tracking an ellipse would an undesirable flexibility, making the calculation prone to failure.
 
 Acknowledging that the scale (e.g., the radius $r$) can be only a few pixels, we aim for a subpixel precision.
 That is a meaningful pursuit thanks to the continuous image model developed in Section \ref{s.imagemodel}.
@@ -157,8 +164,9 @@ The Canny filter requires careful tuning of parameters with respect to the amoun
 Instead, we propose an iterative optimization scheme that will directly fit a circle to the image gradient.
 The energy function is given as
 \begin{equation}
-\f E(\vec c, r) = \int_{\vec x: |\vec x - \vec c| = r} (\vec x - \vec c)\T \nabla \f I (\vec x) \mathrm{d}\vec x.
+\f E(\vec c, r) = \int_{\vec x \in S} (\vec x - \vec c)\T \nabla \f I (\vec x) \mathrm{d}\vec x,
 \end{equation}
+where $S = \{\vec x : |\vec x - \vec c| = r\}.$
 This energy is minimized by gradient descent.
 
 As simple as it seems, the formula is motivated by the fact that the gradient on circle boundary is oriented precisely outwards from the iris center.
@@ -177,13 +185,13 @@ If this algorithm is executed alone, it usually fails to locate the global optim
 
 \subsection{Hough Transformation}
 We can use a voting scheme to find the limbus center, as described in Section \ref{s:algo-hough}.
-\todo{used in \cite{leo14,zhang13}}
+This scheme is used quite often in the literature, e.g., \cite{leo14,zhang13}.
 
 A free parameter remains to be defined: the resolution of the voting grid.
 Setting the resolution too high can result in the votes being distributed quite randomly over a wide region around the true center.
 Especially in the case of blurry or noisy images, it may be reasonable to choose a coarser grid than the actual image resolution.
 
-In fact, we can even extend this method to the image pyramid, as defined in Section \ref{s:impl-face}.
+In fact, we can extend this method to the image pyramid, as defined in Section \ref{s:impl-face}.
 Results from downsampled versions of the input image are added up to the detailed ones in order to agglomerate nearby votes.
 However, it is necessary to express how the votes are upsampled and summed up to the final accumulator.
 That means even more free parameters.
@@ -191,22 +199,31 @@ That means even more free parameters.
 \subsection{Dark iris correlation}
 
 Assuming that the iris is a dark disc and the rest of the image is much brighter, we can use basic template matching techniques to locate it.
-This technique is very popular \cite{zhu12,george16}
-An appropriately fast and reliable one is the normalized correlation, using a slightly blurred black circle as the template.
+This technique is very popular \cite{zhu12,george16}.
+We obtain some robustness at the expense of computational speed by using the normalized cross-correlation.
 
-\todo{formula for the kernel}
+Our iris template $\f T: \R^2 \to R$ is a black circle on a white background, blurred with a box filter:
+\begin{equation}
+\f T(\vec x) = \frac 1 2 + a(|\vec x| - r),
+\end{equation}
+where $a$ is an arbitrary constant, and the result is clamped to the range $[0, 1]$.
 
-This method appears to work especially well when tested in regions where the majority of people are brown-eyed and with white skin.
-It can also easily get confused by dark spots around the eyes, such as glass rims or strong makeup.
+This method appears to work especially well when tested in geographical regions where the majority of people are brown-eyed and with white skin.
+It can easily get confused by dark spots around the eyes, such as glass rims or strong makeup.
 Finally, this method requires most of the iris to be visible, which need not be true because of the viewing angle and the user's personal habit.
 
 \subsection{Personalized iris correlation}
 The assumption of dark iris is wrong: the iris is often much brighter than the surrounding skin, especially in the case of blue-eyed people.
 In fact, the iris image varies so greatly among individuals that it is often advocated as a means of identification or authentification \cite{bowyer16}.
 We can, however, rely on the whole iris region (including the pupil) to be a constant, radially symmetric image, and locate it using a personalized template.
-Acquiring this template requires the user to wide open their eyes, so that the whole limbus is visible.
 
-For tracking a colored object, it is again reasonable to use the normalized correlation.
+In this method, a user-defined template is tracked using the normalized cross-correlation.
+In contrast to the previous method, it is possible to precisely define the radial color gradient of the iris and to adjust how much sclera should be taken into account.
+For this flexibility, this tracker has been included in the application---although experiments so far show its performance as poor.
+
+The template is an image from the hard disk, its acquisition must be done offline.
+The resolution of this image should not be excessively high as it only hurts the computation speed.
+However, the image should be taken with care and with the eyes wide open, so that the whole limbus is visible.
 
 \subsection{Iris radial symmetry}
 
@@ -216,13 +233,12 @@ An example of a filter based on radial symmetry can be found in \cite{leo14}.
 Hereby we design a novel robust algorithm that exploit color information.
 
 The iris colors are recalculated for each frame and each eye position, so only few free parameters remain.
-
 This algorithm has built-in skin masking, so that whole segments of the iris are ignored where the limbus is not visible.
 
-\todo{Add some intro -- let us define the following functions}
+Let us define the following functions:
 \begin{itemize}
 \item
-Angular limbus score $\f{limbus}(\alpha)$ is the gradient magnitude $|\nabla \f{I}(\vec p)|$ where $\arctan(\vec p) = \alpha$ and $|\vec p| = r$.
+Angular limbus score $\f{limbus}(\alpha)$ is the gradient magnitude $|\nabla \f{I}(\vec p)|$ for vector $\vec p$ defined by $\arctan(\vec p) = \alpha$ and $|\vec p| = r$.
 
 \item
 Radial color $\f{mean}(t)$ is a mean value of the set $\{\f{I}(\vec p) \text{ for all } |\vec p| = t \}$.
@@ -253,20 +269,20 @@ This tracker uses exhaustive search to find the global minimum within a crop-out
 \subsection{Skin masking}
 
 Skin, including the eyelids, can be detected quite easily by an analysis of its color.
-This approach is perhaps too naive to be widely advocated in the literature, but it can be found in software libraries such as \cite{deepgaze}.
+This approach is perhaps too naive to be advocated in the literature, but it can be found in software libraries such as \cite{deepgaze}.
 
-We allow each of the eye trackers presented so far to be coupled with a HSV (hue-saturation-value) detector tuned for skin tones.
-Pixels whose HSV vector lies within a user-defined cube are excluded from eye fitting.
+We allow each of the eye trackers presented so far to be coupled with a color detector tuned for skin tones.
+Each pixel is converted to the \todo{\dots}Pixels whose HSL vector lies within a user-defined cube are excluded from eye fitting.
 
-The mapping of RGB values to HSV is a piecewise linear function:
+The method is based on the following heuristic mapping that is supposed to extract the information about hue, saturation and lightness (HSL) from a color vector:
+\begin{equation}
 \todo{formula}
+\end{equation}
 
 It is important to note the heuristic aspects of this approach.
 \todo{HSV, sRGB, the cube -- lighting, skin color etc.}
 
-Since there are usually many distractive features around the eyes, such as the eyelashes and makeup, the mask is pre-processed so as to have a smooth boundary and to cover nearby black splotches.
-
-\todo{This is yet to be coded and tested.}
+Since there are usually many distractive features around the eyes, such as the eyelashes and makeup, the mask is processed by a morphology filter so as to have a smooth boundary and to cover nearby black splotches.
 
 \subsection{Combined estimator}
 

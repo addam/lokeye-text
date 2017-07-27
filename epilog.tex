@@ -2,6 +2,7 @@
 \addcontentsline{toc}{chapter}{Conclusion}
 
 We have designed and implemented a gaze tracker that can serve many real-world purposes.
+The program has been only tested on for Linux but it does not depend on any specific features of the system and thus should be highly portable.
 
 On average, we failed to attain a sub-pixel precision in eye tracking, as was the original goal.
 Evaluation on real-world data shows that  the program is indeed capable of such a precision when supplied with flawless data, and it quite often succeeds even in more challenging cases.
@@ -21,7 +22,7 @@ We have evaluated many test cases in detail and based on these, we provide an an
 A great challenge awaits our algorithm in that they should be compared to Artificial Neural Networks in terms of performance.
 To this end, an existing software library such as \cite{deepgaze} shall be used.
 
-So far, we did not manage to implement the resetting scheme for face trackers, as described in Section \ref{s:impl-markers}.
+So far, we did not manage to implement the resetting scheme for face trackers as it was described in Section \ref{s:impl-markers}.
 This method is important for practical use of the program.
 
 Following quite a similar thought, we should combine both of the eye trackers in a robust manner based on their tracking score.

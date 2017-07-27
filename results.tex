@@ -15,20 +15,20 @@ For a start, we compared the overall performance on all data available.
 
 There are two combined trackers in addition to all the simple ones.
 
-The one called \textit{h;l} is a Hough tracker and a Limbus gradient tracker running in series, in this order.
+The one called \textit{serial} is a Hough tracker and a Limbus gradient tracker running in series, in this order.
 
-In the tracker called \textit{chr;l}, we replaced the simple Hough tracker with a parallel combination of Correlation, Hough, and Radial trackers.
+In the tracker called \textit{serioparallel}, we replaced the simple Hough tracker with a parallel combination of Correlation, Hough, and Radial trackers.
 Again, the result is refined by the Limbus gradient tracker afterwards.
 
 \begin{table}[h]
 \centering
 \begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}}
 \toprule
-\textbf{Algorithm} & \mc{\textbf{Mean [px]} \todo{Q1, Q2, Q3}} \\
+\textbf{Algorithm} & \mc{\textbf{Mean [px]}} \\
 \midrule
-h;l & 7.30 \\
+serial & 7.30 \\
 hough & 8.26 \\
-chr;l & 11.97 \\
+serioparallel & 11.97 \\
 radial & 12.11 \\
 correlation & 16.48 \\
 bitmap & 28.55 \\
@@ -39,7 +39,7 @@ limbus & 35.23 \\
 \end{table}
 
 Looking at the quartiles Q1 and Q2, it seems that there are many nice cases where the algorithms perform much better.
-Indeed, the results of \textit{h;l} combined tracker look like this:\\
+Indeed, the results of \textit{serial} combined tracker look like this:\\
 \todo{graph.}
 
 We evaluated the algorithms separately on each of our data sets:\\
@@ -76,9 +76,9 @@ As expected, there is a strong correlation between many of these quantities:
 \toprule
 \textbf{Algorithm} & \mc{\textbf{Size}} & \mc{\textbf{Iris}} & \mc{\textbf{Contrast}} & \mc{\textbf{Glare}}\\
 \midrule
-h;l & 21.44 & 0.17 & -0.14 & -0.49\\
+serial & 21.44 & 0.17 & -0.14 & -0.49\\
 hough & 16.68 & -0.11 & -0.09 & -0.49\\
-chr;l & 33.03 & 1.80 & 0.19 & 0.73\\
+serioparallel & 33.03 & 1.80 & 0.19 & 0.73\\
 radial & 37.92 & 0.61 & 0.02 & 0.76\\
 correlation & 34.09 & 3.30 & -0.06 & 1.29\\
 bitmap & 72.23 & 0.74 & 0.54 & 1.43\\

@@ -10,18 +10,20 @@
 The attached data is organized as follows:
 
 \begin{itemize}
-\item The directory {\tt bin/} contains \dots
+\item The directory {\tt bin/} contains a pre-built binary for Linux x86\_64 systems with glibc 2.4.
 
-\item {\tt doc/install.html} and {\tt doc/usage.html} is the user documentation of the program.
-The file {\tt doc/code.html} contains developer documentation and overall notes about the structure of the code.
+\item {\tt readme.html} are brief instructions for installation and usage.
 
-\item {\tt extern/} contains the less common external libraries that are needed to compile and run the program.
+\item The directory {\tt src/} contains all of the the source code of the program, in version from 2017-07.
 
-\item {\tt src/} contains the whole source code of the program.
-Apart from it, a Python script {\tt src/io\_export\_tracks.py} is provided that serves for exporting the camera calibration conveniently from Blender as input to our program.
-Further files for testing of the source code are provided in {\tt src/test/}.
+\item The directory {\tt screencapture/} is a MSVC++ project helper tool for acquisition of ground truth data from the Tobii EyeX tracker \cite{tobii}.
+It has been developed as a part of this thesis, and we believe that it may be helpful to other users of the EyeX tracker.
+Note that this program can be only ran on Windows since the Tobii API is also limited to that platform.
 
-\item The directory {\tt data/} contains data for testing of the program.
+\item The directory {\tt opencv/} contains a distribution of the OpenCV 3.1 library, which is necessary for building our program.
+Instead of building this library from source, the user is recommended to download a release specific to their system from \href{http://opencv.org}.
+
+\item The directory {\tt data/} contains the testing data sets, as described in the following attachment.
 
 \item Finally, the file {\tt thesis.pdf} is the electronic version of this document.
 
@@ -31,12 +33,3 @@ Further files for testing of the source code are provided in {\tt src/test/}.
 \label{s:testingdata}
 
 \todo{\dots}
-
-\section{Library interface}
-
-The software can be readily used as a gaze tracking library.
-There are several decisions that the host application must make in order to initialize the tracking algorithms.
-\todo{\dots}
-
-The file {\tt src/example\_main.cpp} is a simple gaze tracking application and an example of the application interface.
-There are more similar files prefixed with {\tt example\_} that showcase smaller bits of the code, and often use methods that should be hidden from the host application.

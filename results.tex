@@ -4,10 +4,33 @@ Having designed and implemented the gaze tracker, we shall now evaluate its perf
 There are three aspects to consider when talking of performance: robustness, precision and speed.
 
 \section{Face tracking}
-We shall demonstrate the face tracking methods by fitting a transformation between the images shown in Figure \todo{ref}.
-\todo{intuitively compare the face tracking methods on a real image}
+In Figure \ref{i:res-face}, we demonstrate the face motion models by fitting a transformation between a pair of images.
 
-\todo{explain that a more thorough comparison is not possible because the planar transformation between two faces is not clearly defined.}
+The performance of the face tracking methods is not evaluated in any exact manner because it is difficult to define the ground truth.
+We could evaluate their performance on artificial images not related to faces, but does not evaluate the algorithms---it would be hardly more than a test of the implementation.
+
+\begin{figure}[t]
+	\centering 
+	\begin{subfigure}[b]{0.55\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/res-face-ref.png} \caption{The reference image.} \label{i:res-face-ref}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/res-face-locrot.png} \caption{Location-rotation tracker.} \label{i:res-face-locrot}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/res-face-aff.png} \caption{Quadrangle affinity tracker.} \label{i:res-face-aff}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/res-face-bary.png} \caption{Triangle affinity tracker.} \label{i:res-face-bary}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/res-face-persp.png} \caption{Homography tracker.} \label{i:res-face-persp}
+	\end{subfigure}
+	\caption{Examples of the master tracker performance on two images.}\label{i:res-face}
+\end{figure}
+
+Note that in the case of the triangle affinity tracker, the area of interest is drawn as a quadrangle.
+This is only a flaw in the user interface: in fact, the bottom two vertices are collapsed together to form the third vertex of a triangle.
 
 \section{Eye tracking}
 
@@ -22,59 +45,80 @@ Again, the result is refined by the Limbus gradient tracker afterwards.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}}
+\begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}}
 \toprule
-\textbf{Algorithm} & \mc{\textbf{Mean [px]}} \\
+\textbf{Algorithm} & \mc{\textbf{Mean [px]}} & \mc{\textbf{Q1 [px]}} & \mc{\textbf{Q2 [px]}} & \mc{\textbf{Q3 [px]}} \\
 \midrule
-serial & 7.30 \\
-hough & 8.26 \\
-serioparallel & 11.97 \\
-radial & 12.11 \\
-correlation & 16.48 \\
-bitmap & 28.55 \\
-limbus & 35.23 \\
+serial & 7.30 & 0.59 & 0.90 & 1.43 \\
+hough & 8.26 & 0.98 & 1.36 & 2.02 \\
+serioparallel & 11.97 & 0.75 & 1.45 & 5.67 \\
+radial & 12.11 & 0.89 & 1.73 & 4.44 \\
+correlation & 16.48 & 0.97 & 1.99 & 6.83 \\
+bitmap & 28.55 & 3.76 & 6.54 & 13.62 \\
+limbus & 35.23 & 5.77 & 10.71 & 16.67 \\
 \bottomrule
 \end{tabular}
 \caption{Algorithm mean error}\label{t:algo-mean}
 \end{table}
 
-Looking at the quartiles Q1 and Q2, it seems that there are many nice cases where the algorithms perform much better.
-Indeed, the results of \textit{serial} combined tracker look like this:\\
-\todo{graph.}
+Looking at the quartiles Q1 and Q2, it seems that there are many nice cases where the algorithms perform well.
+Indeed, Figure \ref{i:res-graph} shows the results of each of the trackers are sorted by distance, so that the error distribution becomes apparent.
 
-We evaluated the algorithms separately on each of our data sets:\\
-\todo{table.}
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\linewidth]{img/res-graph.pdf}
+	\caption{Comparison of the eye trackers, each data row sorted by distance.} \label{i:res-graph}
+\end {figure}
 
-We also selected a subset of the test images with high contrast and limited occlusion:\\
-\todo{table.}
+We evaluated the algorithms separately on each of our data sets separately.
+Example images from each of these can be seen in Figure \ref{i:res-data}, and they are described in Attachment \ref{s:testingdata}.
+
+\begin{figure}[t]
+	\centering 
+	\begin{subfigure}[b]{0.7\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/data-instagram.png} \caption{``Instagram" data set.} \label{i:res-data-instagram}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.7\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/data-models.png} \caption{``Models" data set.} \label{i:res-data-models}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.7\textwidth}
+		\centering \includegraphics[width=\linewidth]{img/data-eyes.png} \caption{``Eyes" data set.} \label{i:res-data-eyes}
+	\end{subfigure}
+	\caption{Example files from the data sets used.}\label{i:res-data}
+\end{figure}
 
 Apparently, the simple tracker based on Circle Hough Transformation provides the best result.
-Its performance can be improved at subpixel scale by adding an additional step of the Limbus gradient maximization.
+Its performance can be improved on subpixel scale by adding an additional step of the Limbus gradient optimization.
 
 It is quite disappointing that a voting scheme based on three of our trackers appears to perform worse than the best of them.
 
 We should note that our Radial tracker is considerably slower than all the remaining ones.
 On overly large-resolution images, its execution time can actually harm the overall framerate of gaze recognition.
-\todo{edit this when the results are done.}
 
 \subsection{Failure factors}
 \label{s:results-eyecovar}
 
 Apparently, the results of eye tracking depend heavily on the qualitative aspects of each image.
-For this reason, we annotated each of our testing samples in the following regards:
+For this reason, we annotated each of our testing samples in the several regards, as follows.
+Each of them is evaluated on a subjective scale:
 \begin{itemize}
-\item Iris brightness
-\item \todo{more}
+\item \textbf{Iris} brightness:
+1 (not distinguishable from the pupil) to 3 (bright blue)
+\item Image \textbf{contrast}:
+1 (image is hardly visible) to 3 (perfect)
+\item \textbf{Glare} or reflection:
+1 (not visible), 2 (only a few pixels), 3 (large)
+%\item \textbf{Occlusion} by eyelids, hair and other objects:
+%1 (whole iris visible) to 4 (sclera not visible)
 \end{itemize}
-The quantities are expressed in a subjective scale from $1$ (effect not visible) to $3$ (severe impact) or $4$ (image is almost unrecognizable).
 Apart from this, each eye sample has already been labeled with the iris radius.
 
 As expected, there is a strong correlation between many of these quantities:
-\begin{table}[h]
+\begin{table}[h!]
 \centering
 \begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}}
 \toprule
-\textbf{Algorithm} & \mc{\textbf{Size}} & \mc{\textbf{Iris}} & \mc{\textbf{Contrast}} & \mc{\textbf{Glare}}\\
+\textbf{Algorithm} & \mc{\textbf{Radius}} & \mc{\textbf{Iris}} & \mc{\textbf{Contrast}} & \mc{\textbf{Glare}}\\
 \midrule
 serial & 21.44 & 0.17 & -0.14 & -0.49\\
 hough & 16.68 & -0.11 & -0.09 & -0.49\\
@@ -85,17 +129,63 @@ bitmap & 72.23 & 0.74 & 0.54 & 1.43\\
 limbus & 46.57 & 0.54 & 0.37 & 0.41\\
 \bottomrule
 \end{tabular}
-\caption{Covariance of mean error wrt. image properties}\label{t:algo-covar}
+\caption{Covariance of mean error wrt. image properties.}\label{t:algo-covar}
 \end{table}
 
-For completeness, we repeated this test with each of our 
-\todo{repeated for each of the three data sets, referenced to the attachment for their description}
+For completeness, we repeated this test with each of our data sets.
+These detailed results are provided in tables \ref{t:algo-covar-instagram}, \ref{t:algo-covar-models} and \ref{t:algo-covar-eyes}.
 
-\section{Gaze Estimation}
-\todo{the overall success rate of the algorithm on the videos from Tobii}\\
-\todo{compare two trackers $\times$ two face trackers}
+\begin{table}[h]
+\centering
+\begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}}
+\toprule
+\textbf{Algorithm} & \mc{\textbf{Radius}} & \mc{\textbf{Iris}} & \mc{\textbf{Contrast}} & \mc{\textbf{Glare}}\\
+\midrule
+bitmap & 41.83 & 1.54 & 0.03 & 2.17\\
+serioparallel & 14.00 & 2.06 & 0.05 & 0.80\\
+correlation & 17.48 & 3.27 & -0.24 & 1.28\\
+radial & 11.80 & 0.81 & -0.11 & 0.77\\
+limbus & 19.12 & 1.06 & -0.10 & 0.89\\
+hough & 4.12 & 0.23 & -0.08 & -0.74\\
+serial & 4.08 & 0.50 & -0.13 & -0.59\\
+\bottomrule
+\end{tabular}
+\caption{Error covariance on the Instagram data set.}\label{t:algo-covar-instagram}
+\end{table}
 
-The program does not perform all that well when compared to the state of the art, but it is certainly much more than a proof of concept.
+\begin{table}[h]
+\centering
+\begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}}
+\toprule
+\textbf{Algorithm} & \mc{\textbf{Radius}} & \mc{\textbf{Iris}} & \mc{\textbf{Contrast}} & \mc{\textbf{Glare}}\\
+\midrule
+serial & 21.77 & -0.23 & -0.09 & 0.13\\
+limbus & 19.90 & 0.13 & 0.29 & 0.23\\
+radial & 31.32 & 0.29 & 0.04 & 0.85\\
+hough & 16.66 & -0.47 & -0.06 & 0.11\\
+correlation & 47.50 & 2.24 & 0.23 & 1.32\\
+bitmap & 55.13 & 0.78 & 0.53 & 1.32\\
+serioparallel & 34.50 & 0.95 & 0.25 & 0.76\\
+\bottomrule
+\end{tabular}
+\caption{Error covariance on the Models data set.}\label{t:algo-covar-models}
+\end{table}
 
-The results on flawless video streams are already usable, and challenging situations could perhaps be solved with more coding manpower.
-\todo{\dots}
+\begin{table}[h]
+\centering
+\begin{tabular}{l@{\hspace{1.5cm}}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}D{.}{.}{3.2}}
+\toprule
+\textbf{Algorithm} & \mc{\textbf{Radius}} & \mc{\textbf{Iris}} & \mc{\textbf{Contrast}} & \mc{\textbf{Glare}}\\
+\midrule
+hough & 56.33 & -1.97 & -2.16 & 2.54\\
+limbus & 524.95 & 2.16 & 4.79 & 4.64\\
+correlation & 109.67 & 5.91 & -0.99 & 2.78\\
+bitmap & 392.63 & 4.26 & 3.33 & 3.20\\
+serial & 99.61 & -1.39 & -2.67 & 1.51\\
+radial & 301.92 & 0.13 & -0.37 & 7.31\\
+serioparallel & 194.48 & 3.59 & 0.44 & 4.07\\
+\bottomrule
+\end{tabular}
+\caption{Error covariance on the Eyes data set.}\label{t:algo-covar-eyes}
+\end{table}
+
